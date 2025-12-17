@@ -2,6 +2,13 @@ import { app, BrowserWindow, ipcMain, dialog } from 'electron'
 import { fileURLToPath } from 'url'
 import path from 'path'
 import fs from 'fs/promises'
+import {
+  parseDocument,
+  createMaskedDocx,
+  createMaskedXlsx,
+  createMaskedPdf
+} from './services/document-parser.js'
+import { extractEntities, detectPersonNames, detectOrganizations } from './services/ner.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -19,7 +26,7 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
-      sandbox: true
+      sandbox: false // Disabled for document processing
     },
     titleBarStyle: 'hiddenInset',
     show: false
@@ -64,6 +71,9 @@ ipcMain.handle('dialog:openFile', async () => {
     filters: [
       { name: 'Documents', extensions: ['txt', 'md', 'docx', 'xlsx', 'pdf', 'csv', 'json', 'html'] },
       { name: 'Text Files', extensions: ['txt', 'md'] },
+      { name: 'Word Documents', extensions: ['docx'] },
+      { name: 'Excel Files', extensions: ['xlsx', 'csv'] },
+      { name: 'PDF Files', extensions: ['pdf'] },
       { name: 'All Files', extensions: ['*'] }
     ]
   })
@@ -87,23 +97,41 @@ ipcMain.handle('dialog:openFile', async () => {
 })
 
 // Save file dialog
-ipcMain.handle('dialog:saveFile', async (_event, data: string, defaultName: string) => {
-  const result = await dialog.showSaveDialog(mainWindow!, {
-    defaultPath: defaultName,
-    filters: [
-      { name: 'Text Files', extensions: ['txt', 'md'] },
-      { name: 'All Files', extensions: ['*'] }
-    ]
-  })
+ipcMain.handle(
+  'dialog:saveFile',
+  async (_event, data: string, defaultName: string, format?: string) => {
+    const ext = format || path.extname(defaultName).slice(1) || 'txt'
 
-  if (result.canceled || !result.filePath) {
-    return null
+    const filters = []
+    switch (ext) {
+      case 'docx':
+        filters.push({ name: 'Word Document', extensions: ['docx'] })
+        break
+      case 'xlsx':
+        filters.push({ name: 'Excel File', extensions: ['xlsx'] })
+        break
+      case 'pdf':
+        filters.push({ name: 'PDF Document', extensions: ['pdf'] })
+        break
+      default:
+        filters.push({ name: 'Text Files', extensions: ['txt', 'md'] })
+    }
+    filters.push({ name: 'All Files', extensions: ['*'] })
+
+    const result = await dialog.showSaveDialog(mainWindow!, {
+      defaultPath: defaultName,
+      filters
+    })
+
+    if (result.canceled || !result.filePath) {
+      return null
+    }
+
+    const buffer = Buffer.from(data, 'base64')
+    await fs.writeFile(result.filePath, buffer)
+    return result.filePath
   }
-
-  const buffer = Buffer.from(data, 'base64')
-  await fs.writeFile(result.filePath, buffer)
-  return result.filePath
-})
+)
 
 // Read file content (for drag and drop)
 ipcMain.handle('file:read', async (_event, filePath: string) => {
@@ -124,6 +152,87 @@ ipcMain.handle('file:read', async (_event, filePath: string) => {
     return null
   }
 })
+
+// Parse document - extract text content from various formats
+ipcMain.handle('document:parse', async (_event, filePath: string, bufferBase64: string) => {
+  try {
+    const buffer = Buffer.from(bufferBase64, 'base64')
+    const parsed = await parseDocument(filePath, buffer)
+
+    return {
+      success: true,
+      content: parsed.content,
+      format: parsed.format,
+      metadata: parsed.metadata,
+      hasImages: parsed.images && parsed.images.length > 0
+    }
+  } catch (error) {
+    console.error('Document parsing error:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown parsing error'
+    }
+  }
+})
+
+// NER - Extract named entities
+ipcMain.handle('ner:extract', async (_event, text: string) => {
+  try {
+    const entities = extractEntities(text)
+    const persons = detectPersonNames(text)
+    const organizations = detectOrganizations(text)
+
+    return {
+      success: true,
+      entities,
+      persons,
+      organizations
+    }
+  } catch (error) {
+    console.error('NER extraction error:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown NER error'
+    }
+  }
+})
+
+// Create masked document
+ipcMain.handle(
+  'document:createMasked',
+  async (_event, originalBufferBase64: string, maskedContent: string, format: string) => {
+    try {
+      const originalBuffer = Buffer.from(originalBufferBase64, 'base64')
+      let resultBuffer: Buffer
+
+      switch (format) {
+        case 'docx':
+          resultBuffer = await createMaskedDocx(originalBuffer, maskedContent)
+          break
+        case 'xlsx':
+          resultBuffer = await createMaskedXlsx(originalBuffer, maskedContent)
+          break
+        case 'pdf':
+          resultBuffer = await createMaskedPdf(originalBuffer, maskedContent)
+          break
+        default:
+          // For text formats, just encode the content
+          resultBuffer = Buffer.from(maskedContent, 'utf-8')
+      }
+
+      return {
+        success: true,
+        buffer: resultBuffer.toString('base64')
+      }
+    } catch (error) {
+      console.error('Create masked document error:', error)
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      }
+    }
+  }
+)
 
 // Get app version
 ipcMain.handle('app:getVersion', () => {

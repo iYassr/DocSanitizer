@@ -16,7 +16,16 @@ export default defineConfig({
           build: {
             outDir: 'dist-electron',
             rollupOptions: {
-              external: ['electron', 'electron-store']
+              external: [
+                'electron',
+                'electron-store',
+                'mammoth',
+                'exceljs',
+                'pdf-parse',
+                'pdf-lib',
+                'docx',
+                'compromise'
+              ]
             }
           }
         }
