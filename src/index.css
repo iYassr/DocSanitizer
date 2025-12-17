@@ -1,0 +1,82 @@
+@import "tailwindcss";
+
+:root {
+  --color-pii: #EF4444;
+  --color-company: #3B82F6;
+  --color-financial: #22C55E;
+  --color-technical: #A855F7;
+  --color-custom: #F97316;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+}
+
+#root {
+  height: 100vh;
+  width: 100vw;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Detection highlight colors */
+.highlight-pii {
+  background-color: rgba(239, 68, 68, 0.2);
+  border-bottom: 2px solid var(--color-pii);
+}
+
+.highlight-company {
+  background-color: rgba(59, 130, 246, 0.2);
+  border-bottom: 2px solid var(--color-company);
+}
+
+.highlight-financial {
+  background-color: rgba(34, 197, 94, 0.2);
+  border-bottom: 2px solid var(--color-financial);
+}
+
+.highlight-technical {
+  background-color: rgba(168, 85, 247, 0.2);
+  border-bottom: 2px solid var(--color-technical);
+}
+
+.highlight-custom {
+  background-color: rgba(249, 115, 22, 0.2);
+  border-bottom: 2px solid var(--color-custom);
+}
+
+/* Title bar drag region for macOS */
+.titlebar-drag-region {
+  -webkit-app-region: drag;
+}
+
+.titlebar-no-drag {
+  -webkit-app-region: no-drag;
+}
