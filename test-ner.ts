@@ -409,6 +409,58 @@ const testCases: TestCase[] = [
     expected: [{ type: 'iban', text: 'SA123456', shouldDetect: false }]
   },
 
+  // ==================== PHONE NUMBER TESTS ====================
+  {
+    name: 'US phone with parentheses',
+    input: 'Call me at (123) 456-7890',
+    expected: [{ type: 'phone', text: '(123) 456-7890', shouldDetect: true }]
+  },
+  {
+    name: 'US phone with dashes',
+    input: 'Phone: 123-456-7890',
+    expected: [{ type: 'phone', text: '123-456-7890', shouldDetect: true }]
+  },
+  {
+    name: 'US phone with dots',
+    input: 'Contact: 123.456.7890',
+    expected: [{ type: 'phone', text: '123.456.7890', shouldDetect: true }]
+  },
+  {
+    name: 'International +1',
+    input: 'Intl: +1 234 567 8900',
+    expected: [{ type: 'phone', text: '+1 234 567 8900', shouldDetect: true }]
+  },
+  {
+    name: 'Saudi mobile +966',
+    input: 'Saudi: +966512345678',
+    expected: [{ type: 'phone', text: '+966512345678', shouldDetect: true }]
+  },
+  {
+    name: 'Saudi mobile 05',
+    input: 'Mobile: 0512345678',
+    expected: [{ type: 'phone', text: '0512345678', shouldDetect: true }]
+  },
+  {
+    name: 'UK phone +44',
+    input: 'UK: +44 20 7946 0958',
+    expected: [{ type: 'phone', text: '+44 20 7946 0958', shouldDetect: true }]
+  },
+  {
+    name: 'Toll-free 1-800',
+    input: 'Toll-free: 1-800-555-1234',
+    expected: [{ type: 'phone', text: '1-800-555-1234', shouldDetect: true }]
+  },
+  {
+    name: 'Phone with extension',
+    input: 'Office: 123-456-7890 ext 1234',
+    expected: [{ type: 'phone', text: '123-456-7890 ext 1234', shouldDetect: true }]
+  },
+  {
+    name: 'Too short - not a phone',
+    input: 'Code: 12345',
+    expected: [{ type: 'phone', text: '12345', shouldDetect: false }]
+  },
+
   // ==================== MIXED CONTENT TESTS ====================
   {
     name: 'Invoice with money and IP',
@@ -558,6 +610,7 @@ function runTests() {
     financial: { total: 0, passed: 0 },
     credit_card: { total: 0, passed: 0 },
     iban: { total: 0, passed: 0 },
+    phone: { total: 0, passed: 0 },
     person: { total: 0, passed: 0 },
     ip: { total: 0, passed: 0 },
     mixed: { total: 0, passed: 0 },
@@ -572,13 +625,17 @@ function runTests() {
         name.includes('money') || name.includes('plain number') || name.includes('percentage') ||
         name.includes('year number') || name.includes('quantity') || name.includes('score') ||
         name.includes('decimal') || name.includes('age') ||
-        name.includes('distance') || name.includes('weight') || name.includes('phone number') ||
+        name.includes('distance') || name.includes('weight') ||
         name.includes('chf') || name.includes('inr') || name.includes('jpy') || name.includes('aed') ||
         name.includes('usd') || name.includes('gbp') || name.includes('riyal') || name.includes('dirham')) {
       cat = 'financial'
     } else if (name.includes('visa') || name.includes('mastercard') || name.includes('amex') ||
                name.includes('card') || name.includes('luhn')) {
       cat = 'credit_card'
+    } else if (name.includes('phone') || name.includes('mobile') || name.includes('toll-free') ||
+               name.includes('intl:') || name.includes('+966') || name.includes('+44') ||
+               name.includes('extension')) {
+      cat = 'phone'
     } else if (name.includes('iban') || name.includes('saudi iban') || name.includes('german iban') ||
                name.includes('uk iban') || name.includes('french iban')) {
       cat = 'iban'

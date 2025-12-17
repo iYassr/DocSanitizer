@@ -55,8 +55,11 @@ export function extractEntities(text: string, userCustomNames?: string[]): NEREn
   // 4. Extract IBAN numbers (with structure validation)
   detectIBANs(text, addEntity)
 
-  // 5. Extract IP addresses
+  // 5. Extract IP addresses (before phone to avoid false matches)
   detectIPAddresses(text, addEntity)
+
+  // 6. Extract phone numbers (all formats)
+  detectPhoneNumbers(text, addEntity)
 
   // Deduplicate entities (same position)
   const seen = new Set<string>()
@@ -259,6 +262,78 @@ function detectIBANs(
           confidence: 95
         })
       }
+    }
+  }
+}
+
+// Detect phone numbers in various formats
+function detectPhoneNumbers(
+  text: string,
+  addEntity: (entity: NEREntity) => void
+): void {
+  const phonePatterns = [
+    // International with + prefix: +1 234 567 8900, +44 20 7946 0958
+    /\+\d{1,3}[\s.-]?\(?\d{1,4}\)?[\s.-]?\d{1,4}[\s.-]?\d{1,4}[\s.-]?\d{0,4}\b/g,
+
+    // Saudi Arabia: +966 5x xxx xxxx, 00966 5xxxxxxxx, 05xxxxxxxx
+    /(?:\+966|00966|0)5\d{8}\b/g,
+    /(?:\+966|00966)[\s.-]?5\d[\s.-]?\d{3}[\s.-]?\d{4}\b/g,
+
+    // UAE: +971 5x xxx xxxx
+    /(?:\+971|00971)[\s.-]?5\d[\s.-]?\d{3}[\s.-]?\d{4}\b/g,
+
+    // US/Canada: (123) 456-7890, 123-456-7890, 123.456.7890
+    /\(\d{3}\)[\s.-]?\d{3}[\s.-]?\d{4}\b/g,
+    /\b\d{3}[\s.-]\d{3}[\s.-]\d{4}\b/g,
+
+    // UK: +44 20 7946 0958, 020 7946 0958, 07xxx xxxxxx
+    /(?:\+44|0044)[\s.-]?\d{2,4}[\s.-]?\d{3,4}[\s.-]?\d{3,4}\b/g,
+    /\b0[1-9]\d{2,3}[\s.-]?\d{3}[\s.-]?\d{3,4}\b/g,
+    /\b07\d{3}[\s.-]?\d{6}\b/g,
+
+    // Germany: +49 xxx xxxxxxx
+    /(?:\+49|0049)[\s.-]?\d{2,4}[\s.-]?\d{3,8}\b/g,
+
+    // France: +33 x xx xx xx xx
+    /(?:\+33|0033)[\s.-]?\d[\s.-]?\d{2}[\s.-]?\d{2}[\s.-]?\d{2}[\s.-]?\d{2}\b/g,
+
+    // Generic international: sequences of 10-15 digits with separators
+    /\b\d{3,4}[\s.-]\d{3,4}[\s.-]\d{3,4}(?:[\s.-]\d{1,4})?\b/g,
+
+    // Toll-free US: 1-800-xxx-xxxx, 1-888-xxx-xxxx
+    /\b1[\s.-]?8(?:00|44|55|66|77|88)[\s.-]?\d{3}[\s.-]?\d{4}\b/g,
+
+    // Extensions: main number ext/x 1234
+    /\b\d{3}[\s.-]\d{3}[\s.-]\d{4}[\s.-]?(?:ext|x|extension)[\s.]?\d{1,5}\b/gi
+  ]
+
+  const seen = new Set<string>()
+
+  for (const pattern of phonePatterns) {
+    pattern.lastIndex = 0
+    let match: RegExpExecArray | null
+    while ((match = pattern.exec(text)) !== null) {
+      const phoneText = match[0]
+      // Normalize for deduplication (remove all non-digits)
+      const digitsOnly = phoneText.replace(/\D/g, '')
+
+      // Must have at least 7 digits (minimum for a local number)
+      if (digitsOnly.length < 7) continue
+
+      // Must not be more than 15 digits (max international standard)
+      if (digitsOnly.length > 15) continue
+
+      // Skip if we've already processed this number
+      if (seen.has(digitsOnly)) continue
+      seen.add(digitsOnly)
+
+      addEntity({
+        text: phoneText,
+        type: 'phone',
+        start: match.index,
+        end: match.index + phoneText.length,
+        confidence: 85
+      })
     }
   }
 }
