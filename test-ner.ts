@@ -5,7 +5,7 @@ interface TestCase {
   input: string
   customNames?: string[]
   expected: {
-    type: 'person' | 'organization' | 'money' | 'phone' | 'email' | 'ip'
+    type: 'person' | 'money' | 'phone' | 'email' | 'ip'
     text: string
     shouldDetect: boolean
   }[]
@@ -340,23 +340,6 @@ const testCases: TestCase[] = [
     expected: [{ type: 'ip', text: '2.3.4.5', shouldDetect: false }]
   },
 
-  // ==================== ORGANIZATION TESTS ====================
-  {
-    name: 'Company with Inc',
-    input: 'Working at Microsoft Inc',
-    expected: [{ type: 'organization', text: 'Microsoft Inc', shouldDetect: true }]
-  },
-  {
-    name: 'Company with Corp',
-    input: 'Contract with Apple Corporation',
-    expected: [{ type: 'organization', text: 'Apple Corporation', shouldDetect: true }]
-  },
-  {
-    name: 'University',
-    input: 'Graduated from Harvard University',
-    expected: [{ type: 'organization', text: 'Harvard University', shouldDetect: true }]
-  },
-
   // ==================== MIXED CONTENT TESTS ====================
   {
     name: 'Invoice with money and IP',
@@ -506,7 +489,6 @@ function runTests() {
     money: { total: 0, passed: 0 },
     person: { total: 0, passed: 0 },
     ip: { total: 0, passed: 0 },
-    organization: { total: 0, passed: 0 },
     mixed: { total: 0, passed: 0 },
     edge: { total: 0, passed: 0 }
   }
@@ -531,8 +513,6 @@ function runTests() {
                name.includes('localhost') || name.includes('gateway') || name.includes('dns') ||
                name.includes('version number')) {
       cat = 'ip'
-    } else if (name.includes('company') || name.includes('university') || name.includes('organization')) {
-      cat = 'organization'
     } else if (name.includes('mixed') || name.includes('invoice') || name.includes('contract') ||
                name.includes('business') || name.includes('report') || name.includes('server config')) {
       cat = 'mixed'

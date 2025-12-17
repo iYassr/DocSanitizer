@@ -7,11 +7,11 @@ import { Upload, FileText, Shield, User, Building2, DollarSign, Cpu, Key, CheckC
 const SUPPORTED_EXTENSIONS = ['.pdf', '.docx', '.doc', '.xlsx', '.xls', '.csv', '.txt', '.md']
 
 // Map NER entity types to detection categories
+// Note: Organizations/companies are only detected via user configuration, not NER
 const typeToCategory: Record<string, DetectionCategory> = {
   person: 'pii',
   email: 'pii',
   phone: 'pii',
-  organization: 'company',
   money: 'financial',
   ip: 'technical'
 }
@@ -22,7 +22,6 @@ function generatePlaceholder(type: string, index: number): string {
     person: 'PERSON',
     email: 'EMAIL',
     phone: 'PHONE',
-    organization: 'ORG',
     money: 'AMOUNT',
     ip: 'IP_ADDRESS'
   }

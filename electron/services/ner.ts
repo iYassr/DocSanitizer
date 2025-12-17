@@ -1,8 +1,6 @@
-import nlp from 'compromise'
-
 export interface NEREntity {
   text: string
-  type: 'person' | 'organization' | 'money' | 'phone' | 'email' | 'ip'
+  type: 'person' | 'money' | 'phone' | 'email' | 'ip'
   start: number
   end: number
   confidence?: number
@@ -26,7 +24,6 @@ export function extractEntities(text: string, userCustomNames?: string[]): NEREn
     setCustomNames(userCustomNames)
   }
 
-  const doc = nlp(text)
   const entities: NEREntity[] = []
   const seenPositions = new Set<string>()
 
@@ -49,26 +46,10 @@ export function extractEntities(text: string, userCustomNames?: string[]): NEREn
   // 1. ONLY detect custom user-defined names (no automatic name detection)
   detectCustomNames(text, addEntity)
 
-  // 2. Extract organizations
-  const orgs = doc.organizations()
-  orgs.forEach((org: ReturnType<typeof nlp>) => {
-    const orgText = org.text()
-    if (!orgText || orgText.length < 2) return
-    const indices = findAllIndices(text, orgText)
-    indices.forEach((start) => {
-      addEntity({
-        text: orgText,
-        type: 'organization',
-        start,
-        end: start + orgText.length
-      })
-    })
-  })
-
-  // 3. Extract money/currency - ONLY with explicit currency symbols
+  // 2. Extract money/currency - ONLY with explicit currency symbols
   detectMoneyWithSymbols(text, addEntity)
 
-  // 4. Extract IP addresses
+  // 3. Extract IP addresses
   detectIPAddresses(text, addEntity)
 
   // Deduplicate entities (same position)
@@ -191,29 +172,6 @@ function detectIPAddresses(
   }
 }
 
-function findAllIndices(text: string, search: string): number[] {
-  // Guard against empty or invalid search strings
-  if (!search || typeof search !== 'string' || search.length === 0) {
-    return []
-  }
-  if (!text || typeof text !== 'string') {
-    return []
-  }
-
-  const indices: number[] = []
-  let idx = text.indexOf(search)
-  // Limit iterations to prevent infinite loops
-  const maxIterations = 10000
-  let iterations = 0
-
-  while (idx !== -1 && iterations < maxIterations) {
-    indices.push(idx)
-    idx = text.indexOf(search, idx + 1)
-    iterations++
-  }
-  return indices
-}
-
 // Additional NER-based detection for specific entity types
 export function detectPersonNames(text: string): Array<{ text: string; start: number; end: number }> {
   // Only return custom names now
@@ -234,28 +192,6 @@ export function detectPersonNames(text: string): Array<{ text: string; start: nu
       })
     }
   }
-
-  return results
-}
-
-export function detectOrganizations(text: string): Array<{ text: string; start: number; end: number }> {
-  const doc = nlp(text)
-  const results: Array<{ text: string; start: number; end: number }> = []
-
-  const orgs = doc.organizations()
-  orgs.forEach((org: ReturnType<typeof nlp>) => {
-    const orgText = org.text()
-    if (orgText.length >= 2) {
-      const indices = findAllIndices(text, orgText)
-      indices.forEach((start) => {
-        results.push({
-          text: orgText,
-          start,
-          end: start + orgText.length
-        })
-      })
-    }
-  })
 
   return results
 }
