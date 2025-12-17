@@ -23,8 +23,10 @@ mac:
   hardenedRuntime: true
   gatekeeperAssess: false
   target:
-    - dmg
-    - zip
+    - target: zip
+      arch:
+        - x64
+        - arm64
 
 win:
   icon: resources/icon.ico
