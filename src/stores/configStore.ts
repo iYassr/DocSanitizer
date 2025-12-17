@@ -2,6 +2,26 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { Config, DetectionCategory } from '../types'
 
+// Input validation helpers
+const MAX_STRING_LENGTH = 500
+const MAX_ARRAY_SIZE = 100
+const MAX_KEYWORD_LENGTH = 100
+
+function sanitizeString(input: string, maxLength = MAX_STRING_LENGTH): string {
+  if (typeof input !== 'string') return ''
+  return input.trim().slice(0, maxLength)
+}
+
+function validateConfidence(value: number): number {
+  if (typeof value !== 'number' || isNaN(value)) return 70
+  return Math.min(100, Math.max(0, Math.round(value)))
+}
+
+function isDuplicateEntry(arr: string[], value: string): boolean {
+  const normalized = value.toLowerCase().trim()
+  return arr.some(item => item.toLowerCase().trim() === normalized)
+}
+
 const defaultConfig: Config = {
   companyInfo: {
     primaryName: '',
@@ -13,7 +33,8 @@ const defaultConfig: Config = {
     clients: [],
     projects: [],
     products: [],
-    keywords: []
+    keywords: [],
+    names: []
   },
   detectionSettings: {
     minConfidence: 70,
@@ -36,6 +57,8 @@ interface ConfigState {
   removeKeyword: (keyword: string) => void
   addAlias: (alias: string) => void
   removeAlias: (alias: string) => void
+  addName: (name: string) => void
+  removeName: (name: string) => void
   toggleCategory: (category: DetectionCategory) => void
   resetConfig: () => void
 }
@@ -48,20 +71,53 @@ export const useConfigStore = create<ConfigState>()(
       setConfig: (config) => set({ config }),
 
       updateCompanyInfo: (info) =>
-        set((state) => ({
-          config: {
-            ...state.config,
-            companyInfo: { ...state.config.companyInfo, ...info }
+        set((state) => {
+          const sanitizedInfo: Partial<Config['companyInfo']> = {}
+          if (info.primaryName !== undefined) {
+            sanitizedInfo.primaryName = sanitizeString(info.primaryName)
           }
-        })),
+          if (info.domain !== undefined) {
+            sanitizedInfo.domain = sanitizeString(info.domain, 253)
+          }
+          if (info.aliases !== undefined) {
+            sanitizedInfo.aliases = info.aliases
+              .map(a => sanitizeString(a, MAX_KEYWORD_LENGTH))
+              .filter(Boolean)
+              .slice(0, MAX_ARRAY_SIZE)
+          }
+          if (info.internalDomains !== undefined) {
+            sanitizedInfo.internalDomains = info.internalDomains
+              .map(d => sanitizeString(d, 253))
+              .filter(Boolean)
+              .slice(0, MAX_ARRAY_SIZE)
+          }
+          return {
+            config: {
+              ...state.config,
+              companyInfo: { ...state.config.companyInfo, ...sanitizedInfo }
+            }
+          }
+        }),
 
       updateDetectionSettings: (settings) =>
-        set((state) => ({
-          config: {
-            ...state.config,
-            detectionSettings: { ...state.config.detectionSettings, ...settings }
+        set((state) => {
+          const sanitizedSettings: Partial<Config['detectionSettings']> = {}
+          if (settings.minConfidence !== undefined) {
+            sanitizedSettings.minConfidence = validateConfidence(settings.minConfidence)
           }
-        })),
+          if (settings.autoMaskHighConfidence !== undefined) {
+            sanitizedSettings.autoMaskHighConfidence = Boolean(settings.autoMaskHighConfidence)
+          }
+          if (settings.categoriesEnabled !== undefined) {
+            sanitizedSettings.categoriesEnabled = settings.categoriesEnabled
+          }
+          return {
+            config: {
+              ...state.config,
+              detectionSettings: { ...state.config.detectionSettings, ...sanitizedSettings }
+            }
+          }
+        }),
 
       updateExportPreferences: (prefs) =>
         set((state) => ({
@@ -72,15 +128,22 @@ export const useConfigStore = create<ConfigState>()(
         })),
 
       addKeyword: (keyword) =>
-        set((state) => ({
-          config: {
-            ...state.config,
-            customEntities: {
-              ...state.config.customEntities,
-              keywords: [...state.config.customEntities.keywords, keyword]
+        set((state) => {
+          const sanitized = sanitizeString(keyword, MAX_KEYWORD_LENGTH)
+          if (!sanitized) return state
+          if (isDuplicateEntry(state.config.customEntities.keywords, sanitized)) return state
+          if (state.config.customEntities.keywords.length >= MAX_ARRAY_SIZE) return state
+
+          return {
+            config: {
+              ...state.config,
+              customEntities: {
+                ...state.config.customEntities,
+                keywords: [...state.config.customEntities.keywords, sanitized]
+              }
             }
           }
-        })),
+        }),
 
       removeKeyword: (keyword) =>
         set((state) => ({
@@ -94,15 +157,22 @@ export const useConfigStore = create<ConfigState>()(
         })),
 
       addAlias: (alias) =>
-        set((state) => ({
-          config: {
-            ...state.config,
-            companyInfo: {
-              ...state.config.companyInfo,
-              aliases: [...state.config.companyInfo.aliases, alias]
+        set((state) => {
+          const sanitized = sanitizeString(alias, MAX_KEYWORD_LENGTH)
+          if (!sanitized) return state
+          if (isDuplicateEntry(state.config.companyInfo.aliases, sanitized)) return state
+          if (state.config.companyInfo.aliases.length >= MAX_ARRAY_SIZE) return state
+
+          return {
+            config: {
+              ...state.config,
+              companyInfo: {
+                ...state.config.companyInfo,
+                aliases: [...state.config.companyInfo.aliases, sanitized]
+              }
             }
           }
-        })),
+        }),
 
       removeAlias: (alias) =>
         set((state) => ({
@@ -111,6 +181,35 @@ export const useConfigStore = create<ConfigState>()(
             companyInfo: {
               ...state.config.companyInfo,
               aliases: state.config.companyInfo.aliases.filter((a) => a !== alias)
+            }
+          }
+        })),
+
+      addName: (name) =>
+        set((state) => {
+          const sanitized = sanitizeString(name, MAX_KEYWORD_LENGTH)
+          if (!sanitized) return state
+          if (isDuplicateEntry(state.config.customEntities.names, sanitized)) return state
+          if (state.config.customEntities.names.length >= MAX_ARRAY_SIZE) return state
+
+          return {
+            config: {
+              ...state.config,
+              customEntities: {
+                ...state.config.customEntities,
+                names: [...state.config.customEntities.names, sanitized]
+              }
+            }
+          }
+        }),
+
+      removeName: (name) =>
+        set((state) => ({
+          config: {
+            ...state.config,
+            customEntities: {
+              ...state.config.customEntities,
+              names: state.config.customEntities.names.filter((n) => n !== name)
             }
           }
         })),

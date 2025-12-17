@@ -8,6 +8,63 @@ interface DetectionRule {
   pattern: RegExp
   confidence: number
   placeholderTemplate: string
+  validator?: (match: string) => boolean
+}
+
+// Luhn algorithm for credit card validation
+function isValidLuhn(num: string): boolean {
+  const digits = num.replace(/\D/g, '')
+  if (digits.length < 13 || digits.length > 19) return false
+
+  let sum = 0
+  let isEven = false
+
+  for (let i = digits.length - 1; i >= 0; i--) {
+    let digit = parseInt(digits[i], 10)
+
+    if (isEven) {
+      digit *= 2
+      if (digit > 9) digit -= 9
+    }
+
+    sum += digit
+    isEven = !isEven
+  }
+
+  return sum % 10 === 0
+}
+
+// IBAN validation (basic structure check)
+function isValidIBAN(iban: string): boolean {
+  const cleanIban = iban.replace(/\s/g, '').toUpperCase()
+  if (cleanIban.length < 15 || cleanIban.length > 34) return false
+  if (!/^[A-Z]{2}\d{2}[A-Z0-9]+$/.test(cleanIban)) return false
+  return true
+}
+
+// Email validation (more comprehensive)
+function isValidEmail(email: string): boolean {
+  // Avoid matching filenames or URLs that happen to contain @
+  if (email.includes('..') || email.startsWith('.') || email.endsWith('.')) return false
+  const parts = email.split('@')
+  if (parts.length !== 2) return false
+  const [local, domain] = parts
+  if (local.length > 64 || domain.length > 253) return false
+  if (!/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(domain)) return false
+  return true
+}
+
+// Check if a string looks like a valid IPv4 address (not just matching the pattern)
+function isValidIPv4(ip: string): boolean {
+  const parts = ip.split('.')
+  if (parts.length !== 4) return false
+  for (const part of parts) {
+    const num = parseInt(part, 10)
+    if (isNaN(num) || num < 0 || num > 255) return false
+    // Avoid version numbers like 1.0.0.0 or 2.3.4.5 in context
+    if (part !== String(num)) return false // Leading zeros check
+  }
+  return true
 }
 
 // Built-in detection rules
@@ -20,7 +77,8 @@ const builtInRules: DetectionRule[] = [
     subcategory: 'email',
     pattern: /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g,
     confidence: 95,
-    placeholderTemplate: '<EMAIL_{n}>'
+    placeholderTemplate: '<EMAIL_{n}>',
+    validator: isValidEmail
   },
   // PII - Phone (International)
   {
@@ -80,7 +138,8 @@ const builtInRules: DetectionRule[] = [
     subcategory: 'iban',
     pattern: /\b[A-Z]{2}\d{2}[A-Z0-9]{4,30}\b/g,
     confidence: 90,
-    placeholderTemplate: '<IBAN_{n}>'
+    placeholderTemplate: '<IBAN_{n}>',
+    validator: isValidIBAN
   },
   // PII - Saudi IBAN
   {
@@ -90,7 +149,8 @@ const builtInRules: DetectionRule[] = [
     subcategory: 'iban',
     pattern: /\bSA\d{2}[A-Z0-9]{20}\b/g,
     confidence: 95,
-    placeholderTemplate: '<IBAN_{n}>'
+    placeholderTemplate: '<IBAN_{n}>',
+    validator: isValidIBAN
   },
   // PII - Credit Card
   {
@@ -100,7 +160,8 @@ const builtInRules: DetectionRule[] = [
     subcategory: 'credit_card',
     pattern: /\b(?:\d{4}[-\s]?){3}\d{4}\b/g,
     confidence: 85,
-    placeholderTemplate: '<CARD_NUMBER_{n}>'
+    placeholderTemplate: '<CARD_NUMBER_{n}>',
+    validator: isValidLuhn
   },
   // PII - Passport
   {
@@ -120,7 +181,8 @@ const builtInRules: DetectionRule[] = [
     subcategory: 'ip_address',
     pattern: /\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b/g,
     confidence: 95,
-    placeholderTemplate: '<IP_ADDRESS_{n}>'
+    placeholderTemplate: '<IP_ADDRESS_{n}>',
+    validator: isValidIPv4
   },
   // Technical - IPv6 Address
   {
@@ -230,6 +292,126 @@ const builtInRules: DetectionRule[] = [
     pattern: /\b(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)[.\s]+\d{1,2}(?:st|nd|rd|th)?[,\s]+\d{4}\b/gi,
     confidence: 75,
     placeholderTemplate: '<DATE_{n}>'
+  },
+  // Technical - GitHub Token
+  {
+    id: 'tech-github-token',
+    name: 'GitHub Token',
+    category: 'technical',
+    subcategory: 'api_key',
+    pattern: /\b(?:ghp|gho|ghu|ghs|ghr)_[a-zA-Z0-9]{36,}\b/g,
+    confidence: 98,
+    placeholderTemplate: '<GITHUB_TOKEN_{n}>'
+  },
+  // Technical - JWT Token
+  {
+    id: 'tech-jwt',
+    name: 'JWT Token',
+    category: 'technical',
+    subcategory: 'credentials',
+    pattern: /\beyJ[a-zA-Z0-9_-]*\.eyJ[a-zA-Z0-9_-]*\.[a-zA-Z0-9_-]+\b/g,
+    confidence: 95,
+    placeholderTemplate: '<JWT_TOKEN_{n}>'
+  },
+  // Technical - Slack Token
+  {
+    id: 'tech-slack-token',
+    name: 'Slack Token',
+    category: 'technical',
+    subcategory: 'api_key',
+    pattern: /\bxox[pbar]-[0-9]{10,}-[0-9]{10,}-[a-zA-Z0-9]{24,}\b/g,
+    confidence: 98,
+    placeholderTemplate: '<SLACK_TOKEN_{n}>'
+  },
+  // Technical - Google API Key
+  {
+    id: 'tech-google-api',
+    name: 'Google API Key',
+    category: 'technical',
+    subcategory: 'api_key',
+    pattern: /\bAIza[0-9A-Za-z_-]{35}\b/g,
+    confidence: 95,
+    placeholderTemplate: '<GOOGLE_API_KEY_{n}>'
+  },
+  // Technical - AWS Secret Key
+  {
+    id: 'tech-aws-secret',
+    name: 'AWS Secret Key',
+    category: 'technical',
+    subcategory: 'api_key',
+    pattern: /\b[A-Za-z0-9/+=]{40}\b/g,
+    confidence: 60,
+    placeholderTemplate: '<AWS_SECRET_{n}>'
+  },
+  // PII - Street Address
+  {
+    id: 'pii-address',
+    name: 'Street Address',
+    category: 'pii',
+    subcategory: 'address',
+    pattern: /\b\d{1,5}\s+[\w\s]{1,30}(?:street|st|avenue|ave|road|rd|highway|hwy|square|sq|trail|trl|drive|dr|court|ct|parkway|pkwy|circle|cir|boulevard|blvd)\b/gi,
+    confidence: 75,
+    placeholderTemplate: '<ADDRESS_{n}>'
+  },
+  // PII - US ZIP Code
+  {
+    id: 'pii-zip-us',
+    name: 'US ZIP Code',
+    category: 'pii',
+    subcategory: 'address',
+    pattern: /\b\d{5}(?:-\d{4})?\b/g,
+    confidence: 60,
+    placeholderTemplate: '<ZIP_CODE_{n}>'
+  },
+  // PII - Driver License
+  {
+    id: 'pii-driver-license',
+    name: 'Driver License',
+    category: 'pii',
+    subcategory: 'license',
+    pattern: /\b(?:DL|driver'?s?\s*license)[#:\s]*[A-Z0-9]{6,15}\b/gi,
+    confidence: 80,
+    placeholderTemplate: '<DRIVER_LICENSE_{n}>'
+  },
+  // Technical - Database Connection String
+  {
+    id: 'tech-db-connection',
+    name: 'Database Connection String',
+    category: 'technical',
+    subcategory: 'credentials',
+    pattern: /(?:mongodb|mysql|postgresql|postgres|redis|mssql):\/\/[^\s"']+/gi,
+    confidence: 95,
+    placeholderTemplate: '<DB_CONNECTION_{n}>'
+  },
+  // Technical - Stripe Key
+  {
+    id: 'tech-stripe-key',
+    name: 'Stripe API Key',
+    category: 'technical',
+    subcategory: 'api_key',
+    pattern: /\b(?:sk|pk)_(?:test|live)_[0-9a-zA-Z]{24,}\b/g,
+    confidence: 98,
+    placeholderTemplate: '<STRIPE_KEY_{n}>'
+  },
+  // PII - MAC Address
+  {
+    id: 'tech-mac-address',
+    name: 'MAC Address',
+    category: 'technical',
+    subcategory: 'device_id',
+    pattern: /\b(?:[0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2}\b/g,
+    confidence: 90,
+    placeholderTemplate: '<MAC_ADDRESS_{n}>'
+  },
+  // PII - UUID
+  {
+    id: 'tech-uuid',
+    name: 'UUID',
+    category: 'technical',
+    subcategory: 'identifier',
+    pattern: /\b[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\b/g,
+    confidence: 85,
+    placeholderTemplate: '<UUID_{n}>'
   }
 ]
 
@@ -271,22 +453,27 @@ function getContextSnippet(content: string, start: number, end: number, contextL
 }
 
 export async function detectSensitiveInfo(content: string, config: Config): Promise<Detection[]> {
+  // Early exit for empty or very short content
+  if (!content || content.length < 3) {
+    return []
+  }
+
   resetEntityCounters()
   const detections: Detection[] = []
   const seenPositions = new Set<string>()
 
+  // Pre-compute enabled categories as a Set for O(1) lookup
+  const enabledCategories = new Set(config.detectionSettings.categoriesEnabled)
+  const minConfidence = config.detectionSettings.minConfidence
+  const autoMaskHighConfidence = config.detectionSettings.autoMaskHighConfidence
+
+  // Pre-filter rules for better performance
+  const applicableRules = builtInRules.filter(rule =>
+    enabledCategories.has(rule.category) && rule.confidence >= minConfidence
+  )
+
   // Run built-in rules
-  for (const rule of builtInRules) {
-    // Skip if category is not enabled
-    if (!config.detectionSettings.categoriesEnabled.includes(rule.category)) {
-      continue
-    }
-
-    // Skip if confidence is below threshold
-    if (rule.confidence < config.detectionSettings.minConfidence) {
-      continue
-    }
-
+  for (const rule of applicableRules) {
     // Reset regex lastIndex
     rule.pattern.lastIndex = 0
 
@@ -296,6 +483,12 @@ export async function detectSensitiveInfo(content: string, config: Config): Prom
 
       // Skip if we've already detected something at this position
       if (seenPositions.has(posKey)) continue
+
+      // Run validator if available
+      if (rule.validator && !rule.validator(match[0])) {
+        continue
+      }
+
       seenPositions.add(posKey)
 
       const detection: Detection = {
@@ -307,7 +500,7 @@ export async function detectSensitiveInfo(content: string, config: Config): Prom
         position: { start: match.index, end: match.index + match[0].length },
         suggestedPlaceholder: getPlaceholder(rule.placeholderTemplate, match[0]),
         context: getContextSnippet(content, match.index, match.index + match[0].length),
-        approved: config.detectionSettings.autoMaskHighConfidence && rule.confidence >= 90
+        approved: autoMaskHighConfidence && rule.confidence >= 90
       }
 
       detections.push(detection)
@@ -317,7 +510,9 @@ export async function detectSensitiveInfo(content: string, config: Config): Prom
   // Use NER for person names and organizations (if available)
   if (config.detectionSettings.categoriesEnabled.includes('pii') && window.api?.extractEntities) {
     try {
-      const nerResult = await window.api.extractEntities(content)
+      // Pass custom names from config to enhance NER detection
+      const customNames = config.customEntities.names || []
+      const nerResult = await window.api.extractEntities(content, customNames)
 
       if (nerResult.success) {
         // Add person names

@@ -20,6 +20,7 @@ export function ConfigModal({ onClose }: ConfigModalProps) {
   const [activeTab, setActiveTab] = useState<Tab>('company')
   const [newAlias, setNewAlias] = useState('')
   const [newKeyword, setNewKeyword] = useState('')
+  const [newName, setNewName] = useState('')
 
   const {
     config,
@@ -30,6 +31,8 @@ export function ConfigModal({ onClose }: ConfigModalProps) {
     removeAlias,
     addKeyword,
     removeKeyword,
+    addName,
+    removeName,
     toggleCategory,
     resetConfig
   } = useConfigStore()
@@ -45,6 +48,13 @@ export function ConfigModal({ onClose }: ConfigModalProps) {
     if (newKeyword.trim()) {
       addKeyword(newKeyword.trim())
       setNewKeyword('')
+    }
+  }
+
+  const handleAddName = () => {
+    if (newName.trim()) {
+      addName(newName.trim())
+      setNewName('')
     }
   }
 
@@ -241,6 +251,63 @@ export function ConfigModal({ onClose }: ConfigModalProps) {
                     ))
                   )}
                 </div>
+              </div>
+
+              {/* Custom Names */}
+              <div className="card bg-base-300 p-5">
+                <label className="flex items-center gap-2 text-sm font-medium text-base-content mb-3">
+                  <svg className="w-4 h-4 text-error" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                  Custom Person Names
+                </label>
+                <p className="text-xs text-neutral-content mb-3">
+                  Add specific names that should always be detected (e.g., colleagues, clients, team members)
+                </p>
+                <div className="join w-full mb-3">
+                  <input
+                    type="text"
+                    value={newName}
+                    onChange={(e) => setNewName(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleAddName()}
+                    placeholder="Add name (e.g., Yasser Aldosari, Ahmed)"
+                    className="input input-bordered join-item flex-1 bg-base-100"
+                  />
+                  <button
+                    onClick={handleAddName}
+                    className="btn btn-primary join-item"
+                  >
+                    Add
+                  </button>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {(!config.customEntities.names || config.customEntities.names.length === 0) ? (
+                    <span className="text-sm text-neutral-content">No custom names added yet</span>
+                  ) : (
+                    config.customEntities.names.map((name) => (
+                      <span
+                        key={name}
+                        className="badge badge-lg badge-error gap-1.5"
+                      >
+                        {name}
+                        <button
+                          onClick={() => removeName(name)}
+                          className="opacity-60 hover:opacity-100 transition-opacity"
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </span>
+                    ))
+                  )}
+                </div>
+                <p className="mt-3 text-xs text-neutral-content flex items-center gap-1.5">
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Names will be masked as <code className="px-1.5 py-0.5 bg-base-100 rounded text-primary font-mono">&lt;PERSON_N&gt;</code>
+                </p>
               </div>
             </div>
           )}

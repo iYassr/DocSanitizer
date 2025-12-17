@@ -99,8 +99,8 @@ const api = {
     ipcRenderer.invoke('document:createMasked', originalBufferBase64, maskedContent, format),
 
   // NER extraction
-  extractEntities: (text: string): Promise<NERResult> =>
-    ipcRenderer.invoke('ner:extract', text),
+  extractEntities: (text: string, customNames?: string[]): Promise<NERResult> =>
+    ipcRenderer.invoke('ner:extract', text, customNames),
 
   // OCR
   ocrExtractText: (imageBufferBase64: string, language?: string): Promise<OCRResult> =>

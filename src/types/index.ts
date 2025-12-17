@@ -40,6 +40,7 @@ export interface Config {
     projects: NamedEntity[]
     products: NamedEntity[]
     keywords: string[]
+    names: string[] // Custom person names to detect
   }
   detectionSettings: {
     minConfidence: number

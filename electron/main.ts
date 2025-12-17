@@ -198,9 +198,9 @@ ipcMain.handle('document:parse', async (_event, filePath: string, bufferBase64: 
 })
 
 // NER - Extract named entities
-ipcMain.handle('ner:extract', async (_event, text: string) => {
+ipcMain.handle('ner:extract', async (_event, text: string, customNames?: string[]) => {
   try {
-    const entities = extractEntities(text)
+    const entities = extractEntities(text, customNames)
     const persons = detectPersonNames(text)
     const organizations = detectOrganizations(text)
 

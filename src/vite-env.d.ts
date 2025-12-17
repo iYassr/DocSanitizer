@@ -96,7 +96,7 @@ interface Window {
     readFile: (filePath: string) => Promise<FileData | null>
     parseDocument: (filePath: string, bufferBase64: string) => Promise<ParsedDocument>
     createMaskedDocument: (originalBufferBase64: string, maskedContent: string, format: string) => Promise<MaskedDocumentResult>
-    extractEntities: (text: string) => Promise<NERResult>
+    extractEntities: (text: string, customNames?: string[]) => Promise<NERResult>
     ocrExtractText: (imageBufferBase64: string, language?: string) => Promise<OCRResult>
     ocrExtractTextBatch: (imageBuffersBase64: string[], language?: string) => Promise<OCRBatchResult>
     profilesGetAll: () => Promise<ConfigProfile[]>
