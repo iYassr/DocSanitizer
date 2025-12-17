@@ -1,23 +1,50 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type ReactNode } from 'react'
 import { useDocumentStore } from '../stores/documentStore'
 import { useConfigStore } from '../stores/configStore'
 import { applyMasking } from '../lib/detector'
 import type { Detection, DetectionCategory } from '../types'
 
-const categoryColors: Record<DetectionCategory, { bg: string; border: string; text: string }> = {
-  pii: { bg: 'bg-red-50', border: 'border-red-200', text: 'text-red-700' },
-  company: { bg: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-700' },
-  financial: { bg: 'bg-green-50', border: 'border-green-200', text: 'text-green-700' },
-  technical: { bg: 'bg-purple-50', border: 'border-purple-200', text: 'text-purple-700' },
-  custom: { bg: 'bg-orange-50', border: 'border-orange-200', text: 'text-orange-700' }
-}
-
-const categoryLabels: Record<DetectionCategory, string> = {
-  pii: 'Personal Info',
-  company: 'Company',
-  financial: 'Financial',
-  technical: 'Technical',
-  custom: 'Custom'
+const categoryConfig: Record<DetectionCategory, { label: string; icon: ReactNode }> = {
+  pii: {
+    label: 'Personal Info',
+    icon: (
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+      </svg>
+    )
+  },
+  company: {
+    label: 'Company',
+    icon: (
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+      </svg>
+    )
+  },
+  financial: {
+    label: 'Financial',
+    icon: (
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    )
+  },
+  technical: {
+    label: 'Technical',
+    icon: (
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+      </svg>
+    )
+  },
+  custom: {
+    label: 'Custom',
+    icon: (
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+      </svg>
+    )
+  }
 }
 
 export function ReviewPanel() {
@@ -25,6 +52,7 @@ export function ReviewPanel() {
   const { config } = useConfigStore()
   const [showPreview, setShowPreview] = useState<'original' | 'masked'>('original')
   const [copied, setCopied] = useState(false)
+  const [expandedCategories, setExpandedCategories] = useState<Set<DetectionCategory>>(new Set(['pii', 'company', 'financial', 'technical', 'custom']))
 
   // Group detections by category
   const groupedDetections = useMemo(() => {
@@ -72,6 +100,18 @@ export function ReviewPanel() {
 
   const approvedCount = detections.filter(d => d.approved).length
 
+  const toggleCategory = (category: DetectionCategory) => {
+    setExpandedCategories(prev => {
+      const next = new Set(prev)
+      if (next.has(category)) {
+        next.delete(category)
+      } else {
+        next.add(category)
+      }
+      return next
+    })
+  }
+
   const handleDownload = () => {
     const blob = new Blob([maskedContent], { type: 'text/plain' })
     const url = URL.createObjectURL(blob)
@@ -106,28 +146,37 @@ export function ReviewPanel() {
   return (
     <div className="flex h-full">
       {/* Left: Document Preview */}
-      <div className="flex-1 flex flex-col border-r border-slate-200">
+      <div className="flex-1 flex flex-col border-r border-[var(--border-primary)]">
         {/* Preview header */}
-        <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-slate-200">
+        <div className="flex items-center justify-between px-6 py-4 glass border-b border-[var(--border-primary)]">
           <div className="flex items-center gap-4">
-            <h2 className="font-medium text-slate-700">Document Preview</h2>
-            <div className="flex bg-slate-100 rounded-lg p-0.5">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-[var(--accent-secondary-dim)] flex items-center justify-center">
+                <svg className="w-4 h-4 text-[var(--accent-secondary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <h2 className="font-display font-semibold text-[var(--text-primary)]">Document Preview</h2>
+            </div>
+
+            {/* Toggle buttons */}
+            <div className="flex bg-[var(--bg-tertiary)] rounded-lg p-1 border border-[var(--border-primary)]">
               <button
                 onClick={() => setShowPreview('original')}
-                className={`px-3 py-1 text-sm rounded-md transition-colors ${
+                className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all duration-200 ${
                   showPreview === 'original'
-                    ? 'bg-white text-slate-800 shadow-sm'
-                    : 'text-slate-600 hover:text-slate-800'
+                    ? 'bg-[var(--accent-primary)] text-[var(--bg-primary)] shadow-lg shadow-[var(--accent-primary-dim)]'
+                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                 }`}
               >
                 Original
               </button>
               <button
                 onClick={() => setShowPreview('masked')}
-                className={`px-3 py-1 text-sm rounded-md transition-colors ${
+                className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all duration-200 ${
                   showPreview === 'masked'
-                    ? 'bg-white text-slate-800 shadow-sm'
-                    : 'text-slate-600 hover:text-slate-800'
+                    ? 'bg-[var(--accent-primary)] text-[var(--bg-primary)] shadow-lg shadow-[var(--accent-primary-dim)]'
+                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                 }`}
               >
                 Masked
@@ -136,17 +185,20 @@ export function ReviewPanel() {
           </div>
 
           {stats && (
-            <div className="text-sm text-slate-500">
-              Processed in {stats.processingTimeMs}ms
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-[var(--bg-tertiary)] rounded-lg border border-[var(--border-primary)]">
+              <svg className="w-4 h-4 text-[var(--accent-primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              <span className="text-sm font-mono text-[var(--text-secondary)]">{stats.processingTimeMs}ms</span>
             </div>
           )}
         </div>
 
         {/* Preview content */}
-        <div className="flex-1 overflow-auto p-6 bg-slate-50">
-          <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+        <div className="flex-1 overflow-auto p-6 bg-[var(--bg-primary)]">
+          <div className="max-w-4xl mx-auto card p-8 animate-fade-in">
             <pre
-              className="whitespace-pre-wrap font-mono text-sm text-slate-700 leading-relaxed"
+              className="whitespace-pre-wrap font-mono text-sm text-[var(--text-secondary)] leading-relaxed"
               dangerouslySetInnerHTML={{ __html: highlightedContent }}
             />
           </div>
@@ -154,27 +206,49 @@ export function ReviewPanel() {
       </div>
 
       {/* Right: Detection Panel */}
-      <div className="w-96 flex flex-col bg-white">
+      <div className="w-[400px] flex flex-col bg-[var(--bg-secondary)]">
         {/* Stats header */}
-        <div className="px-4 py-3 border-b border-slate-200">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="font-medium text-slate-700">Detected Items</h2>
-            <span className="text-sm text-slate-500">
-              {approvedCount}/{detections.length} selected
-            </span>
+        <div className="px-5 py-4 border-b border-[var(--border-primary)]">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-[var(--accent-primary-dim)] flex items-center justify-center">
+                <svg className="w-4 h-4 text-[var(--accent-primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+              </div>
+              <h2 className="font-display font-semibold text-[var(--text-primary)]">Detections</h2>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-2xl font-display font-bold text-[var(--accent-primary)]">{approvedCount}</span>
+              <span className="text-sm text-[var(--text-tertiary)]">/ {detections.length}</span>
+            </div>
+          </div>
+
+          {/* Progress bar */}
+          <div className="h-1.5 bg-[var(--bg-tertiary)] rounded-full overflow-hidden mb-4">
+            <div
+              className="h-full bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] transition-all duration-300"
+              style={{ width: detections.length > 0 ? `${(approvedCount / detections.length) * 100}%` : '0%' }}
+            />
           </div>
 
           <div className="flex gap-2">
             <button
               onClick={approveAll}
-              className="flex-1 px-3 py-1.5 text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-md transition-colors"
+              className="flex-1 btn-secondary px-3 py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5"
             >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4" />
+              </svg>
               Select All
             </button>
             <button
               onClick={rejectAll}
-              className="flex-1 px-3 py-1.5 text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-md transition-colors"
+              className="flex-1 btn-secondary px-3 py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5"
             >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
               Deselect All
             </button>
           </div>
@@ -186,87 +260,139 @@ export function ReviewPanel() {
             const items = groupedDetections[category]
             if (items.length === 0) return null
 
-            const colors = categoryColors[category]
             const approvedInCategory = items.filter(d => d.approved).length
+            const isExpanded = expandedCategories.has(category)
+            const config = categoryConfig[category]
 
             return (
-              <div key={category} className="border-b border-slate-100">
-                <div className={`px-4 py-2 ${colors.bg} flex items-center justify-between`}>
-                  <span className={`font-medium text-sm ${colors.text}`}>
-                    {categoryLabels[category]} ({items.length})
-                  </span>
-                  <span className="text-xs text-slate-500">
-                    {approvedInCategory} selected
-                  </span>
-                </div>
-
-                <div className="divide-y divide-slate-100">
-                  {items.map((detection) => (
-                    <label
-                      key={detection.id}
-                      className="flex items-start gap-3 px-4 py-2 hover:bg-slate-50 cursor-pointer"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={detection.approved}
-                        onChange={() => toggleDetection(detection.id)}
-                        className="mt-1 w-4 h-4 rounded border-slate-300 text-blue-500 focus:ring-blue-500"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="font-mono text-sm text-slate-800 truncate">
-                            {detection.text}
-                          </span>
-                          <span className={`shrink-0 text-xs px-1.5 py-0.5 rounded ${colors.bg} ${colors.text}`}>
-                            {detection.confidence}%
-                          </span>
-                        </div>
-                        <div className="text-xs text-slate-500 mt-0.5">
-                          → {detection.suggestedPlaceholder}
-                        </div>
+              <div key={category} className="border-b border-[var(--border-secondary)]">
+                {/* Category header */}
+                <button
+                  onClick={() => toggleCategory(category)}
+                  className={`w-full px-4 py-3 flex items-center justify-between hover:bg-[var(--bg-tertiary)] transition-colors`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center badge-${category}`}>
+                      {config.icon}
+                    </div>
+                    <div className="text-left">
+                      <span className="font-medium text-sm text-[var(--text-primary)]">
+                        {config.label}
+                      </span>
+                      <div className="text-xs text-[var(--text-tertiary)]">
+                        {approvedInCategory} of {items.length} selected
                       </div>
-                    </label>
-                  ))}
-                </div>
+                    </div>
+                  </div>
+                  <svg
+                    className={`w-4 h-4 text-[var(--text-tertiary)] transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                {/* Detection items */}
+                {isExpanded && (
+                  <div className="bg-[var(--bg-primary)]">
+                    {items.map((detection, index) => (
+                      <label
+                        key={detection.id}
+                        className={`
+                          flex items-start gap-3 px-4 py-3 cursor-pointer transition-all duration-200
+                          hover:bg-[var(--bg-tertiary)] border-l-2
+                          ${detection.approved ? `border-[var(--color-${category})]` : 'border-transparent'}
+                          animate-fade-in
+                        `}
+                        style={{ animationDelay: `${index * 0.03}s` }}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={detection.approved}
+                          onChange={() => toggleDetection(detection.id)}
+                          className="mt-1"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-mono text-sm text-[var(--text-primary)] break-all">
+                              {detection.text}
+                            </span>
+                            <span className={`badge badge-${category} shrink-0`}>
+                              {detection.confidence}%
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1.5 mt-1.5 text-xs text-[var(--text-tertiary)] font-mono">
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                            </svg>
+                            <span className="text-[var(--accent-primary)]">{detection.suggestedPlaceholder}</span>
+                          </div>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+                )}
               </div>
             )
           })}
 
           {detections.length === 0 && (
-            <div className="flex flex-col items-center justify-center h-full text-center p-8">
-              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-3">
-                <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            <div className="flex flex-col items-center justify-center h-full text-center p-8 animate-fade-in">
+              <div className="w-16 h-16 rounded-2xl bg-[var(--color-success-dim)] flex items-center justify-center mb-4">
+                <svg className="w-8 h-8 text-[var(--color-success)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
               </div>
-              <p className="text-slate-600 font-medium">No sensitive data detected</p>
-              <p className="text-sm text-slate-500 mt-1">Your document appears to be clean</p>
+              <p className="font-display font-semibold text-[var(--text-primary)]">All Clear</p>
+              <p className="text-sm text-[var(--text-tertiary)] mt-1">No sensitive data detected in this document</p>
             </div>
           )}
         </div>
 
         {/* Actions */}
-        <div className="p-4 border-t border-slate-200 space-y-2">
+        <div className="p-4 border-t border-[var(--border-primary)] bg-[var(--bg-tertiary)] space-y-3">
           {config.exportPreferences.includeMappingFile && approvedCount > 0 && (
             <button
               onClick={handleExportMapping}
-              className="w-full px-4 py-2 text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
+              className="w-full btn-secondary px-4 py-2.5 rounded-lg text-sm font-medium flex items-center justify-center gap-2"
             >
-              Export Mapping
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              Export Mapping File
             </button>
           )}
 
-          <div className="flex gap-2">
+          <div className="flex gap-3">
             <button
               onClick={handleCopyToClipboard}
-              className="flex-1 px-4 py-2 text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
+              className="flex-1 btn-secondary px-4 py-2.5 rounded-lg text-sm font-medium flex items-center justify-center gap-2"
             >
-              {copied ? 'Copied!' : 'Copy'}
+              {copied ? (
+                <>
+                  <svg className="w-4 h-4 text-[var(--color-success)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  Copied!
+                </>
+              ) : (
+                <>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                  </svg>
+                  Copy
+                </>
+              )}
             </button>
             <button
               onClick={handleDownload}
-              className="flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors"
+              className="flex-1 btn-primary px-4 py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center gap-2"
             >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
               Download
             </button>
           </div>
