@@ -194,6 +194,26 @@ const builtInRules: DetectionRule[] = [
     confidence: 95,
     placeholderTemplate: '<IP_ADDRESS_{n}>'
   },
+  // Technical - Domain Names
+  {
+    id: 'tech-domain',
+    name: 'Domain Name',
+    category: 'technical',
+    subcategory: 'domain',
+    pattern: /\b(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+(?:com|org|net|edu|gov|mil|int|io|co|ai|app|dev|cloud|tech|info|biz|me|tv|cc|xyz|online|site|website|store|shop|blog|email|pro|name|mobi|asia|eu|uk|de|fr|es|it|nl|be|ch|at|au|ca|us|sa|ae|eg|qa|kw|bh|om|jo|lb|sy|iq|ye|ps|ma|dz|tn|ly|sd|so|local|internal|intranet|corp|lan|test|localhost)\b/gi,
+    confidence: 80,
+    placeholderTemplate: '<DOMAIN_{n}>'
+  },
+  // Technical - Full URLs
+  {
+    id: 'tech-url',
+    name: 'URL',
+    category: 'technical',
+    subcategory: 'url',
+    pattern: /\bhttps?:\/\/[^\s<>"{}|\\^`[\]]+/gi,
+    confidence: 85,
+    placeholderTemplate: '<URL_{n}>'
+  },
   // Technical - API Key patterns
   {
     id: 'tech-api-key',
@@ -273,25 +293,6 @@ const builtInRules: DetectionRule[] = [
     pattern: /\b\d+(?:\.\d+)?%\b/g,
     confidence: 50,
     placeholderTemplate: '<PERCENTAGE_{n}>'
-  },
-  // Dates (various formats)
-  {
-    id: 'pii-date-numeric',
-    name: 'Date (Numeric)',
-    category: 'pii',
-    subcategory: 'date',
-    pattern: /\b(?:\d{1,2}[-/]\d{1,2}[-/]\d{2,4}|\d{4}[-/]\d{1,2}[-/]\d{1,2})\b/g,
-    confidence: 70,
-    placeholderTemplate: '<DATE_{n}>'
-  },
-  {
-    id: 'pii-date-text',
-    name: 'Date (Text)',
-    category: 'pii',
-    subcategory: 'date',
-    pattern: /\b(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)[.\s]+\d{1,2}(?:st|nd|rd|th)?[,\s]+\d{4}\b/gi,
-    confidence: 75,
-    placeholderTemplate: '<DATE_{n}>'
   },
   // Technical - GitHub Token
   {
