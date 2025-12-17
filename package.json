@@ -21,7 +21,10 @@
     "privacy",
     "masking"
   ],
-  "author": "iYassr",
+  "author": {
+    "name": "iYassr",
+    "email": "iyassr@users.noreply.github.com"
+  },
   "license": "MIT",
   "dependencies": {
     "compromise": "^14.14.4",
