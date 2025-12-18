@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" width="200" height="60">
+  <defs>
+    <linearGradient id="grad3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f43f5e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ec4899;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Icon: Eye with horizontal line through it (redacted) -->
+  <ellipse cx="24" cy="30" rx="18" ry="12" fill="none" stroke="url(#grad3)" stroke-width="2.5"/>
+  <circle cx="24" cy="30" r="6" fill="url(#grad3)" opacity="0.3"/>
+  <!-- Redaction line -->
+  <rect x="4" y="27" width="40" height="6" rx="3" fill="url(#grad3)"/>
+
+  <!-- Text: Maskr -->
+  <text x="52" y="40" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="700" fill="#1f2937">
+    Mask<tspan fill="url(#grad3)">r</tspan>
+  </text>
+</svg>

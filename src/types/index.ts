@@ -17,6 +17,16 @@ export interface Detection {
   suggestedPlaceholder: string
   context: string
   approved: boolean
+  isImageDetection?: boolean
+  imageId?: string
+}
+
+export interface LogoConfig {
+  enabled: boolean
+  imageData: string | null      // base64 thumbnail for preview
+  imageHash: string | null      // perceptual hash for comparison
+  similarityThreshold: number   // 0-100, default 85
+  placeholderText: string       // default "[LOGO REMOVED]"
 }
 
 export type DetectionCategory = 'pii' | 'company' | 'financial' | 'technical' | 'custom'
@@ -51,6 +61,7 @@ export interface Config {
     includeMappingFile: boolean
     defaultFormat: 'same' | 'txt' | 'md'
   }
+  logoDetection: LogoConfig
 }
 
 export interface NamedEntity {

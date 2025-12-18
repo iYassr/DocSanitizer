@@ -89,6 +89,23 @@ interface ConfigProfile {
   }
 }
 
+interface LogoHashResult {
+  success: boolean
+  hash?: string
+  thumbnail?: string
+  width?: number
+  height?: number
+  error?: string
+}
+
+interface LogoScanResult {
+  success: boolean
+  matchedImageIds?: string[]
+  scannedCount?: number
+  similarities?: Array<{ id: string; similarity: number }>
+  error?: string
+}
+
 interface Window {
   api: {
     openFile: () => Promise<FileData | null>
@@ -107,6 +124,9 @@ interface Window {
     profilesDelete: (id: string) => Promise<boolean>
     profilesCreate: (name: string, config: ConfigProfile['config']) => Promise<ConfigProfile>
     getVersion: () => Promise<string>
+    logoIsAvailable: () => Promise<boolean>
+    logoComputeHash: (imageBufferBase64: string) => Promise<LogoHashResult>
+    logoScanDocument: (filePath: string, bufferBase64: string, logoHash: string, threshold: number) => Promise<LogoScanResult>
     platform: NodeJS.Platform
     onMenuEvent: (channel: string, callback: (...args: unknown[]) => void) => void
     removeMenuListener: (channel: string) => void

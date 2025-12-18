@@ -1,8 +1,10 @@
 import { useState, useCallback, useRef } from 'react'
 import { useDocumentStore } from '../stores/documentStore'
+import { useConfigStore } from '../stores/configStore'
 import type { Detection, DetectionCategory } from '../types'
 import { Spinner } from './ui/spinner'
-import { Upload, FileText, Shield, User, Building2, DollarSign, Cpu, Key, CheckCircle } from 'lucide-react'
+import { LogoSettings } from './LogoSettings'
+import { Upload, Shield, User, Building2, DollarSign, Cpu, Key, CheckCircle, Settings, Image } from 'lucide-react'
 
 const SUPPORTED_EXTENSIONS = ['.pdf', '.docx', '.doc', '.xlsx', '.xls', '.csv', '.txt', '.md']
 
@@ -41,9 +43,11 @@ export function UploadStep({ onFileUploaded }: UploadStepProps) {
   const [isProcessing, setIsProcessing] = useState(false)
   const [processingStatus, setProcessingStatus] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const [showLogoSettings, setShowLogoSettings] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const { setFile, setContent, setDetections, setStats } = useDocumentStore()
+  const { config } = useConfigStore()
 
   const processFile = useCallback(async (file: File) => {
     setError(null)
@@ -133,6 +137,51 @@ export function UploadStep({ onFileUploaded }: UploadStepProps) {
         }
       })
 
+      // Logo detection for DOCX files
+      const logoDetection = config.logoDetection
+      const extension = file.name.split('.').pop()?.toLowerCase()
+
+      if (
+        logoDetection.enabled &&
+        logoDetection.imageHash &&
+        extension === 'docx' &&
+        parseResult.hasImages
+      ) {
+        setProcessingStatus('Scanning for company logos...')
+
+        try {
+          const logoResult = await window.api?.logoScanDocument(
+            file.name,
+            buffer,
+            logoDetection.imageHash,
+            logoDetection.similarityThreshold
+          )
+
+          if (logoResult?.success && logoResult.matchedImageIds && logoResult.matchedImageIds.length > 0) {
+            // Add logo detections
+            logoResult.matchedImageIds.forEach((imageId: string, idx: number) => {
+              const similarity = logoResult.similarities?.find((s: { id: string; similarity: number }) => s.id === imageId)?.similarity || 0
+              detections.push({
+                id: `logo-detection-${idx}-${imageId}`,
+                text: `[Image: ${imageId}]`,
+                category: 'company',
+                subcategory: 'Logo',
+                confidence: similarity / 100,
+                position: { start: 0, end: 0 },
+                suggestedPlaceholder: logoDetection.placeholderText,
+                context: `Company logo detected in document (${Math.round(similarity)}% match)`,
+                approved: true,
+                isImageDetection: true,
+                imageId: imageId
+              })
+            })
+          }
+        } catch (logoErr) {
+          console.warn('Logo detection failed:', logoErr)
+          // Continue without logo detection
+        }
+      }
+
       // Calculate stats safely
       const stats = {
         totalDetections: detections.length,
@@ -166,7 +215,7 @@ export function UploadStep({ onFileUploaded }: UploadStepProps) {
       setIsProcessing(false)
       setProcessingStatus('')
     }
-  }, [setFile, setContent, setDetections, setStats, onFileUploaded])
+  }, [setFile, setContent, setDetections, setStats, onFileUploaded, config.logoDetection])
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault()
@@ -277,16 +326,28 @@ export function UploadStep({ onFileUploaded }: UploadStepProps) {
         </div>
       </div>
 
+      {/* Logo Settings Dialog */}
+      <LogoSettings open={showLogoSettings} onOpenChange={setShowLogoSettings} />
+
       {/* Right side - Info panel */}
       <div className="w-96 flex flex-col p-8 bg-muted/20">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-            <Shield className="h-5 w-5 text-primary" />
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Shield className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-xl font-semibold text-foreground">DocSanitizer</h1>
+              <p className="text-sm text-muted-foreground">Protect your data</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-xl font-semibold text-foreground">DocSanitizer</h1>
-            <p className="text-sm text-muted-foreground">Protect your data</p>
-          </div>
+          <button
+            onClick={() => setShowLogoSettings(true)}
+            className="p-2 rounded-md hover:bg-muted transition-colors"
+            title="Logo Detection Settings"
+          >
+            <Settings className="h-5 w-5 text-muted-foreground" />
+          </button>
         </div>
 
         <p className="text-muted-foreground mb-8">
@@ -322,6 +383,11 @@ export function UploadStep({ onFileUploaded }: UploadStepProps) {
             icon={<Key className="h-4 w-4" />}
             title="Credentials"
             description="API keys, passwords, tokens"
+          />
+          <FeatureItem
+            icon={<Image className="h-4 w-4" />}
+            title="Company Logos"
+            description="Detect and remove logos from DOCX files"
           />
         </div>
 

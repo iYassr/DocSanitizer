@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { Config, DetectionCategory } from '../types'
+import type { Config, DetectionCategory, LogoConfig } from '../types'
 
 // Input validation helpers
 const MAX_STRING_LENGTH = 500
@@ -44,6 +44,13 @@ const defaultConfig: Config = {
   exportPreferences: {
     includeMappingFile: true,
     defaultFormat: 'same'
+  },
+  logoDetection: {
+    enabled: false,
+    imageData: null,
+    imageHash: null,
+    similarityThreshold: 85,
+    placeholderText: '[LOGO REMOVED]'
   }
 }
 
@@ -62,6 +69,8 @@ interface ConfigState {
   addInternalDomain: (domain: string) => void
   removeInternalDomain: (domain: string) => void
   toggleCategory: (category: DetectionCategory) => void
+  setLogoConfig: (logoConfig: Partial<LogoConfig>) => void
+  clearLogo: () => void
   resetConfig: () => void
 }
 
@@ -261,6 +270,45 @@ export const useConfigStore = create<ConfigState>()(
             }
           }
         }),
+
+      setLogoConfig: (logoConfig) =>
+        set((state) => {
+          const sanitizedConfig: Partial<LogoConfig> = {}
+          if (logoConfig.enabled !== undefined) {
+            sanitizedConfig.enabled = Boolean(logoConfig.enabled)
+          }
+          if (logoConfig.imageData !== undefined) {
+            sanitizedConfig.imageData = logoConfig.imageData
+          }
+          if (logoConfig.imageHash !== undefined) {
+            sanitizedConfig.imageHash = logoConfig.imageHash
+          }
+          if (logoConfig.similarityThreshold !== undefined) {
+            sanitizedConfig.similarityThreshold = Math.min(100, Math.max(0, Math.round(logoConfig.similarityThreshold)))
+          }
+          if (logoConfig.placeholderText !== undefined) {
+            sanitizedConfig.placeholderText = sanitizeString(logoConfig.placeholderText, 50)
+          }
+          return {
+            config: {
+              ...state.config,
+              logoDetection: { ...state.config.logoDetection, ...sanitizedConfig }
+            }
+          }
+        }),
+
+      clearLogo: () =>
+        set((state) => ({
+          config: {
+            ...state.config,
+            logoDetection: {
+              ...state.config.logoDetection,
+              enabled: false,
+              imageData: null,
+              imageHash: null
+            }
+          }
+        })),
 
       resetConfig: () => set({ config: defaultConfig })
     }),

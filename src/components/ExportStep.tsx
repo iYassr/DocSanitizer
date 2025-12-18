@@ -57,15 +57,6 @@ function applyMasking(content: string, detections: Detection[]): string {
   }
 }
 
-// Category colors
-const categoryColors: Record<string, string> = {
-  pii: 'bg-red-500',
-  company: 'bg-blue-500',
-  financial: 'bg-green-500',
-  technical: 'bg-purple-500',
-  custom: 'bg-yellow-500'
-}
-
 export function ExportStep({ onBack, onReset }: ExportStepProps) {
   const { file, content, detections, maskedContent, setMaskedContent, setMappings } = useDocumentStore()
 

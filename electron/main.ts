@@ -15,6 +15,12 @@ import {
   combineOCRResults,
   isValidImage
 } from './services/ocr.js'
+import {
+  computePerceptualHash,
+  calculateSimilarity,
+  createThumbnail,
+  isSharpAvailable
+} from './services/image-hash.js'
 import { createApplicationMenu } from './menu.js'
 import {
   getAllProfiles,
@@ -348,3 +354,113 @@ ipcMain.handle('profiles:delete', (_event, id: string) => {
 ipcMain.handle('profiles:create', (_event, name: string, config: ConfigProfile['config']) => {
   return createProfile(name, config)
 })
+
+// Logo detection handlers
+
+// Check if Sharp is available for logo detection
+ipcMain.handle('logo:isAvailable', () => {
+  return isSharpAvailable()
+})
+
+// Compute hash for an uploaded logo image
+ipcMain.handle('logo:computeHash', async (_event, imageBufferBase64: string) => {
+  try {
+    if (!isSharpAvailable()) {
+      return {
+        success: false,
+        error: 'Sharp is not available - logo detection is disabled'
+      }
+    }
+
+    const buffer = Buffer.from(imageBufferBase64, 'base64')
+    const hashResult = await computePerceptualHash(buffer)
+
+    if (!hashResult) {
+      return {
+        success: false,
+        error: 'Failed to compute image hash'
+      }
+    }
+
+    // Create thumbnail for preview
+    const thumbnail = await createThumbnail(buffer, 128)
+
+    return {
+      success: true,
+      hash: hashResult.hash,
+      thumbnail,
+      width: hashResult.width,
+      height: hashResult.height
+    }
+  } catch (error) {
+    console.error('Logo hash computation error:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    }
+  }
+})
+
+// Scan a document for logo matches
+ipcMain.handle(
+  'logo:scanDocument',
+  async (
+    _event,
+    filePath: string,
+    bufferBase64: string,
+    logoHash: string,
+    threshold: number
+  ) => {
+    try {
+      if (!isSharpAvailable()) {
+        return {
+          success: false,
+          error: 'Sharp is not available - logo detection is disabled'
+        }
+      }
+
+      const buffer = Buffer.from(bufferBase64, 'base64')
+      const parsed = await parseDocument(filePath, buffer)
+
+      if (!parsed.images || parsed.images.length === 0) {
+        return {
+          success: true,
+          matchedImageIds: [],
+          scannedCount: 0
+        }
+      }
+
+      const matchedImageIds: string[] = []
+      const similarities: { id: string; similarity: number }[] = []
+
+      for (const image of parsed.images) {
+        try {
+          const imageHashResult = await computePerceptualHash(image.data)
+          if (imageHashResult) {
+            const similarity = calculateSimilarity(imageHashResult.hash, logoHash)
+            similarities.push({ id: image.id, similarity })
+
+            if (similarity >= threshold) {
+              matchedImageIds.push(image.id)
+            }
+          }
+        } catch (imgError) {
+          console.warn(`Failed to hash image ${image.id}:`, imgError)
+        }
+      }
+
+      return {
+        success: true,
+        matchedImageIds,
+        scannedCount: parsed.images.length,
+        similarities
+      }
+    } catch (error) {
+      console.error('Logo scan error:', error)
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      }
+    }
+  }
+)

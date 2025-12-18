@@ -80,6 +80,23 @@ export interface ConfigProfile {
   }
 }
 
+export interface LogoHashResult {
+  success: boolean
+  hash?: string
+  thumbnail?: string  // base64 PNG
+  width?: number
+  height?: number
+  error?: string
+}
+
+export interface LogoScanResult {
+  success: boolean
+  matchedImageIds?: string[]
+  scannedCount?: number
+  similarities?: Array<{ id: string; similarity: number }>
+  error?: string
+}
+
 const api = {
   // File operations
   openFile: (): Promise<FileData | null> => ipcRenderer.invoke('dialog:openFile'),
@@ -120,6 +137,18 @@ const api = {
 
   // App info
   getVersion: (): Promise<string> => ipcRenderer.invoke('app:getVersion'),
+
+  // Logo detection
+  logoIsAvailable: (): Promise<boolean> => ipcRenderer.invoke('logo:isAvailable'),
+  logoComputeHash: (imageBufferBase64: string): Promise<LogoHashResult> =>
+    ipcRenderer.invoke('logo:computeHash', imageBufferBase64),
+  logoScanDocument: (
+    filePath: string,
+    bufferBase64: string,
+    logoHash: string,
+    threshold: number
+  ): Promise<LogoScanResult> =>
+    ipcRenderer.invoke('logo:scanDocument', filePath, bufferBase64, logoHash, threshold),
 
   // Platform info
   platform: process.platform,
