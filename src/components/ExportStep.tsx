@@ -139,7 +139,21 @@ export function ExportStep({ onBack, onReset }: ExportStepProps) {
       const baseName = file?.fileName?.replace(/\.[^/.]+$/, '') || 'document'
       const defaultName = `${baseName}_sanitized.${ext}`
 
-      const contentBase64 = btoa(unescape(encodeURIComponent(maskedContent)))
+      // For binary formats (docx, xlsx, pdf), use createMaskedDocument
+      const binaryFormats = ['docx', 'xlsx', 'pdf']
+      let contentBase64: string
+
+      if (binaryFormats.includes(ext) && file?.buffer) {
+        // Create proper binary document
+        const result = await window.api?.createMaskedDocument(file.buffer, maskedContent, ext)
+        if (!result?.success || !result.buffer) {
+          throw new Error(result?.error || 'Failed to create document')
+        }
+        contentBase64 = result.buffer
+      } else {
+        // For text formats, just encode the content
+        contentBase64 = btoa(unescape(encodeURIComponent(maskedContent)))
+      }
 
       const result = await window.api?.saveFile(contentBase64, defaultName, ext)
 
@@ -147,7 +161,8 @@ export function ExportStep({ onBack, onReset }: ExportStepProps) {
         setExportSuccess(true)
       }
     } catch (err) {
-      setError('Failed to export document')
+      console.error('Export error:', err)
+      setError(err instanceof Error ? err.message : 'Failed to export document')
     } finally {
       setIsExporting(false)
     }

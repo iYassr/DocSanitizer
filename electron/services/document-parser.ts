@@ -161,7 +161,7 @@ async function parseCsv(buffer: Buffer): Promise<ParsedDocument> {
 async function parsePdf(buffer: Buffer): Promise<ParsedDocument> {
   // Use unpdf for lightweight PDF text extraction
   try {
-    const { extractText, getDocumentProxy } = await import('unpdf')
+    const { extractText } = await import('unpdf')
 
     // Convert Buffer to Uint8Array for unpdf
     const uint8Array = new Uint8Array(buffer)
@@ -307,7 +307,9 @@ export async function createMaskedPdf(
   const pdfDoc = await PDFDocument.create()
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica)
 
-  const lines = maskedContent.split('\n')
+  // Ensure maskedContent is a valid string
+  const safeContent = typeof maskedContent === 'string' ? maskedContent : String(maskedContent || '')
+  const lines = safeContent.split('\n')
   const fontSize = 10
   const lineHeight = fontSize * 1.5
   const margin = 50

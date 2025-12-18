@@ -455,7 +455,7 @@ ipcMain.handle(
               matchedImageIds.push(image.id)
             }
           }
-        } catch (imgError) {
+        } catch {
           // Skip images that fail to hash
         }
       }

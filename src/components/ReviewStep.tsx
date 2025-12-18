@@ -35,6 +35,29 @@ const categoryColors: Record<DetectionCategory, string> = {
 type SortField = 'text' | 'category' | 'confidence' | 'replacement'
 type SortDirection = 'asc' | 'desc'
 
+// SortableHeader component - defined outside to avoid recreating during render
+function SortableHeader({
+  field,
+  children,
+  sortField,
+  onSort
+}: {
+  field: SortField
+  children: React.ReactNode
+  sortField: SortField
+  onSort: (field: SortField) => void
+}) {
+  return (
+    <button
+      onClick={() => onSort(field)}
+      className="flex items-center gap-1 hover:text-foreground transition-colors"
+    >
+      {children}
+      <ArrowUpDown className={`h-3 w-3 ${sortField === field ? 'opacity-100' : 'opacity-40'}`} />
+    </button>
+  )
+}
+
 interface ReviewStepProps {
   onContinue: () => void
   onBack: () => void
@@ -141,16 +164,6 @@ export function ReviewStep({ onContinue, onBack }: ReviewStepProps) {
     })
   }, [filteredDetections, toggleDetection])
 
-  const SortableHeader = ({ field, children }: { field: SortField; children: React.ReactNode }) => (
-    <button
-      onClick={() => handleSort(field)}
-      className="flex items-center gap-1 hover:text-foreground transition-colors"
-    >
-      {children}
-      <ArrowUpDown className={`h-3 w-3 ${sortField === field ? 'opacity-100' : 'opacity-40'}`} />
-    </button>
-  )
-
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
@@ -231,16 +244,16 @@ export function ReviewStep({ onContinue, onBack }: ReviewStepProps) {
                   />
                 </TableHead>
                 <TableHead>
-                  <SortableHeader field="text">Original</SortableHeader>
+                  <SortableHeader field="text" sortField={sortField} onSort={handleSort}>Original</SortableHeader>
                 </TableHead>
                 <TableHead className="w-32">
-                  <SortableHeader field="category">Category</SortableHeader>
+                  <SortableHeader field="category" sortField={sortField} onSort={handleSort}>Category</SortableHeader>
                 </TableHead>
                 <TableHead className="w-24">
-                  <SortableHeader field="confidence">Confidence</SortableHeader>
+                  <SortableHeader field="confidence" sortField={sortField} onSort={handleSort}>Confidence</SortableHeader>
                 </TableHead>
                 <TableHead className="w-40">
-                  <SortableHeader field="replacement">Replacement</SortableHeader>
+                  <SortableHeader field="replacement" sortField={sortField} onSort={handleSort}>Replacement</SortableHeader>
                 </TableHead>
                 <TableHead className="w-64">Context</TableHead>
               </TableRow>

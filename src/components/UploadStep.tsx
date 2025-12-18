@@ -98,12 +98,9 @@ export function UploadStep({ onFileUploaded }: UploadStepProps) {
           const ocrResult = await window.api?.ocrExtractText(buffer)
           if (ocrResult?.success && ocrResult.text) {
             contentForNER = ocrResult.text
-            console.log('OCR extracted text:', contentForNER.substring(0, 200))
-          } else {
-            console.warn('OCR failed or returned no text:', ocrResult?.error)
           }
-        } catch (ocrErr) {
-          console.warn('OCR error:', ocrErr)
+        } catch {
+          // OCR failed, continue without extracted text
         }
       }
 
@@ -168,12 +165,6 @@ export function UploadStep({ onFileUploaded }: UploadStepProps) {
 
       // Logo detection for DOCX files
       const logoDetection = config.logoDetection
-      console.log('Logo detection check:', {
-        enabled: logoDetection.enabled,
-        hasHash: !!logoDetection.imageHash,
-        extension,
-        hasImages: parseResult.hasImages
-      })
 
       if (
         logoDetection.enabled &&
@@ -182,7 +173,6 @@ export function UploadStep({ onFileUploaded }: UploadStepProps) {
         parseResult.hasImages
       ) {
         setProcessingStatus('Scanning for company logos...')
-        console.log('Starting logo scan...')
 
         try {
           const logoResult = await window.api?.logoScanDocument(
@@ -191,7 +181,6 @@ export function UploadStep({ onFileUploaded }: UploadStepProps) {
             logoDetection.imageHash,
             logoDetection.similarityThreshold
           )
-          console.log('Logo scan result:', logoResult)
 
           if (logoResult?.success && logoResult.matchedImageIds && logoResult.matchedImageIds.length > 0) {
             // Add logo detections
@@ -212,9 +201,8 @@ export function UploadStep({ onFileUploaded }: UploadStepProps) {
               })
             })
           }
-        } catch (logoErr) {
-          console.warn('Logo detection failed:', logoErr)
-          // Continue without logo detection
+        } catch {
+          // Logo detection failed, continue without it
         }
       }
 

@@ -17,22 +17,29 @@ release/
 .idea/
 *.swp
 *.swo
+*.sublime-*
 
 # OS files
 .DS_Store
+.DS_Store?
+._*
 Thumbs.db
+ehthumbs.db
 
 # Logs
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
 
 # Testing
 coverage/
 test-results/
+test-output/
 playwright-report/
 playwright/.cache/
+*.test.ts.snap
 
 # Electron builder
 *.dmg
@@ -40,6 +47,8 @@ playwright/.cache/
 *.deb
 *.exe
 *.snap
+*.msi
+*.nsis
 
 # TypeScript build info
 *.tsbuildinfo
@@ -47,3 +56,13 @@ playwright/.cache/
 # Misc
 *.local
 *.traineddata
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.bak
+
+# Package manager locks (keep package-lock.json)
+yarn.lock
+pnpm-lock.yaml

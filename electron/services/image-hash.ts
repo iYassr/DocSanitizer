@@ -10,8 +10,8 @@ const require = createRequire(import.meta.url)
 let sharp: typeof import('sharp') | null = null
 try {
   sharp = require('sharp')
-} catch (err) {
-  console.log('Sharp not available - logo detection disabled', err)
+} catch {
+  // Sharp not available - logo detection will be disabled
 }
 
 export interface ImageHashResult {

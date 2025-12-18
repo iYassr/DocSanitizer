@@ -1,9 +1,17 @@
 {
   "name": "docsanitizer",
   "version": "1.0.0",
-  "description": "Desktop application for detecting and masking sensitive information in documents",
+  "description": "A privacy-focused desktop app for detecting and masking sensitive information in documents before sharing with AI or other parties",
   "main": "dist-electron/main.js",
   "type": "module",
+  "homepage": "https://github.com/iYassr/DocSanitizer",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iYassr/DocSanitizer.git"
+  },
+  "bugs": {
+    "url": "https://github.com/iYassr/DocSanitizer/issues"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build && electron-builder",
@@ -13,30 +21,32 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "npm run build:vite && npx playwright test",
-    "test:ci": "npm run build:vite && xvfb-run --auto-servernum -- npx playwright test",
-    "test:headed": "npm run build:vite && npx playwright test --headed",
-    "test:debug": "npm run build:vite && npx playwright test --debug",
-    "test:ui": "npm run build:vite && npx playwright test --ui",
-    "test:file-uploader": "npm run build:vite && npx playwright test file-uploader",
-    "test:review-panel": "npm run build:vite && npx playwright test review-panel",
-    "test:config-modal": "npm run build:vite && npx playwright test config-modal",
-    "test:detection": "npm run build:vite && npx playwright test detection",
-    "test:workflows": "npm run build:vite && npx playwright test workflows",
-    "test:report": "npx playwright show-report"
+    "test:headed": "npm run build:vite && npx playwright test --headed"
   },
   "keywords": [
     "electron",
+    "desktop",
     "document",
     "sanitizer",
     "pii",
     "privacy",
-    "masking"
+    "masking",
+    "redaction",
+    "sensitive-data",
+    "data-protection",
+    "ocr",
+    "pdf",
+    "docx",
+    "local-first"
   ],
   "author": {
     "name": "iYassr",
-    "email": "iyassr@users.noreply.github.com"
+    "url": "https://github.com/iYassr"
   },
   "license": "MIT",
+  "engines": {
+    "node": ">=20.19.0 || >=22.12.0"
+  },
   "dependencies": {
     "@radix-ui/react-checkbox": "^1.3.3",
     "@radix-ui/react-dialog": "^1.1.15",
@@ -53,6 +63,7 @@
     "docx": "^9.5.1",
     "electron-store": "^11.0.0",
     "exceljs": "^4.4.0",
+    "jszip": "^3.10.1",
     "mammoth": "^1.11.0",
     "pdf-lib": "^1.17.1",
     "react": "^19.1.0",

@@ -1,38 +1,89 @@
-# DocSanitizer
+<p align="center">
+  <img src="logos/maskr-icon.svg" alt="DocSanitizer Logo" width="120" height="120">
+</p>
 
-A local-first desktop application for detecting and masking sensitive information in documents before sharing with AI applications or other parties.
+<h1 align="center">DocSanitizer</h1>
+
+<p align="center">
+  <strong>A privacy-focused desktop app for detecting and masking sensitive information in documents</strong>
+</p>
+
+<p align="center">
+  <a href="#features">Features</a> •
+  <a href="#installation">Installation</a> •
+  <a href="#usage">Usage</a> •
+  <a href="#supported-formats">Formats</a> •
+  <a href="#contributing">Contributing</a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey" alt="Platform">
+  <img src="https://img.shields.io/badge/node-%3E%3D20.19.0-green" alt="Node Version">
+  <img src="https://img.shields.io/badge/license-MIT-blue" alt="License">
+  <img src="https://img.shields.io/badge/electron-39-9feaf9" alt="Electron">
+  <img src="https://img.shields.io/badge/react-19-61dafb" alt="React">
+</p>
+
+---
+
+## Why DocSanitizer?
+
+Before sharing documents with AI assistants, cloud services, or external parties, you need to ensure sensitive information is properly masked. DocSanitizer runs **100% locally** on your machine - no data ever leaves your device.
+
+<p align="center">
+  <img src="screenshots/audit-02-review.png" alt="DocSanitizer Review Interface" width="800">
+</p>
 
 ## Features
 
-- **100% Local Processing**: All document analysis happens on your device - no data leaves your machine
-- **Multi-Format Support**: Process TXT, MD, DOCX, XLSX, CSV, PDF, JSON, HTML files
-- **Image OCR**: Extract and scan text from images (PNG, JPG, JPEG, GIF, BMP, WebP, TIFF) using Tesseract.js
-- **Company Logo Detection**: Upload your company logo and automatically detect/remove it from DOCX files using perceptual hashing
-- **Smart Detection**: Automatically detect PII including:
-  - Email addresses
-  - Phone numbers (US, UK, Saudi, international formats)
-  - Social Security Numbers
-  - Credit card numbers (with Luhn validation)
-  - Saudi National IDs
-  - IBANs (with structure validation)
-  - IP addresses (IPv4 and IPv6)
-  - AWS keys and API tokens
-  - Person names (via custom names list)
-  - And more...
-- **Custom Detection**: Add your own keywords, names, and patterns to detect
-- **Configurable Profiles**: Save and switch between detection profiles
-- **Entity Consistency**: Same entity always maps to the same placeholder
-- **Review & Edit**: Review detections with confidence scores before applying masks
-- **Export Options**: Export sanitized documents in original format
+### Privacy First
+- **100% Local Processing** - All analysis happens on your device
+- **No Internet Required** - Works completely offline
+- **No Telemetry** - Zero data collection or tracking
+- **No Cloud Services** - Your documents stay on your machine
+
+### Smart Detection
+- **Email Addresses** - Personal and corporate emails
+- **Phone Numbers** - US, UK, Saudi, and international formats
+- **Credit Cards** - With Luhn algorithm validation
+- **Social Security Numbers** - US SSN format
+- **IBANs** - International bank account numbers with validation
+- **IP Addresses** - Both IPv4 and IPv6
+- **API Keys & Tokens** - AWS keys, API tokens, secrets
+- **Custom Names** - Add your own names to detect
+- **Custom Keywords** - Define project-specific terms
+
+### Advanced Capabilities
+- **OCR Support** - Extract and scan text from images using Tesseract.js
+- **Logo Detection** - Detect and remove company logos from DOCX files using perceptual hashing
+- **Confidence Scores** - Each detection includes a confidence rating
+- **Entity Consistency** - Same entity always maps to the same placeholder
+- **Configuration Profiles** - Save and switch between detection settings
+
+## Supported Formats
+
+| Format | Parse | Export | OCR | Logo Detection |
+|--------|-------|--------|-----|----------------|
+| TXT    | Yes   | Yes    | -   | -              |
+| MD     | Yes   | Yes    | -   | -              |
+| JSON   | Yes   | Yes    | -   | -              |
+| CSV    | Yes   | Yes    | -   | -              |
+| HTML   | Yes   | Yes    | -   | -              |
+| DOCX   | Yes   | Yes    | -   | Yes            |
+| XLSX   | Yes   | Yes    | -   | -              |
+| PDF    | Yes   | Yes    | -   | -              |
+| PNG    | Yes   | -      | Yes | -              |
+| JPG    | Yes   | -      | Yes | -              |
+| WebP   | Yes   | -      | Yes | -              |
 
 ## Installation
 
 ### Prerequisites
 
-- Node.js 20.19+ or 22.12+ (required by Vite 7)
-- npm or yarn
+- **Node.js** 20.19+ or 22.12+ (required by Vite 7)
+- **npm** (comes with Node.js)
 
-### Development Setup
+### Quick Start
 
 ```bash
 # Clone the repository
@@ -42,9 +93,6 @@ cd DocSanitizer
 # Install dependencies
 npm install
 
-# If using nvm, ensure correct Node version
-nvm use 22
-
 # Start development server
 npm run dev
 ```
@@ -52,103 +100,92 @@ npm run dev
 ### Building for Production
 
 ```bash
-# Build the application
+# Build and package the application
 npm run build
-
-# Or build without packaging
-npm run build:vite
 ```
 
-The packaged application will be in the `release` directory.
+The packaged application will be available in the `release` directory.
+
+### Platform-Specific Builds
+
+The build process automatically creates installers for your current platform:
+- **macOS**: `.dmg` file
+- **Windows**: `.exe` installer
+- **Linux**: `.AppImage` and `.deb` packages
 
 ## Usage
 
-1. **Configure Settings** (Optional):
-   - Click the sliders icon to add custom names and keywords
-   - Click the gear icon to configure logo detection
+### Basic Workflow
 
-2. **Open a Document**: Click the upload area or drag and drop a file
+1. **Upload** - Drag and drop a document or click to browse
+2. **Review** - See detected sensitive information with confidence scores
+3. **Customize** - Toggle individual detections on/off
+4. **Export** - Save the sanitized document
 
-3. **Review Detections**: See highlighted sensitive information with categories and confidence scores
+### Configuration Options
 
-4. **Customize**: Toggle individual detections on/off, filter by category
+#### Custom Names & Keywords
+Click the sliders icon to add:
+- **Custom Names** - Employee names, client names, etc.
+- **Custom Keywords** - Project names, confidential terms
 
-5. **Export**: Save the sanitized document
+These will be detected with 100% confidence.
 
-### Logo Detection Setup
-
-1. Click the gear icon in the upload step
+#### Logo Detection (DOCX only)
+1. Click the gear icon
 2. Upload your company logo (PNG, JPG, WebP)
-3. Adjust the similarity threshold (default 85%)
-4. Enable logo detection
-5. When processing DOCX files, matching logos will be detected and can be replaced
-
-### Custom Names & Keywords
-
-1. Click the sliders icon in the upload step
-2. Add custom names (employee names, client names, etc.)
-3. Add custom keywords (project names, confidential terms, etc.)
-4. These will be detected with 100% confidence
+3. Adjust similarity threshold (default: 85%)
+4. Enable detection
 
 ### Keyboard Shortcuts
 
-- `Cmd/Ctrl + O`: Open file
-- `Cmd/Ctrl + S`: Export sanitized document
-- `Cmd/Ctrl + 1`: Show original view
-- `Cmd/Ctrl + 2`: Show sanitized view
-- `Cmd/Ctrl + 3`: Side by side view
-- `Cmd/Ctrl + ,`: Open preferences (macOS)
-
-## Configuration Profiles
-
-DocSanitizer comes with built-in profiles:
-
-- **Default**: Balanced detection for common PII
-- **Strict (All PII)**: Maximum detection, lower confidence threshold
-- **Minimal (Contacts Only)**: Only detect emails and phone numbers
-
-You can also create custom profiles via the Profiles menu.
+| Shortcut | Action |
+|----------|--------|
+| `Cmd/Ctrl + O` | Open file |
+| `Cmd/Ctrl + S` | Export sanitized document |
+| `Cmd/Ctrl + 1` | Original view |
+| `Cmd/Ctrl + 2` | Sanitized view |
+| `Cmd/Ctrl + 3` | Side-by-side view |
 
 ## Detection Categories
 
-| Category | Examples | Color |
-|----------|----------|-------|
-| PII (Personal) | Names, emails, phones, IDs | Red |
-| Company | Organization names, logos | Blue |
-| Financial | Currency amounts, IBANs, credit cards | Green |
-| Technical | IP addresses, API keys, URLs | Purple |
-| Custom | User-defined keywords | Yellow |
+| Category | Color | Examples |
+|----------|-------|----------|
+| **PII** | Red | Names, emails, phones, SSN |
+| **Company** | Blue | Organization names, logos |
+| **Financial** | Green | Credit cards, IBANs, amounts |
+| **Technical** | Purple | IP addresses, API keys |
+| **Custom** | Yellow | User-defined keywords |
+
+## Configuration Profiles
+
+DocSanitizer includes preset profiles:
+
+- **Default** - Balanced detection for common PII
+- **Strict** - Maximum detection, lower confidence threshold
+- **Minimal** - Only emails and phone numbers
+
+Create custom profiles via the Profiles menu.
 
 ## Tech Stack
 
-- **Electron**: Cross-platform desktop framework
-- **React 19**: UI framework
-- **TypeScript**: Type-safe development
-- **Vite 7**: Fast build tool
-- **Tailwind CSS 4**: Styling
-- **Zustand**: State management with persistence
-- **Tesseract.js**: OCR engine for image text extraction
-- **Sharp**: Image processing for logo detection
-- **compromise.js**: NER extraction
-- **mammoth/docx**: DOCX handling
-- **JSZip**: DOCX image extraction
-- **ExcelJS**: XLSX handling
-- **pdf-parse/pdf-lib**: PDF handling
-
-## Privacy
-
-DocSanitizer is designed with privacy as a core principle:
-
-- No internet connection required for processing
-- No telemetry or analytics
-- No cloud services
-- All processing happens locally on your machine
-- Configuration stored locally using encrypted storage
+| Technology | Purpose |
+|------------|---------|
+| Electron 39 | Cross-platform desktop |
+| React 19 | UI framework |
+| TypeScript 5 | Type safety |
+| Vite 7 | Build tool |
+| Tailwind CSS 4 | Styling |
+| Zustand | State management |
+| Tesseract.js | OCR engine |
+| Sharp | Image processing |
+| mammoth | DOCX parsing |
+| ExcelJS | XLSX handling |
+| pdf-lib | PDF handling |
 
 ## Troubleshooting
 
 ### Node.js Version Error
-If you see "Vite requires Node.js version 20.19+ or 22.12+":
 ```bash
 # Using nvm
 nvm install 22
@@ -156,19 +193,46 @@ nvm use 22
 ```
 
 ### Logo Detection Not Working
-- Ensure Sharp is installed correctly (`npm install sharp`)
+- Ensure Sharp is installed: `npm install sharp`
 - Logo detection only works with DOCX files
-- Try adjusting the similarity threshold (lower = more matches)
+- Try lowering the similarity threshold
 
-### OCR Not Extracting Text
-- OCR requires Tesseract.js trained data
-- For best results, use clear, high-resolution images
-- Supported formats: PNG, JPG, JPEG, GIF, BMP, WebP, TIFF
-
-## License
-
-MIT
+### OCR Issues
+- Use clear, high-resolution images
+- Supported: PNG, JPG, JPEG, GIF, BMP, WebP, TIFF
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+### Development
+
+```bash
+# Run in development mode
+npm run dev
+
+# Type checking
+npm run typecheck
+
+# Linting
+npm run lint
+
+# Run tests
+npm test
+```
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- [Tesseract.js](https://tesseract.projectnaptha.com/) for OCR capabilities
+- [Radix UI](https://www.radix-ui.com/) for accessible components
+- [Tailwind CSS](https://tailwindcss.com/) for styling
+
+---
+
+<p align="center">
+  Made with privacy in mind
+</p>

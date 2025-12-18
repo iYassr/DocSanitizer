@@ -6,8 +6,8 @@ const require = createRequire(import.meta.url)
 let sharp: typeof import('sharp') | null = null
 try {
   sharp = require('sharp')
-} catch (err) {
-  console.log('Sharp not available - image preprocessing disabled', err)
+} catch {
+  // Sharp not available - image preprocessing will be skipped
 }
 
 export interface OCRResult {
