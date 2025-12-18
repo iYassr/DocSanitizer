@@ -159,47 +159,57 @@ async function parseCsv(buffer: Buffer): Promise<ParsedDocument> {
 }
 
 async function parsePdf(buffer: Buffer): Promise<ParsedDocument> {
-  const images: ParsedDocument['images'] = []
-
-  // Use dynamic import for pdf-parse as it has issues with ESM
+  // Use unpdf for lightweight PDF text extraction
   try {
-    const pdfParse = (await import('pdf-parse')).default
-    const data = await pdfParse(buffer)
+    const { extractText, getDocumentProxy } = await import('unpdf')
 
-    // Try to extract embedded images using pdf-lib
+    // Convert Buffer to Uint8Array for unpdf
+    const uint8Array = new Uint8Array(buffer)
+
+    // Extract text from PDF
+    const { text, totalPages } = await extractText(uint8Array)
+
+    // Try to get metadata using pdf-lib
+    let title: string | undefined
+    let author: string | undefined
     try {
-      await PDFDocument.load(buffer, { ignoreEncryption: true })
-      // Note: pdf-lib doesn't provide easy image extraction
-      // Images would need more complex parsing - for now we note if there might be images
+      const pdfDoc = await PDFDocument.load(buffer, { ignoreEncryption: true })
+      title = pdfDoc.getTitle() || undefined
+      author = pdfDoc.getAuthor() || undefined
     } catch {
-      // Ignore image extraction errors
+      // Ignore metadata extraction errors
     }
 
     return {
-      content: data.text,
+      content: text,
       format: 'pdf',
       metadata: {
-        pages: data.numpages,
-        title: data.info?.Title,
-        author: data.info?.Author
-      },
-      images: images.length > 0 ? images : undefined
+        pages: totalPages,
+        title,
+        author
+      }
     }
   } catch (error) {
-    // Fallback: try to extract what we can from the PDF
+    // Fallback: try to extract what we can from the PDF using pdf-lib
     console.error('PDF parsing error:', error)
 
-    // Try using pdf-lib as a fallback for basic text
-    const pdfDoc = await PDFDocument.load(buffer, { ignoreEncryption: true })
-    const pages = pdfDoc.getPages()
+    try {
+      const pdfDoc = await PDFDocument.load(buffer, { ignoreEncryption: true })
+      const pages = pdfDoc.getPages()
 
-    return {
-      content: `[PDF document with ${pages.length} pages - text extraction failed]`,
-      format: 'pdf',
-      metadata: {
-        pages: pages.length,
-        title: pdfDoc.getTitle() || undefined,
-        author: pdfDoc.getAuthor() || undefined
+      return {
+        content: `[PDF document with ${pages.length} pages - text extraction failed]`,
+        format: 'pdf',
+        metadata: {
+          pages: pages.length,
+          title: pdfDoc.getTitle() || undefined,
+          author: pdfDoc.getAuthor() || undefined
+        }
+      }
+    } catch {
+      return {
+        content: '[PDF document - text extraction failed]',
+        format: 'pdf'
       }
     }
   }

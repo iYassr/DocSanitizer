@@ -3,7 +3,7 @@ import { useDocumentStore } from './stores/documentStore'
 import { UploadStep } from './components/UploadStep'
 import { ReviewStep } from './components/ReviewStep'
 import { ExportStep } from './components/ExportStep'
-import { Check } from 'lucide-react'
+import { Check } from './components/ui/icons'
 
 type Step = 'upload' | 'review' | 'export'
 

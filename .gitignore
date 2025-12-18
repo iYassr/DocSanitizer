@@ -46,3 +46,4 @@ playwright/.cache/
 
 # Misc
 *.local
+*.traineddata

@@ -3,7 +3,7 @@ import { useDocumentStore } from '../stores/documentStore'
 import type { Detection } from '../types'
 import { Button } from './ui/button'
 import { ScrollArea } from './ui/scroll-area'
-import { ChevronLeft, Download, Copy, CheckCircle } from 'lucide-react'
+import { ChevronLeft, Download, Copy, CheckCircle } from './ui/icons'
 
 interface ExportStepProps {
   onBack: () => void

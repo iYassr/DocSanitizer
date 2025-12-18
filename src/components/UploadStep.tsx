@@ -5,7 +5,7 @@ import type { Detection, DetectionCategory } from '../types'
 import { Spinner } from './ui/spinner'
 import { LogoSettings } from './LogoSettings'
 import { ConfigModal } from './ConfigModal'
-import { Upload, Shield, User, Building2, DollarSign, Cpu, Key, CheckCircle, Settings, Image, Sliders } from 'lucide-react'
+import { Upload, Shield, User, Building2, DollarSign, Cpu, Key, CheckCircle, Settings, Image, Sliders } from './ui/icons'
 
 const SUPPORTED_EXTENSIONS = ['.pdf', '.docx', '.doc', '.xlsx', '.xls', '.csv', '.txt', '.md', '.png', '.jpg', '.jpeg', '.gif', '.bmp', '.webp', '.tiff']
 

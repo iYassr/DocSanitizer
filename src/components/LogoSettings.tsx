@@ -11,7 +11,7 @@ import {
 import { Button } from './ui/button'
 import { Switch } from './ui/switch'
 import { Spinner } from './ui/spinner'
-import { Upload, Trash2, Image, AlertCircle } from 'lucide-react'
+import { Upload, Trash2, Image, AlertCircle } from './ui/icons'
 
 interface LogoSettingsProps {
   open: boolean

@@ -9,7 +9,7 @@ import {
 } from './ui/dialog'
 import { Button } from './ui/button'
 import { ScrollArea } from './ui/scroll-area'
-import { X, Plus, User, Key } from 'lucide-react'
+import { X, Plus, User, Key } from './ui/icons'
 
 interface ConfigModalProps {
   open: boolean

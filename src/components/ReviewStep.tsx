@@ -12,7 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from './ui/table'
-import { ChevronLeft, ChevronRight, Search, ArrowUpDown } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Search, ArrowUpDown } from './ui/icons'
 
 // Category labels
 const CATEGORY_LABELS: Record<DetectionCategory, string> = {

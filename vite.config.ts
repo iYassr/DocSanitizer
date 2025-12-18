@@ -21,7 +21,7 @@ export default defineConfig({
                 'electron-store',
                 'mammoth',
                 'exceljs',
-                'pdf-parse',
+                'unpdf',
                 'pdf-lib',
                 'docx',
                 'compromise',
