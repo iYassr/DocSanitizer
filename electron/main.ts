@@ -58,9 +58,7 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
-      // Note: sandbox disabled due to IPC issues with document parsing
-      // Security is maintained via contextIsolation, nodeIntegration:false, and input validation
-      sandbox: false
+      sandbox: true
     },
     titleBarStyle: 'hiddenInset',
     show: false
@@ -353,6 +351,11 @@ ipcMain.handle(
 // Get app version
 ipcMain.handle('app:getVersion', () => {
   return app.getVersion()
+})
+
+// Get platform
+ipcMain.handle('app:getPlatform', () => {
+  return process.platform
 })
 
 // OCR - Extract text from image

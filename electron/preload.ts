@@ -151,7 +151,7 @@ const api = {
     ipcRenderer.invoke('logo:scanDocument', filePath, bufferBase64, logoHash, threshold),
 
   // Platform info
-  platform: process.platform,
+  getPlatform: (): Promise<string> => ipcRenderer.invoke('app:getPlatform'),
 
   // Menu event listeners
   onMenuEvent: (channel: string, callback: (...args: unknown[]) => void) => {
