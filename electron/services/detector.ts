@@ -407,7 +407,8 @@ function detectFullNames(
   const people = doc.people()
 
   people.forEach((person: ReturnType<typeof nlp>) => {
-    const name = person.text()
+    // Clean up the name - remove trailing punctuation
+    const name = person.text().replace(/[,;:]+$/, '').trim()
 
     // Only detect if name has at least 2 parts (first + last)
     const parts = name.trim().split(/\s+/)
