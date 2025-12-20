@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 100" width="300" height="100">
+  <rect x="0" y="0" width="300" height="100" fill="#0f0f0f"/>
+  <!-- Glitch layers -->
+  <text x="148" y="65" font-family="Arial Black, sans-serif" font-size="50" font-weight="900" fill="#ff0040" text-anchor="middle" opacity="0.8">maskr</text>
+  <text x="152" y="65" font-family="Arial Black, sans-serif" font-size="50" font-weight="900" fill="#00ffff" text-anchor="middle" opacity="0.8">maskr</text>
+  <text x="150" y="65" font-family="Arial Black, sans-serif" font-size="50" font-weight="900" fill="#ffffff" text-anchor="middle">maskr</text>
+  <!-- Glitch lines -->
+  <rect x="0" y="38" width="300" height="3" fill="#ff0040" opacity="0.3"/>
+  <rect x="0" y="58" width="300" height="2" fill="#00ffff" opacity="0.3"/>
+</svg>

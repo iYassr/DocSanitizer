@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 120" width="320" height="120">
+  <rect x="0" y="0" width="320" height="120" rx="12" fill="#282a36"/>
+  <!-- Dracula dots -->
+  <circle cx="20" cy="20" r="6" fill="#ff5555"/>
+  <circle cx="40" cy="20" r="6" fill="#f1fa8c"/>
+  <circle cx="60" cy="20" r="6" fill="#50fa7b"/>
+  <!-- Dracula prompt -->
+  <text x="20" y="68" font-family="Fira Code, monospace" font-size="18" fill="#bd93f9">➜</text>
+  <text x="50" y="68" font-family="Fira Code, monospace" font-size="18" fill="#8be9fd">maskr</text>
+  <text x="125" y="68" font-family="Fira Code, monospace" font-size="18" fill="#6272a4">git:(</text>
+  <text x="175" y="68" font-family="Fira Code, monospace" font-size="18" fill="#ff79c6">main</text>
+  <text x="220" y="68" font-family="Fira Code, monospace" font-size="18" fill="#6272a4">)</text>
+  <text x="20" y="100" font-family="Fira Code, monospace" font-size="24" fill="#f8f8f2">maskr</text>
+  <rect x="130" y="82" width="12" height="24" fill="#f8f8f2"/>
+</svg>

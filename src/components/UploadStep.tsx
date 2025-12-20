@@ -360,7 +360,12 @@ export function UploadStep({ onFileUploaded }: UploadStepProps) {
       <div className="w-96 flex flex-col p-8 bg-muted/20">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <img src="/logo-full.svg" alt="Maskr" className="h-14" />
+            <svg viewBox="0 0 175 90" className="h-14" xmlns="http://www.w3.org/2000/svg">
+              <rect x="0" y="0" width="175" height="90" fill="#282828" rx="8"/>
+              <text x="10" y="45" fontFamily="ui-monospace, monospace" fontSize="28" fill="#ebdbb2">maskr</text>
+              <rect x="150" y="25" width="14" height="28" fill="#fe8019"/>
+              <text x="10" y="75" fontFamily="ui-monospace, monospace" fontSize="13" fill="#928374"># document sanitizer</text>
+            </svg>
           </div>
           <div className="flex items-center gap-1">
             <button

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 120" width="320" height="120">
+  <rect x="0" y="0" width="320" height="120" rx="12" fill="#1e1e2e"/>
+  <!-- Catppuccin dots -->
+  <circle cx="20" cy="20" r="6" fill="#f38ba8"/>
+  <circle cx="40" cy="20" r="6" fill="#f9e2af"/>
+  <circle cx="60" cy="20" r="6" fill="#a6e3a1"/>
+  <!-- Starship-style prompt -->
+  <text x="20" y="60" font-family="JetBrains Mono, monospace" font-size="14" fill="#cba6f7">┌──(</text>
+  <text x="75" y="60" font-family="JetBrains Mono, monospace" font-size="14" fill="#89b4fa">maskr</text>
+  <text x="130" y="60" font-family="JetBrains Mono, monospace" font-size="14" fill="#cba6f7">)</text>
+  <text x="20" y="85" font-family="JetBrains Mono, monospace" font-size="14" fill="#cba6f7">└─</text>
+  <text x="55" y="85" font-family="JetBrains Mono, monospace" font-size="14" fill="#f38ba8">$</text>
+  <text x="75" y="95" font-family="JetBrains Mono, monospace" font-size="28" fill="#cdd6f4">maskr</text>
+  <rect x="195" y="77" width="12" height="24" fill="#f5c2e7"/>
+</svg>

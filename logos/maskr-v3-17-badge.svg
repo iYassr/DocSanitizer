@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="g17" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#fbbf24"/>
+      <stop offset="100%" style="stop-color:#f59e0b"/>
+    </linearGradient>
+  </defs>
+  <!-- Outer decorative ring -->
+  <circle cx="100" cy="100" r="95" fill="#1e293b"/>
+  <circle cx="100" cy="100" r="85" fill="none" stroke="url(#g17)" stroke-width="3"/>
+  <circle cx="100" cy="100" r="75" fill="none" stroke="url(#g17)" stroke-width="1"/>
+  <!-- Inner circle -->
+  <circle cx="100" cy="100" r="65" fill="url(#g17)"/>
+  <!-- Text -->
+  <text x="100" y="108" font-family="Georgia, serif" font-size="32" font-weight="bold" fill="#1e293b" text-anchor="middle">maskr</text>
+  <!-- Decorative stars -->
+  <text x="30" y="105" font-size="14" fill="url(#g17)">★</text>
+  <text x="165" y="105" font-size="14" fill="url(#g17)">★</text>
+</svg>

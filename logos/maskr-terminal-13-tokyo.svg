@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 120" width="320" height="120">
+  <rect x="0" y="0" width="320" height="120" rx="12" fill="#1a1b26"/>
+  <!-- Tokyo Night dots -->
+  <circle cx="20" cy="20" r="6" fill="#f7768e"/>
+  <circle cx="40" cy="20" r="6" fill="#e0af68"/>
+  <circle cx="60" cy="20" r="6" fill="#9ece6a"/>
+  <!-- Tokyo Night prompt -->
+  <text x="20" y="65" font-family="Victor Mono, monospace" font-size="16" fill="#7aa2f7">~/dev</text>
+  <text x="85" y="65" font-family="Victor Mono, monospace" font-size="16" fill="#bb9af7">❯❯❯</text>
+  <text x="20" y="95" font-family="Victor Mono, monospace" font-size="28" fill="#c0caf5">maskr</text>
+  <rect x="140" y="77" width="12" height="24" fill="#7dcfff"/>
+  <text x="170" y="95" font-family="Victor Mono, monospace" font-size="16" fill="#565f89">--protect</text>
+</svg>

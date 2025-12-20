@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="grad10" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#22d3ee"/>
+      <stop offset="100%" style="stop-color:#0891b2"/>
+    </linearGradient>
+  </defs>
+  <!-- Dark tech background -->
+  <rect x="10" y="10" width="180" height="180" rx="16" fill="#0f172a"/>
+  <!-- Grid lines -->
+  <line x1="10" y1="70" x2="190" y2="70" stroke="#1e293b" stroke-width="1"/>
+  <line x1="10" y1="130" x2="190" y2="130" stroke="#1e293b" stroke-width="1"/>
+  <line x1="70" y1="10" x2="70" y2="190" stroke="#1e293b" stroke-width="1"/>
+  <line x1="130" y1="10" x2="130" y2="190" stroke="#1e293b" stroke-width="1"/>
+  <!-- Glowing M -->
+  <text x="100" y="125" font-family="Consolas, monospace" font-size="80" font-weight="bold" fill="url(#grad10)" text-anchor="middle">M</text>
+  <!-- Scan lines effect -->
+  <rect x="30" y="145" width="40" height="4" rx="2" fill="url(#grad10)"/>
+  <rect x="80" y="145" width="60" height="4" rx="2" fill="url(#grad10)" opacity="0.7"/>
+  <rect x="150" y="145" width="25" height="4" rx="2" fill="url(#grad10)" opacity="0.5"/>
+  <!-- Corner accents -->
+  <path d="M10,30 L10,10 L30,10" fill="none" stroke="url(#grad10)" stroke-width="3"/>
+  <path d="M170,10 L190,10 L190,30" fill="none" stroke="url(#grad10)" stroke-width="3"/>
+  <path d="M190,170 L190,190 L170,190" fill="none" stroke="url(#grad10)" stroke-width="3"/>
+  <path d="M30,190 L10,190 L10,170" fill="none" stroke="url(#grad10)" stroke-width="3"/>
+  <!-- Binary decoration -->
+  <text x="25" y="58" font-family="Consolas, monospace" font-size="8" fill="url(#grad10)" opacity="0.5">01001</text>
+  <text x="150" y="58" font-family="Consolas, monospace" font-size="8" fill="url(#grad10)" opacity="0.5">10110</text>
+</svg>

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- Circle background -->
+  <circle cx="100" cy="100" r="90" fill="#1e1e2e"/>
+  <!-- Stylized M made of bars -->
+  <rect x="45" y="60" width="16" height="80" rx="4" fill="#f472b6"/>
+  <rect x="92" y="60" width="16" height="80" rx="4" fill="#f472b6"/>
+  <rect x="139" y="60" width="16" height="80" rx="4" fill="#f472b6"/>
+  <!-- Connecting diagonals -->
+  <polygon points="53,60 61,60 108,95 100,95" fill="#f472b6"/>
+  <polygon points="139,60 147,60 100,95 92,95" fill="#f472b6"/>
+  <!-- Redaction underline -->
+  <rect x="45" y="150" width="110" height="6" rx="3" fill="#f472b6" opacity="0.6"/>
+</svg>

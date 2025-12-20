@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 120" width="320" height="120">
+  <!-- CRT monitor effect -->
+  <rect x="0" y="0" width="320" height="120" rx="8" fill="#1a1a0a"/>
+  <!-- Scan lines -->
+  <defs>
+    <pattern id="scanlines" patternUnits="userSpaceOnUse" width="320" height="4">
+      <rect width="320" height="2" fill="#00000030"/>
+    </pattern>
+  </defs>
+  <rect x="0" y="0" width="320" height="120" fill="url(#scanlines)"/>
+  <!-- Amber terminal text -->
+  <text x="20" y="45" font-family="Consolas, Monaco, monospace" font-size="16" fill="#ffb000">C:\MASKR></text>
+  <text x="20" y="75" font-family="Consolas, Monaco, monospace" font-size="32" fill="#ffb000">maskr</text>
+  <rect x="155" y="55" width="16" height="28" fill="#ffb000"/>
+  <text x="20" y="105" font-family="Consolas, Monaco, monospace" font-size="12" fill="#ffb000" opacity="0.7">READY.</text>
+</svg>

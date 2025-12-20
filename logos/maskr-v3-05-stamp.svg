@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <circle cx="100" cy="100" r="90" fill="none" stroke="#dc2626" stroke-width="8"/>
+  <circle cx="100" cy="100" r="75" fill="none" stroke="#dc2626" stroke-width="3"/>
+  <text x="100" y="90" font-family="Impact, sans-serif" font-size="36" fill="#dc2626" text-anchor="middle">maskr</text>
+  <line x1="30" y1="110" x2="170" y2="110" stroke="#dc2626" stroke-width="3"/>
+  <text x="100" y="135" font-family="Arial, sans-serif" font-size="16" fill="#dc2626" text-anchor="middle">REDACTED</text>
+  <!-- Stamp effect rotation -->
+  <rect x="20" y="95" width="160" height="30" fill="none" stroke="#dc2626" stroke-width="2" transform="rotate(-8 100 100)"/>
+</svg>

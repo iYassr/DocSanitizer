@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 120" width="320" height="120">
+  <rect x="0" y="0" width="320" height="120" rx="10" fill="#012456"/>
+  <!-- PowerShell header -->
+  <rect x="0" y="0" width="320" height="28" fill="#00325a"/>
+  <text x="15" y="19" font-family="Segoe UI, sans-serif" font-size="12" fill="#ffffff">Windows PowerShell</text>
+  <!-- Close buttons -->
+  <rect x="270" y="8" width="12" height="12" fill="transparent" stroke="#ffffff" stroke-width="1" opacity="0.5"/>
+  <rect x="286" y="8" width="12" height="12" fill="transparent" stroke="#ffffff" stroke-width="1" opacity="0.5"/>
+  <text x="304" y="17" font-family="Segoe UI, sans-serif" font-size="12" fill="#ffffff" opacity="0.7">×</text>
+  <!-- Command -->
+  <text x="20" y="60" font-family="Consolas, monospace" font-size="16" fill="#ffff00">PS C:\></text>
+  <text x="100" y="60" font-family="Consolas, monospace" font-size="16" fill="#ffffff">./maskr</text>
+  <text x="20" y="90" font-family="Consolas, monospace" font-size="24" fill="#00bfff">maskr</text>
+  <text x="115" y="90" font-family="Consolas, monospace" font-size="24" fill="#ffffff">: sanitizing...</text>
+</svg>

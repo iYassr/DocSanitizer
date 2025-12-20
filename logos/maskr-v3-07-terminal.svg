@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 120" width="320" height="120">
+  <rect x="0" y="0" width="320" height="120" rx="12" fill="#1a1a2e"/>
+  <!-- Terminal dots -->
+  <circle cx="20" cy="20" r="6" fill="#ff5f56"/>
+  <circle cx="40" cy="20" r="6" fill="#ffbd2e"/>
+  <circle cx="60" cy="20" r="6" fill="#27ca40"/>
+  <!-- Command line -->
+  <text x="20" y="70" font-family="Consolas, Monaco, monospace" font-size="28" fill="#4ade80">$</text>
+  <text x="50" y="70" font-family="Consolas, Monaco, monospace" font-size="28" fill="#f8fafc">maskr</text>
+  <rect x="165" y="52" width="14" height="26" fill="#4ade80" opacity="0.8"/>
+  <text x="20" y="100" font-family="Consolas, Monaco, monospace" font-size="14" fill="#64748b">sanitizing documents...</text>
+</svg>

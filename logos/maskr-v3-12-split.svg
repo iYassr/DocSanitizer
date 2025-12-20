@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 100" width="300" height="100">
+  <rect x="0" y="0" width="150" height="100" fill="#1e293b"/>
+  <rect x="150" y="0" width="150" height="100" fill="#6366f1"/>
+  <text x="150" y="65" font-family="Arial, sans-serif" font-size="48" font-weight="bold" text-anchor="middle">
+    <tspan fill="#6366f1">mas</tspan><tspan fill="white">kr</tspan>
+  </text>
+</svg>
