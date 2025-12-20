@@ -1,8 +1,7 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, ReactNode } from 'react'
 import { useDocumentStore } from '../stores/documentStore'
 import type { Detection } from '../types'
 import { Button } from './ui/button'
-import { ScrollArea } from './ui/scroll-area'
 import { ChevronLeft, Download, Copy, CheckCircle } from './ui/icons'
 
 interface ExportStepProps {
@@ -57,6 +56,85 @@ function applyMasking(content: string, detections: Detection[]): string {
   }
 }
 
+// Highlight detected text in original content (red background)
+function highlightOriginal(content: string, detections: Detection[]): ReactNode[] {
+  if (!content || !detections.length) return [content]
+
+  const validDetections = detections
+    .filter(d => d.approved && d.position && d.position.start >= 0 && d.position.end <= content.length)
+    .sort((a, b) => a.position.start - b.position.start)
+
+  if (!validDetections.length) return [content]
+
+  const result: ReactNode[] = []
+  let lastIndex = 0
+
+  validDetections.forEach((detection, idx) => {
+    const start = detection.position.start
+    const end = detection.position.end
+
+    // Add text before this detection
+    if (start > lastIndex) {
+      result.push(content.slice(lastIndex, start))
+    }
+
+    // Add highlighted detection
+    result.push(
+      <span
+        key={`orig-${idx}`}
+        className="bg-red-500/30 text-red-700 dark:text-red-300 px-0.5 rounded"
+      >
+        {content.slice(start, end)}
+      </span>
+    )
+
+    lastIndex = end
+  })
+
+  // Add remaining text
+  if (lastIndex < content.length) {
+    result.push(content.slice(lastIndex))
+  }
+
+  return result
+}
+
+// Highlight placeholders in sanitized content (green background)
+function highlightSanitized(content: string): ReactNode[] {
+  if (!content) return [content]
+
+  const placeholderPattern = /\[[A-Z_]+_\d+\]/g
+  const result: ReactNode[] = []
+  let lastIndex = 0
+  let match: RegExpExecArray | null
+
+  while ((match = placeholderPattern.exec(content)) !== null) {
+    // Add text before this placeholder
+    if (match.index > lastIndex) {
+      result.push(content.slice(lastIndex, match.index))
+    }
+
+    // Add highlighted placeholder
+    result.push(
+      <span
+        key={`san-${match.index}`}
+        className="bg-green-500/30 text-green-700 dark:text-green-300 px-0.5 rounded"
+      >
+        {match[0]}
+      </span>
+    )
+
+    lastIndex = match.index + match[0].length
+  }
+
+  // Add remaining text
+  if (lastIndex < content.length) {
+    result.push(content.slice(lastIndex))
+  }
+
+  return result
+}
+
 export function ExportStep({ onBack, onReset }: ExportStepProps) {
   const { file, content, detections, maskedContent, setMaskedContent, setMappings } = useDocumentStore()
 
@@ -64,7 +142,7 @@ export function ExportStep({ onBack, onReset }: ExportStepProps) {
   const [isExporting, setIsExporting] = useState(false)
   const [exportSuccess, setExportSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [viewMode, setViewMode] = useState<'sanitized' | 'comparison'>('sanitized')
+  const [viewMode, setViewMode] = useState<'sanitized' | 'comparison'>('comparison')
   const [copied, setCopied] = useState(false)
 
   const approvedDetections = useMemo(() =>
@@ -248,24 +326,28 @@ export function ExportStep({ onBack, onReset }: ExportStepProps) {
             <p className="text-muted-foreground">Generating sanitized document...</p>
           </div>
         ) : viewMode === 'comparison' ? (
-          <div className="flex-1 flex gap-0">
-            <div className="flex-1 flex flex-col border-r border-border">
-              <div className="px-4 py-2 border-b border-border flex items-center gap-2">
+          <div className="flex-1 flex gap-0 overflow-hidden">
+            <div className="flex-1 flex flex-col border-r border-border min-w-0">
+              <div className="px-4 py-2 border-b border-border flex items-center gap-2 flex-shrink-0">
                 <span className="w-2 h-2 rounded-full bg-red-500"></span>
                 <span className="text-xs font-medium text-muted-foreground">Original</span>
               </div>
-              <ScrollArea className="flex-1">
-                <pre className="p-4 text-sm whitespace-pre-wrap text-foreground font-mono">{content}</pre>
-              </ScrollArea>
+              <div className="flex-1 overflow-auto">
+                <pre className="p-4 text-sm whitespace-pre-wrap text-foreground font-mono">
+                  {highlightOriginal(content, detections)}
+                </pre>
+              </div>
             </div>
-            <div className="flex-1 flex flex-col">
-              <div className="px-4 py-2 border-b border-border flex items-center gap-2">
+            <div className="flex-1 flex flex-col min-w-0">
+              <div className="px-4 py-2 border-b border-border flex items-center gap-2 flex-shrink-0">
                 <span className="w-2 h-2 rounded-full bg-green-500"></span>
                 <span className="text-xs font-medium text-muted-foreground">Sanitized</span>
               </div>
-              <ScrollArea className="flex-1">
-                <pre className="p-4 text-sm whitespace-pre-wrap text-foreground font-mono">{maskedContent}</pre>
-              </ScrollArea>
+              <div className="flex-1 overflow-auto">
+                <pre className="p-4 text-sm whitespace-pre-wrap text-foreground font-mono">
+                  {highlightSanitized(maskedContent)}
+                </pre>
+              </div>
             </div>
           </div>
         ) : (

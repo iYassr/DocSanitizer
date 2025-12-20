@@ -1,9 +1,9 @@
 # Product Requirements Document: Maskr
 ## Sensitive Information Detection & Masking Desktop Application
 
-**Version:** 1.2
+**Version:** 1.2.0
 **Date:** December 2024
-**Last Updated:** December 2024
+**Last Updated:** December 21, 2024
 
 ---
 
@@ -341,7 +341,7 @@ Frontend (Renderer Process):
 └── File Dialogs: Native Electron dialogs
 
 Backend (Main Process - Node.js):
-├── NLP/NER: Compromise.js (lightweight, fast)
+├── NLP: Compromise.js (automatic name detection)
 ├── OCR: Tesseract.js (local processing)
 ├── Document Processing:
 │   ├── DOCX: mammoth (read) + docx (write)
@@ -1020,12 +1020,14 @@ useEffect(() => {
 - [x] DOCX parsing with mammoth, writing with docx
 - [x] Excel (XLSX) support with ExcelJS
 - [x] PDF support with pdf-parse and pdf-lib
-- [x] NER integration (Compromise.js) for names/organizations
+- [x] NLP integration (Compromise.js) for automatic full name detection
 - [x] Financial pattern detection (amounts, IBANs, credit cards)
-- [x] Saudi-specific patterns (National ID, Saudi phone)
+- [x] Saudi-specific patterns (National ID/Iqama, Saudi phone, Saudi IBAN)
+- [x] URL and domain detection
 - [x] Entity consistency engine (same entity = same token)
 - [x] Detection confidence scoring
 - [x] Mapping file export
+- [x] Duplicate detection (all occurrences detected)
 
 ### Phase 3: Image Handling & OCR (1-2 weeks) - COMPLETED
 - [x] Image detection in DOCX documents (using JSZip)
@@ -1038,18 +1040,23 @@ useEffect(() => {
 - [ ] Bundle Arabic + English trained data
 - [ ] Text masking within images
 
-### Phase 4: Polish & Distribution (2 weeks) - PARTIALLY COMPLETED
+### Phase 4: Polish & Distribution (2 weeks) - COMPLETED
 - [x] Configuration profiles (save/load/export/import)
 - [x] Application menu bar (File, Edit, View, Help)
 - [x] Recent documents list
 - [x] Keyboard shortcuts
-- [x] Comprehensive testing
+- [x] Comprehensive testing (E2E with Playwright)
 - [x] User documentation
+- [x] Gruvbox theme with orange accent
+- [x] Compare view with red/green highlighting
+- [x] Custom app icon (development and production)
+- [x] macOS builds (dmg, arm64/x64)
+- [x] Windows builds (exe installer, portable)
+- [x] Linux builds (AppImage, deb)
 - [ ] Native notifications (processing complete)
 - [ ] Auto-updater integration
 - [ ] macOS notarization & code signing
 - [ ] Windows code signing
-- [ ] Linux AppImage/deb builds
 
 ### Phase 5: Advanced Features (Future)
 - [ ] Batch processing (folder scan)

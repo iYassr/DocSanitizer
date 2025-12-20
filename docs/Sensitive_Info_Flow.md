@@ -2,7 +2,7 @@
 
 ## Overview
 
-Maskr uses a multi-layered detection system to identify and mask sensitive information in documents. The system combines regex-based pattern matching, Natural Language Processing (NLP), and user-defined custom patterns.
+Maskr uses a multi-layered detection system to identify and mask sensitive information in documents. The system combines regex-based pattern matching, NLP-based name detection using compromise.js, and user-defined custom patterns. All processing happens 100% locally on the user's machine.
 
 ---
 
@@ -34,21 +34,22 @@ Maskr uses a multi-layered detection system to identify and mask sensitive infor
                     │               │               │
                     ▼               ▼               ▼
 ┌───────────────────────┐ ┌─────────────────┐ ┌─────────────────────────────┐
-│   REGEX DETECTOR      │ │  NER ENGINE     │ │   CUSTOM PATTERNS           │
-│   (detector.ts)       │ │  (ner.ts)       │ │   (User Config)             │
-│   [PRIMARY]           │ │  [SECONDARY]    │ │                             │
+│   REGEX DETECTOR      │ │  NLP ENGINE     │ │   CUSTOM PATTERNS           │
+│   (detector.ts)       │ │  (detector.ts)  │ │   (User Config)             │
+│   [PRIMARY]           │ │  [INTEGRATED]   │ │                             │
 │                       │ │                 │ │                             │
 │ • Email               │ │ • Person Names  │ │ • Company Name + Aliases    │
-│ • Phone Numbers       │ │   (custom only) │ │ • Internal Domains          │
-│ • National IDs        │ │ • Organizations │ │ • Custom Keywords           │
-│ • Credit Cards        │ │ • Money (with   │ │ • Client Names              │
-│ • IBANs               │ │   symbols only) │ │ • Project Names             │
-│ • SSN                 │ │ • IP Addresses  │ │                             │
-│ • IP Addresses        │ │                 │ │                             │
-│ • URLs/Domains        │ │ Uses:           │ │                             │
-│ • API Keys            │ │ • compromise.js │ │                             │
-│ • Credentials         │ │ • Custom regex  │ │                             │
-│ • Financial Data      │ │                 │ │                             │
+│ • Phone Numbers       │ │   (full names   │ │ • Internal Domains          │
+│ • Saudi National IDs  │ │   with 2+ parts)│ │ • Custom Keywords           │
+│ • Credit Cards        │ │                 │ │ • Client Names              │
+│ • IBANs               │ │ Uses:           │ │ • Project Names             │
+│ • IP Addresses        │ │ • compromise.js │ │                             │
+│ • URLs                │ │   NLP library   │ │                             │
+│ • Domain Names        │ │                 │ │                             │
+│ • API Keys            │ │ Features:       │ │                             │
+│ • Credentials         │ │ • Hyphenated    │ │                             │
+│ • Financial Amounts   │ │ • Apostrophes   │ │                             │
+│                       │ │ • Titles (Dr.)  │ │                             │
 └───────────────────────┘ └─────────────────┘ └─────────────────────────────┘
                     │               │               │
                     └───────────────┼───────────────┘
@@ -263,8 +264,7 @@ Custom patterns defined by the user in the configuration.
 | `pii-email` | email | Email Address | `[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}` | 95% | isValidEmail |
 | `pii-phone-intl` | phone | Phone (International) | `(?:\+?[1-9]\d{0,2}[-.\s]?)?\(?\d{2,4}\)?[-.\s]?\d{3,4}[-.\s]?\d{3,4}` | 80% | - |
 | `pii-saudi-phone` | phone | Saudi Phone | `(?:\+?966\|00966\|0)?5[0-9]{8}` | 90% | - |
-| `pii-saudi-id` | national_id | Saudi National ID | `\b[12]\d{9}\b` | 85% | - |
-| `pii-iqama` | national_id | Iqama Number | `\b2\d{9}\b` | 80% | - |
+| `pii-saudi-id` | saudi_id | Saudi National ID | `\b[12]\d{9}\b` | 90% | - |
 | `pii-ssn` | ssn | US Social Security | `\b\d{3}-\d{2}-\d{4}\b` | 95% | - |
 | `pii-iban` | iban | IBAN (General) | `\b[A-Z]{2}\d{2}[A-Z0-9]{4,30}\b` | 90% | isValidIBAN |
 | `pii-saudi-iban` | iban | Saudi IBAN | `\bSA\d{2}[A-Z0-9]{20}\b` | 95% | isValidIBAN |
@@ -273,7 +273,8 @@ Custom patterns defined by the user in the configuration.
 | `pii-address` | address | Street Address | `\b\d{1,5}\s+[\w\s]{1,30}(?:street\|st\|avenue\|...)` | 75% | - |
 | `pii-zip-us` | address | US ZIP Code | `\b\d{5}(?:-\d{4})?\b` | 60% | - |
 | `pii-driver-license` | license | Driver License | `\b(?:DL\|driver'?s?\s*license)[#:\s]*[A-Z0-9]{6,15}\b` | 80% | - |
-| `ner-person` | person_name | Person Name | Custom names list only | 75-100% | - |
+| `nlp-person` | person | Person Name (Full) | NLP: 2+ name parts (compromise.js) | 85% | - |
+| `custom-person` | person | Custom Person Name | User-configured names | 100% | - |
 
 ### Company
 
@@ -297,8 +298,8 @@ Custom patterns defined by the user in the configuration.
 |----|-------------|----------------|---------|------------|
 | `tech-ipv4` | ip_address | IPv4 Address | `\b(?:(?:25[0-5]\|2[0-4][0-9]\|...)\.){3}...\b` | 95% |
 | `tech-ipv6` | ip_address | IPv6 Address | `\b(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}\b` | 95% |
-| `tech-domain` | domain | Domain Name | Common TLDs pattern | 80% |
-| `tech-url` | url | Full URL | `\bhttps?:\/\/[^\s<>"{}|\\^`[\]]+` | 85% |
+| `tech-url` | url | Full URL | `\b(?:https?\|ftp):\/\/[^\s<>"]+` | 95% |
+| `tech-domain` | domain | Domain Name | Common TLDs (.com, .org, .io, .tech, etc.) | 90% |
 | `tech-api-key` | api_key | Generic API Key | `(?:api[_-]?key\|...)=["']?([a-zA-Z0-9_-]{20,})` | 90% |
 | `tech-aws-key` | api_key | AWS Access Key | `\b(?:AKIA\|ABIA\|ACCA\|ASIA)[A-Z0-9]{16}\b` | 95% |
 | `tech-aws-secret` | api_key | AWS Secret Key | `\b[A-Za-z0-9/+=]{40}\b` | 60% |
@@ -364,9 +365,9 @@ The NER engine detects money **only** with explicit currency indicators:
 
 ---
 
-## Name Detection (NER)
+## Name Detection (NLP)
 
-### Important: Custom Names Only
+### Automatic Full Name Detection
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -374,20 +375,32 @@ The NER engine detects money **only** with explicit currency indicators:
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
 │  ╔═══════════════════════════════════════════════════════════════════════╗ │
-│  ║  NAMES ARE ONLY DETECTED IF EXPLICITLY ADDED TO CUSTOM NAMES LIST     ║ │
+│  ║  FULL NAMES (2+ PARTS) ARE AUTOMATICALLY DETECTED USING COMPROMISE.JS ║ │
 │  ╚═══════════════════════════════════════════════════════════════════════╝ │
 │                                                                             │
-│  This prevents false positives from common words that look like names.     │
+│  The NLP engine detects names with at least 2 parts (first + last name).   │
+│  Single names are skipped to reduce false positives.                        │
 │                                                                             │
-│  DETECTED (if in custom list):        NOT DETECTED (unless in list):       │
-│  ─────────────────────────────        ──────────────────────────────       │
-│  "John Smith" ✓ (if configured)       "John Smith" ✗ (auto-detection)      │
-│  "Mohammed Al-Faisal" ✓               "Dear Mr. Anderson" ✗                │
-│                                       "CEO: Elizabeth Warren" ✗            │
+│  AUTOMATICALLY DETECTED:               NOT DETECTED (single names):         │
+│  ────────────────────────              ─────────────────────────────        │
+│  "John Smith" ✓                        "John" ✗                             │
+│  "Sarah Johnson-Williams" ✓            "Sarah" ✗                            │
+│  "Michael O'Brien" ✓                   "Dear John" ✗ (single name)          │
+│  "Ahmed Al-Rashid" ✓                   "Thanks Michael" ✗                   │
+│  "Dr. James Wilson" ✓                                                       │
+│  "Prof. Maria Santos" ✓                                                     │
 │                                                                             │
-│  TO DETECT A NAME:                                                          │
-│  1. Add it to config.customEntities.names                                  │
-│  2. Or add it to the Custom Names field in the UI                          │
+│  FALSE POSITIVE FILTERING:                                                  │
+│  ─────────────────────────                                                  │
+│  Names containing these words are skipped:                                  │
+│  • Company, Corporation, Provider, Owner, Customer, Client                 │
+│  • Employee, Manager, Director, Officer, Partner, Vendor                   │
+│  • Trade, Mark, Trademark, Copyright, Patent                               │
+│  • Service, Product, Software, System, Account                             │
+│                                                                             │
+│  CUSTOM NAMES (100% confidence):                                            │
+│  User-defined names in config.customEntities.names are always detected     │
+│  with 100% confidence, even if they're single names.                       │
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -649,9 +662,10 @@ interface Config {
 
 | Version | Date | Changes |
 |---------|------|---------|
-| 1.0 | 2024 | Initial release with regex + NER detection, pure shadcn UI |
-| 1.1 | 2024 | Removed location/place detection, removed date detection, added IP address detection to NER, clarified detection engine precedence |
-| 1.2 | 2024 | Added company logo detection using perceptual hashing (aHash), OCR support for image files using Tesseract.js, custom names/keywords configuration UI, confidence column in review table, DOCX image extraction using JSZip |
+| 1.0 | 2024-12-19 | Initial release with regex + NER detection, pure shadcn UI |
+| 1.1 | 2024-12-19 | Removed location/place detection, removed date detection, added IP address detection to NER, clarified detection engine precedence |
+| 1.2 | 2024-12-21 | Added company logo detection using perceptual hashing (aHash), OCR support for image files using Tesseract.js, custom names/keywords configuration UI, confidence column in review table, DOCX image extraction using JSZip |
+| 1.2.0 | 2024-12-21 | **Major Update:** NLP-based name detection using compromise.js (automatic full name detection), Saudi ID detection, URL/domain detection, duplicate detection fixed, compare view with red/green highlighting, Gruvbox theme with orange accent |
 
 ---
 
@@ -677,30 +691,32 @@ Test categories include:
 │                    DETECTION ENGINE PRECEDENCE                               │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
-│  1. REGEX ENGINE (detector.ts) - PRIMARY                                    │
-│     ─────────────────────────────────────                                   │
-│     • Runs first                                                            │
-│     • 40+ pattern rules with validators                                     │
-│     • High precision, low false positives                                   │
-│     • Handles: PII, financial, technical, credentials                       │
+│  ALL DETECTION IS NOW UNIFIED IN detector.ts                                │
 │                                                                             │
-│  2. NER ENGINE (ner.ts) - SECONDARY                                         │
-│     ────────────────────────────────────                                    │
-│     • Runs after regex engine                                               │
-│     • Uses compromise.js NLP library                                        │
-│     • Handles: Organizations, custom names, money, IP addresses             │
-│     • Results merged and deduplicated by position                           │
-│                                                                             │
-│  3. CUSTOM PATTERNS (User Config) - HIGHEST PRIORITY                        │
+│  1. CUSTOM NAMES (User Config) - HIGHEST PRIORITY                           │
 │     ─────────────────────────────────────────────────                       │
 │     • User-defined names, keywords, clients, projects                       │
 │     • Always 100% confidence                                                │
-│     • Cannot be overridden by other detectors                               │
+│     • Runs first                                                            │
+│                                                                             │
+│  2. NLP NAME DETECTION (compromise.js)                                      │
+│     ────────────────────────────────────                                    │
+│     • Automatic detection of full names (2+ parts)                          │
+│     • Filters out false positives (Provider, Company, etc.)                │
+│     • 85% confidence                                                        │
+│                                                                             │
+│  3. REGEX-BASED DETECTION                                                   │
+│     ─────────────────────────                                               │
+│     • Financial: amounts, credit cards, IBANs                              │
+│     • IDs: Saudi IDs, IPs                                                   │
+│     • Contact: phones, emails                                               │
+│     • Technical: URLs, domains                                              │
+│     • High precision with validators (Luhn, IBAN checksum)                 │
 │                                                                             │
 │  DEDUPLICATION RULE:                                                        │
 │  ───────────────────                                                        │
-│  If multiple engines detect at the same position, the first detection       │
-│  (by processing order) wins. Regex results take precedence over NER.        │
+│  Detections at the same position are deduplicated by position key.          │
+│  All occurrences of the same value ARE detected (no text deduplication).   │
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```

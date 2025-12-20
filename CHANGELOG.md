@@ -5,6 +5,38 @@ All notable changes to Maskr will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2024-12-21
+
+### Added
+- **NLP-Based Name Detection** - Automatic detection of full names (first + last) using compromise.js
+  - Works with hyphenated names (Sarah Johnson-Williams)
+  - Works with apostrophes (Michael O'Brien)
+  - Works with multicultural names (Ahmed Al-Rashid, Maria Garcia-Lopez)
+  - Titles supported (Dr., Prof., Mr., Ms.)
+  - Single names filtered to reduce false positives
+  - False positive filtering for common words (Provider, Owner, Company, etc.)
+- **Saudi ID Detection** - Detect Saudi National IDs and Iqama numbers
+  - 10-digit numbers starting with 1 (citizens)
+  - 10-digit numbers starting with 2 (residents/Iqama)
+- **URL Detection** - Full URLs (http://, https://, ftp://)
+- **Domain Detection** - Standalone domain names (google.com, api.company.io)
+- **Duplicate Detection** - All occurrences of same sensitive data now detected (was previously deduplicated)
+- **Compare View Improvements**
+  - Compare view now default on export screen
+  - Red highlighting for original sensitive data
+  - Green highlighting for sanitized placeholders
+  - Both panels independently scrollable
+
+### Changed
+- Renamed `ner.ts` to `detector.ts` (more accurate naming)
+- Updated Gruvbox theme with orange accent color (#fe8019)
+- App icon now shows in development mode (macOS dock and window)
+- E2E test updated to check for SVG logo instead of h1
+
+### Fixed
+- Trailing punctuation (commas, colons) stripped from detected names
+- Fixed duplicate detection for emails, phones, credit cards, IBANs
+
 ## [1.1.0] - 2024-12-19
 
 ### Added
@@ -75,3 +107,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [1.0.0]: https://github.com/iYassr/Maskr/releases/tag/v1.0.0
 [1.1.0]: https://github.com/iYassr/Maskr/releases/tag/v1.1.0
+[1.2.0]: https://github.com/iYassr/Maskr/releases/tag/v1.2.0

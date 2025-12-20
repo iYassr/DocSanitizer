@@ -2,7 +2,7 @@ import nlp from 'compromise'
 
 export interface NEREntity {
   text: string
-  type: 'person' | 'financial' | 'credit_card' | 'iban' | 'phone' | 'email' | 'ip' | 'url' | 'domain'
+  type: 'person' | 'financial' | 'credit_card' | 'iban' | 'phone' | 'email' | 'ip' | 'url' | 'domain' | 'saudi_id'
   start: number
   end: number
   confidence?: number
@@ -74,6 +74,9 @@ export function extractEntities(text: string, userCustomNames?: string[]): NEREn
 
   // 10. Extract domain names (after URLs and emails to avoid duplicates)
   detectDomains(text, addEntity)
+
+  // 11. Extract Saudi ID numbers (National ID and Iqama)
+  detectSaudiIDs(text, addEntity)
 
   // Deduplicate entities (same position)
   const seen = new Set<string>()
@@ -406,6 +409,19 @@ function detectFullNames(
   const doc = nlp(text)
   const people = doc.people()
 
+  // Common words that indicate false positives
+  const falsePositiveWords = [
+    'company', 'corporation', 'provider', 'owner', 'customer', 'client',
+    'employee', 'employer', 'manager', 'director', 'officer', 'member',
+    'partner', 'vendor', 'supplier', 'contractor', 'tenant', 'landlord',
+    'buyer', 'seller', 'lender', 'borrower', 'licensee', 'licensor',
+    'assignee', 'assignor', 'beneficiary', 'trustee', 'agent', 'principal',
+    'party', 'parties', 'entity', 'organization', 'business', 'firm',
+    'service', 'services', 'product', 'products', 'software', 'system',
+    'user', 'account', 'holder', 'applicant', 'recipient', 'donor',
+    'trade', 'mark', 'trademark', 'copyright', 'patent'
+  ]
+
   people.forEach((person: ReturnType<typeof nlp>) => {
     // Clean up the name - remove trailing punctuation
     const name = person.text().replace(/[,;:]+$/, '').trim()
@@ -416,6 +432,13 @@ function detectFullNames(
 
     // Skip if name is too short (likely false positive)
     if (name.length < 4) return
+
+    // Skip if contains possessive 's (like "Provider 's")
+    if (name.includes("'s") || name.includes("' s")) return
+
+    // Skip if any part is a common false positive word
+    const lowerParts = parts.map(p => p.toLowerCase().replace(/[^a-z]/g, ''))
+    if (lowerParts.some(p => falsePositiveWords.includes(p))) return
 
     // Find position in original text
     const start = text.indexOf(name)
@@ -523,6 +546,40 @@ function detectDomains(
       type: 'domain',
       start: start,
       end: start + domain.length,
+      confidence: 90
+    })
+  }
+}
+
+// Detect Saudi ID numbers (National ID and Iqama)
+function detectSaudiIDs(
+  text: string,
+  addEntity: (entity: NEREntity) => void
+): void {
+  // Saudi ID pattern:
+  // - National ID (citizens): 10 digits starting with 1
+  // - Iqama (residents): 10 digits starting with 2
+  const saudiIdPattern = /\b[12]\d{9}\b/g
+
+  let match: RegExpExecArray | null
+  while ((match = saudiIdPattern.exec(text)) !== null) {
+    const id = match[0]
+
+    // Validate it's exactly 10 digits
+    if (id.length !== 10) continue
+
+    // Skip if it looks like a phone number (check context)
+    const charBefore = text[match.index - 1] || ''
+    const charAfter = text[match.index + id.length] || ''
+
+    // Skip if preceded by + or followed by more digits
+    if (charBefore === '+' || /\d/.test(charAfter)) continue
+
+    addEntity({
+      text: id,
+      type: 'saudi_id',
+      start: match.index,
+      end: match.index + id.length,
       confidence: 90
     })
   }

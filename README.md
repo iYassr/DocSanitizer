@@ -63,14 +63,16 @@ Preview the sanitized document with all sensitive data replaced by placeholders.
 - **No Cloud Services** - Your documents stay on your machine
 
 ### Smart Detection
+- **Person Names** - Automatic NLP detection using compromise.js (first + last names)
 - **Email Addresses** - Personal and corporate emails
 - **Phone Numbers** - US, UK, Saudi, and international formats
+- **Saudi National IDs** - 10-digit IDs starting with 1 (citizens) or 2 (residents/Iqama)
 - **Credit Cards** - With Luhn algorithm validation
-- **Social Security Numbers** - US SSN format
 - **IBANs** - International bank account numbers with validation
 - **IP Addresses** - Both IPv4 and IPv6
-- **API Keys & Tokens** - AWS keys, API tokens, secrets
-- **Custom Names** - Add your own names to detect
+- **URLs & Domains** - Full URLs and standalone domain names
+- **Financial Amounts** - Currency symbols and amounts
+- **Custom Names** - Add your own names to detect (100% confidence)
 - **Custom Keywords** - Define project-specific terms
 
 ### Advanced Capabilities
@@ -171,10 +173,10 @@ These will be detected with 100% confidence.
 
 | Category | Color | Examples |
 |----------|-------|----------|
-| **PII** | Red | Names, emails, phones, SSN |
+| **PII** | Red | Names, emails, phones, Saudi IDs |
 | **Company** | Blue | Organization names, logos |
 | **Financial** | Green | Credit cards, IBANs, amounts |
-| **Technical** | Purple | IP addresses, API keys |
+| **Technical** | Purple | IP addresses, URLs, domains |
 | **Custom** | Yellow | User-defined keywords |
 
 ## Configuration Profiles
@@ -197,6 +199,7 @@ Create custom profiles via the Profiles menu.
 | Vite 7 | Build tool |
 | Tailwind CSS 4 | Styling |
 | Zustand | State management |
+| compromise | NLP for name detection |
 | Tesseract.js | OCR engine |
 | Sharp | Image processing |
 | mammoth | DOCX parsing |
