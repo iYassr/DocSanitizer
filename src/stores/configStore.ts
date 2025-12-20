@@ -313,7 +313,7 @@ export const useConfigStore = create<ConfigState>()(
       resetConfig: () => set({ config: defaultConfig })
     }),
     {
-      name: 'docsanitizer-config',
+      name: 'maskr-config',
       // Merge persisted state with defaults to handle new properties
       merge: (persistedState, currentState) => {
         const persisted = persistedState as { config?: Partial<Config> } | undefined

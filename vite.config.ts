@@ -21,12 +21,13 @@ export default defineConfig({
                 'electron-store',
                 'mammoth',
                 'exceljs',
-                'unpdf',
+                'pdfjs-dist',
                 'pdf-lib',
                 'docx',
                 'compromise',
                 'tesseract.js',
-                'sharp'
+                'sharp',
+                'jszip'
               ]
             }
           }

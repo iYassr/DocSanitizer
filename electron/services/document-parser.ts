@@ -159,32 +159,65 @@ async function parseCsv(buffer: Buffer): Promise<ParsedDocument> {
 }
 
 async function parsePdf(buffer: Buffer): Promise<ParsedDocument> {
-  // Use unpdf for lightweight PDF text extraction
+  // Use pdfjs-dist for robust PDF text extraction
   try {
-    const { extractText } = await import('unpdf')
+    const pdfjsLib = await import('pdfjs-dist')
 
-    // Convert Buffer to Uint8Array for unpdf
+    // Convert Buffer to Uint8Array for pdfjs
     const uint8Array = new Uint8Array(buffer)
 
-    // Extract text from PDF
-    const { text, totalPages } = await extractText(uint8Array)
+    // Load the PDF document
+    const loadingTask = pdfjsLib.getDocument({
+      data: uint8Array,
+      useSystemFonts: true,
+      // Disable worker for Electron compatibility
+      disableFontFace: true,
+    })
+
+    const pdfDoc = await loadingTask.promise
+    const numPages = pdfDoc.numPages
+    const textParts: string[] = []
+
+    // Extract text from each page
+    for (let i = 1; i <= numPages; i++) {
+      const page = await pdfDoc.getPage(i)
+      const textContent = await page.getTextContent()
+
+      // Safely extract text from items
+      const pageText = textContent.items
+        .map((item: unknown) => {
+          // Type guard for text items
+          if (item && typeof item === 'object' && 'str' in item) {
+            const str = (item as { str: unknown }).str
+            return typeof str === 'string' ? str : String(str || '')
+          }
+          return ''
+        })
+        .join(' ')
+
+      if (pageText.trim()) {
+        textParts.push(pageText)
+      }
+    }
+
+    const content = textParts.join('\n\n')
 
     // Try to get metadata using pdf-lib
     let title: string | undefined
     let author: string | undefined
     try {
-      const pdfDoc = await PDFDocument.load(buffer, { ignoreEncryption: true })
-      title = pdfDoc.getTitle() || undefined
-      author = pdfDoc.getAuthor() || undefined
+      const pdfLibDoc = await PDFDocument.load(buffer, { ignoreEncryption: true })
+      title = pdfLibDoc.getTitle() || undefined
+      author = pdfLibDoc.getAuthor() || undefined
     } catch {
       // Ignore metadata extraction errors
     }
 
     return {
-      content: text,
+      content: content || '[PDF document - no text content extracted]',
       format: 'pdf',
       metadata: {
-        pages: totalPages,
+        pages: numPages,
         title,
         author
       }
@@ -194,16 +227,16 @@ async function parsePdf(buffer: Buffer): Promise<ParsedDocument> {
     console.error('PDF parsing error:', error)
 
     try {
-      const pdfDoc = await PDFDocument.load(buffer, { ignoreEncryption: true })
-      const pages = pdfDoc.getPages()
+      const pdfLibDoc = await PDFDocument.load(buffer, { ignoreEncryption: true })
+      const pages = pdfLibDoc.getPages()
 
       return {
         content: `[PDF document with ${pages.length} pages - text extraction failed]`,
         format: 'pdf',
         metadata: {
           pages: pages.length,
-          title: pdfDoc.getTitle() || undefined,
-          author: pdfDoc.getAuthor() || undefined
+          title: pdfLibDoc.getTitle() || undefined,
+          author: pdfLibDoc.getAuthor() || undefined
         }
       }
     } catch {

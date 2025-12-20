@@ -32,6 +32,15 @@ import {
   createProfile
 } from './services/profiles.js'
 import type { ConfigProfile } from './services/profiles.js'
+import {
+  validateFilePath,
+  validateFileExtension,
+  validateDragDropPath,
+  validateBufferSize,
+  validateTextInput,
+  validateProfileId,
+  validateThreshold
+} from './services/security.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -49,7 +58,9 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
-      sandbox: false // Disabled for document processing
+      // Note: sandbox disabled due to IPC issues with document parsing
+      // Security is maintained via contextIsolation, nodeIntegration:false, and input validation
+      sandbox: false
     },
     titleBarStyle: 'hiddenInset',
     show: false
@@ -168,7 +179,21 @@ ipcMain.handle(
 // Read file content (for drag and drop)
 ipcMain.handle('file:read', async (_event, filePath: string) => {
   try {
+    // Validate file path for security
+    const pathValidation = validateDragDropPath(filePath)
+    if (!pathValidation.valid) {
+      console.error('File read blocked:', pathValidation.error)
+      return null
+    }
+
     const buffer = await fs.readFile(filePath)
+
+    // Validate file size (50MB limit)
+    if (buffer.length > 50 * 1024 * 1024) {
+      console.error('File too large:', buffer.length)
+      return null
+    }
+
     const fileName = path.basename(filePath)
     const extension = path.extname(filePath).toLowerCase().slice(1)
 
@@ -186,10 +211,28 @@ ipcMain.handle('file:read', async (_event, filePath: string) => {
 })
 
 // Parse document - extract text content from various formats
-ipcMain.handle('document:parse', async (_event, filePath: string, bufferBase64: string) => {
+ipcMain.handle('document:parse', async (_event, fileName: string, bufferBase64: string) => {
   try {
+    // Validate file extension (buffer already provided, just need format check)
+    const extValidation = validateFileExtension(fileName)
+    if (!extValidation.valid) {
+      return {
+        success: false,
+        error: extValidation.error
+      }
+    }
+
+    // Validate buffer size
+    const bufferValidation = validateBufferSize(bufferBase64)
+    if (!bufferValidation.valid) {
+      return {
+        success: false,
+        error: bufferValidation.error
+      }
+    }
+
     const buffer = Buffer.from(bufferBase64, 'base64')
-    const parsed = await parseDocument(filePath, buffer)
+    const parsed = await parseDocument(fileName, buffer)
 
     return {
       success: true,
@@ -210,6 +253,30 @@ ipcMain.handle('document:parse', async (_event, filePath: string, bufferBase64: 
 // NER - Extract named entities
 ipcMain.handle('ner:extract', async (_event, text: string, customNames?: string[]) => {
   try {
+    // Validate text input
+    const textValidation = validateTextInput(text)
+    if (!textValidation.valid) {
+      return {
+        success: false,
+        error: textValidation.error
+      }
+    }
+
+    // Validate customNames if provided
+    if (customNames) {
+      if (!Array.isArray(customNames)) {
+        return { success: false, error: 'customNames must be an array' }
+      }
+      if (customNames.length > 1000) {
+        return { success: false, error: 'Too many custom names (max 1000)' }
+      }
+      for (const name of customNames) {
+        if (typeof name !== 'string' || name.length > 200) {
+          return { success: false, error: 'Invalid custom name' }
+        }
+      }
+    }
+
     const entities = extractEntities(text, customNames)
     const persons = detectPersonNames(text)
 
@@ -233,6 +300,24 @@ ipcMain.handle(
   'document:createMasked',
   async (_event, originalBufferBase64: string, maskedContent: string, format: string) => {
     try {
+      // Validate buffer size
+      const bufferValidation = validateBufferSize(originalBufferBase64)
+      if (!bufferValidation.valid) {
+        return { success: false, error: bufferValidation.error }
+      }
+
+      // Validate masked content
+      const textValidation = validateTextInput(maskedContent)
+      if (!textValidation.valid) {
+        return { success: false, error: textValidation.error }
+      }
+
+      // Validate format
+      const allowedFormats = ['docx', 'xlsx', 'pdf', 'txt', 'md', 'json', 'csv', 'html']
+      if (!allowedFormats.includes(format)) {
+        return { success: false, error: 'Invalid document format' }
+      }
+
       const originalBuffer = Buffer.from(originalBufferBase64, 'base64')
       let resultBuffer: Buffer
 
@@ -273,6 +358,17 @@ ipcMain.handle('app:getVersion', () => {
 // OCR - Extract text from image
 ipcMain.handle('ocr:extractText', async (_event, imageBufferBase64: string, language?: string) => {
   try {
+    // Validate buffer size
+    const bufferValidation = validateBufferSize(imageBufferBase64)
+    if (!bufferValidation.valid) {
+      return { success: false, error: bufferValidation.error }
+    }
+
+    // Validate language code (simple alphanumeric check)
+    if (language && (typeof language !== 'string' || !/^[a-z]{3}$/.test(language))) {
+      return { success: false, error: 'Invalid language code' }
+    }
+
     const imageBuffer = Buffer.from(imageBufferBase64, 'base64')
 
     // Validate image
@@ -306,6 +402,29 @@ ipcMain.handle(
   'ocr:extractTextBatch',
   async (_event, imageBuffersBase64: string[], language?: string) => {
     try {
+      // Validate input array
+      if (!Array.isArray(imageBuffersBase64)) {
+        return { success: false, error: 'Input must be an array' }
+      }
+
+      // Limit batch size
+      if (imageBuffersBase64.length > 50) {
+        return { success: false, error: 'Too many images (max 50)' }
+      }
+
+      // Validate each buffer
+      for (const bufferBase64 of imageBuffersBase64) {
+        const bufferValidation = validateBufferSize(bufferBase64)
+        if (!bufferValidation.valid) {
+          return { success: false, error: bufferValidation.error }
+        }
+      }
+
+      // Validate language code
+      if (language && (typeof language !== 'string' || !/^[a-z]{3}$/.test(language))) {
+        return { success: false, error: 'Invalid language code' }
+      }
+
       const imageBuffers = imageBuffersBase64.map((b) => Buffer.from(b, 'base64'))
       const results = await extractTextFromImages(imageBuffers, language || 'eng')
       const combinedText = combineOCRResults(results)
@@ -335,6 +454,10 @@ ipcMain.handle('profiles:getAll', () => {
 })
 
 ipcMain.handle('profiles:get', (_event, id: string) => {
+  const validation = validateProfileId(id)
+  if (!validation.valid) {
+    return undefined
+  }
   return getProfile(id)
 })
 
@@ -343,19 +466,43 @@ ipcMain.handle('profiles:getActive', () => {
 })
 
 ipcMain.handle('profiles:setActive', (_event, id: string) => {
+  const validation = validateProfileId(id)
+  if (!validation.valid) {
+    return false
+  }
   return setActiveProfile(id)
 })
 
 ipcMain.handle('profiles:save', (_event, profile: ConfigProfile) => {
+  if (!profile || typeof profile !== 'object') {
+    return false
+  }
+  const validation = validateProfileId(profile.id)
+  if (!validation.valid) {
+    return false
+  }
+  if (typeof profile.name !== 'string' || profile.name.length > 100) {
+    return false
+  }
   saveProfile(profile)
   return true
 })
 
 ipcMain.handle('profiles:delete', (_event, id: string) => {
+  const validation = validateProfileId(id)
+  if (!validation.valid) {
+    return false
+  }
   return deleteProfile(id)
 })
 
 ipcMain.handle('profiles:create', (_event, name: string, config: ConfigProfile['config']) => {
+  if (typeof name !== 'string' || name.length === 0 || name.length > 100) {
+    return null
+  }
+  if (!config || typeof config !== 'object') {
+    return null
+  }
   return createProfile(name, config)
 })
 
@@ -369,6 +516,12 @@ ipcMain.handle('logo:isAvailable', () => {
 // Compute hash for an uploaded logo image
 ipcMain.handle('logo:computeHash', async (_event, imageBufferBase64: string) => {
   try {
+    // Validate buffer size
+    const bufferValidation = validateBufferSize(imageBufferBase64)
+    if (!bufferValidation.valid) {
+      return { success: false, error: bufferValidation.error }
+    }
+
     if (!isSharpAvailable()) {
       return {
         success: false,
@@ -417,12 +570,35 @@ ipcMain.handle(
   'logo:scanDocument',
   async (
     _event,
-    filePath: string,
+    fileName: string,
     bufferBase64: string,
     logoHash: string,
     threshold: number
   ) => {
     try {
+      // Validate file extension (buffer already provided)
+      const extValidation = validateFileExtension(fileName)
+      if (!extValidation.valid) {
+        return { success: false, error: extValidation.error }
+      }
+
+      // Validate buffer size
+      const bufferValidation = validateBufferSize(bufferBase64)
+      if (!bufferValidation.valid) {
+        return { success: false, error: bufferValidation.error }
+      }
+
+      // Validate logo hash (should be hex string)
+      if (!logoHash || typeof logoHash !== 'string' || !/^[0-9a-fA-F]+$/.test(logoHash)) {
+        return { success: false, error: 'Invalid logo hash' }
+      }
+
+      // Validate threshold
+      const thresholdValidation = validateThreshold(threshold)
+      if (!thresholdValidation.valid) {
+        return { success: false, error: thresholdValidation.error }
+      }
+
       if (!isSharpAvailable()) {
         return {
           success: false,
@@ -431,7 +607,7 @@ ipcMain.handle(
       }
 
       const buffer = Buffer.from(bufferBase64, 'base64')
-      const parsed = await parseDocument(filePath, buffer)
+      const parsed = await parseDocument(fileName, buffer)
 
       if (!parsed.images || parsed.images.length === 0) {
         return {

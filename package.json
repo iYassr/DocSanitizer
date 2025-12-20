@@ -1,16 +1,16 @@
 {
-  "name": "docsanitizer",
+  "name": "maskr",
   "version": "1.1.0",
   "description": "A privacy-focused desktop app for detecting and masking sensitive information in documents before sharing with AI or other parties",
   "main": "dist-electron/main.js",
   "type": "module",
-  "homepage": "https://github.com/iYassr/DocSanitizer",
+  "homepage": "https://github.com/iYassr/Maskr",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/iYassr/DocSanitizer.git"
+    "url": "git+https://github.com/iYassr/Maskr.git"
   },
   "bugs": {
-    "url": "https://github.com/iYassr/DocSanitizer/issues"
+    "url": "https://github.com/iYassr/Maskr/issues"
   },
   "scripts": {
     "dev": "vite",
@@ -41,6 +41,7 @@
   ],
   "author": {
     "name": "iYassr",
+    "email": "yasser@example.com",
     "url": "https://github.com/iYassr"
   },
   "license": "MIT",
@@ -66,11 +67,11 @@
     "jszip": "^3.10.1",
     "mammoth": "^1.11.0",
     "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "^4.4.168",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "tailwind-merge": "^3.4.0",
     "tesseract.js": "^7.0.0",
-    "unpdf": "^1.4.0",
     "zustand": "^5.0.5"
   },
   "optionalDependencies": {

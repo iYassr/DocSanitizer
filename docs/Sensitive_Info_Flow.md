@@ -1,8 +1,8 @@
-# DocSanitizer - Sensitive Information Detection Flow
+# Maskr - Sensitive Information Detection Flow
 
 ## Overview
 
-DocSanitizer uses a multi-layered detection system to identify and mask sensitive information in documents. The system combines regex-based pattern matching, Natural Language Processing (NLP), and user-defined custom patterns.
+Maskr uses a multi-layered detection system to identify and mask sensitive information in documents. The system combines regex-based pattern matching, Natural Language Processing (NLP), and user-defined custom patterns.
 
 ---
 

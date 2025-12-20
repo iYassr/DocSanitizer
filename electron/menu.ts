@@ -193,23 +193,23 @@ export function createApplicationMenu(mainWindow: BrowserWindow) {
         {
           label: 'Documentation',
           click: async () => {
-            await shell.openExternal('https://github.com/iYassr/DocSanitizer#readme')
+            await shell.openExternal('https://github.com/iYassr/Maskr#readme')
           }
         },
         {
           label: 'Report Issue',
           click: async () => {
-            await shell.openExternal('https://github.com/iYassr/DocSanitizer/issues')
+            await shell.openExternal('https://github.com/iYassr/Maskr/issues')
           }
         },
         { type: 'separator' },
         {
-          label: 'About DocSanitizer',
+          label: 'About Maskr',
           click: () => {
             dialog.showMessageBox(mainWindow, {
               type: 'info',
-              title: 'About DocSanitizer',
-              message: 'DocSanitizer',
+              title: 'About Maskr',
+              message: 'Maskr',
               detail: `Version: ${app.getVersion()}\n\nA local-first document sanitization tool that detects and masks sensitive information before sharing with AI applications.\n\nAll processing is done locally - no data leaves your device.`
             })
           }

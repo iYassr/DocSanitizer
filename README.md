@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="logos/maskr-icon.svg" alt="DocSanitizer Logo" width="120" height="120">
+  <img src="logos/maskr-icon.svg" alt="Maskr Logo" width="120" height="120">
 </p>
 
-<h1 align="center">DocSanitizer</h1>
+<h1 align="center">Maskr</h1>
 
 <p align="center">
   <strong>A privacy-focused desktop app for detecting and masking sensitive information in documents</strong>
@@ -27,9 +27,9 @@
 
 ---
 
-## Why DocSanitizer?
+## Why Maskr?
 
-Before sharing documents with AI assistants, cloud services, or external parties, you need to ensure sensitive information is properly masked. DocSanitizer runs **100% locally** on your machine - no data ever leaves your device.
+Before sharing documents with AI assistants, cloud services, or external parties, you need to ensure sensitive information is properly masked. Maskr runs **100% locally** on your machine - no data ever leaves your device.
 
 ## Screenshots
 
@@ -37,21 +37,21 @@ Before sharing documents with AI assistants, cloud services, or external parties
 Drag and drop or browse to select any supported document format. The sidebar shows what types of sensitive information will be detected.
 
 <p align="center">
-  <img src="screenshots/upload.png" alt="DocSanitizer Upload Screen" width="800">
+  <img src="screenshots/upload.png" alt="Maskr Upload Screen" width="800">
 </p>
 
 ### 2. Review Detections
 See all detected sensitive information organized in a table with categories, confidence scores, replacements, and context. Filter by type and toggle items on/off.
 
 <p align="center">
-  <img src="screenshots/review.png" alt="DocSanitizer Review Screen" width="800">
+  <img src="screenshots/review.png" alt="Maskr Review Screen" width="800">
 </p>
 
 ### 3. Export Sanitized Document
 Preview the sanitized document with all sensitive data replaced by placeholders. View a summary of masked items by category, then export.
 
 <p align="center">
-  <img src="screenshots/export.png" alt="DocSanitizer Export Screen" width="800">
+  <img src="screenshots/export.png" alt="Maskr Export Screen" width="800">
 </p>
 
 ## Features
@@ -107,8 +107,8 @@ Preview the sanitized document with all sensitive data replaced by placeholders.
 
 ```bash
 # Clone the repository
-git clone https://github.com/iYassr/DocSanitizer.git
-cd DocSanitizer
+git clone https://github.com/iYassr/Maskr.git
+cd Maskr
 
 # Install dependencies
 npm install
@@ -179,7 +179,7 @@ These will be detected with 100% confidence.
 
 ## Configuration Profiles
 
-DocSanitizer includes preset profiles:
+Maskr includes preset profiles:
 
 - **Default** - Balanced detection for common PII
 - **Strict** - Maximum detection, lower confidence threshold

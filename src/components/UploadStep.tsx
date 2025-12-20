@@ -364,7 +364,7 @@ export function UploadStep({ onFileUploaded }: UploadStepProps) {
               <Shield className="h-5 w-5 text-primary" />
             </div>
             <div>
-              <h1 className="text-xl font-semibold text-foreground">DocSanitizer</h1>
+              <h1 className="text-xl font-semibold text-foreground">Maskr</h1>
               <p className="text-sm text-muted-foreground">Protect your data</p>
             </div>
           </div>

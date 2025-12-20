@@ -1,4 +1,4 @@
-# Product Requirements Document: DocSanitizer
+# Product Requirements Document: Maskr
 ## Sensitive Information Detection & Masking Desktop Application
 
 **Version:** 1.2
@@ -9,7 +9,7 @@
 
 ## 1. Executive Summary
 
-DocSanitizer is a desktop application (built with Electron) that automatically detects and masks sensitive information in documents before they are shared with AI applications or external parties. The tool scans uploaded documents for PII, company-specific information, financial data, and other configurable sensitive patterns, then replaces them with safe placeholder tokens. All processing happens locally on the user's machine—no data ever leaves the device.
+Maskr is a desktop application (built with Electron) that automatically detects and masks sensitive information in documents before they are shared with AI applications or external parties. The tool scans uploaded documents for PII, company-specific information, financial data, and other configurable sensitive patterns, then replaces them with safe placeholder tokens. All processing happens locally on the user's machine—no data ever leaves the device.
 
 ---
 
@@ -255,7 +255,7 @@ The configuration panel should include:
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  DocSanitizer                              [Config] [Help] [⚙]  │
+│  Maskr                                     [Config] [Help] [⚙]  │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
 │  ┌─────────────────────────────────────────────────────────┐   │
@@ -274,7 +274,7 @@ The configuration panel should include:
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  DocSanitizer                              [Config] [Help] [⚙]  │
+│  Maskr                                     [Config] [Help] [⚙]  │
 ├─────────────────────────────────────────────────────────────────┤
 │  document.docx                    Detected: 23 items   [Scan]  │
 ├───────────────────────────────────┬─────────────────────────────┤
@@ -379,7 +379,7 @@ Backend (Main Process - Node.js):
 ### 8.3 Project Structure
 
 ```
-docsanitizer/
+maskr/
 ├── electron/
 │   ├── main.ts                 # Main process entry
 │   ├── preload.ts              # Secure IPC bridge
@@ -530,8 +530,8 @@ declare global {
 
 ```yaml
 # electron-builder.yml
-appId: com.yourcompany.docsanitizer
-productName: DocSanitizer
+appId: com.maskr.app
+productName: Maskr
 copyright: Copyright © 2024
 
 directories:
