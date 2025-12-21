@@ -158,11 +158,14 @@ test.describe('Maskr E2E Tests', () => {
     const exportSection = page.locator('text=Export Sanitized Document')
     await expect(exportSection).toBeVisible({ timeout: 10000 })
 
-    // Find the preview content area
-    const previewArea = page.locator('.whitespace-pre-wrap').first()
-    await expect(previewArea).toBeVisible({ timeout: 5000 })
+    // Find the sanitized preview content area (second panel in compare view)
+    // Compare view shows original (left) and sanitized (right) side by side
+    const previewAreas = page.locator('.whitespace-pre-wrap')
+    await expect(previewAreas.first()).toBeVisible({ timeout: 5000 })
 
-    const content = await previewArea.textContent() || ''
+    // Get the sanitized content (last panel - right side of compare view)
+    const sanitizedArea = previewAreas.last()
+    const content = await sanitizedArea.textContent() || ''
 
     // Verify email is masked (replaced with placeholder)
     expect(content).not.toContain('yasser.rashid@armc-corp.com')
