@@ -13,6 +13,7 @@ maskr is an Electron desktop app for detecting and masking sensitive information
 - **Test before claiming done** - User will verify manually, so make sure it actually works
 - **Push when asked** - Only push/release when explicitly requested
 - **No unnecessary files** - Don't create documentation unless asked
+- **Use latest stable packages** - Always use current stable versions, not outdated or beta
 
 ## Things NOT To Do
 - Don't refactor code unless explicitly asked
