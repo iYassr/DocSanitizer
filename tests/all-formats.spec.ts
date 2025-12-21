@@ -127,7 +127,7 @@ test.afterAll(async () => {
   console.log('Test files preserved in:', testDir)
 })
 
-test.describe('Maskr All Formats E2E Tests', () => {
+test.describe('maskr All Formats E2E Tests', () => {
   let electronApp: ElectronApplication
   let page: Page
 

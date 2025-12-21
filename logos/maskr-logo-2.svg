@@ -12,8 +12,8 @@
   <!-- Mask bar across shield -->
   <rect x="12" y="24" width="24" height="6" rx="3" fill="url(#grad2)"/>
 
-  <!-- Text: Maskr -->
+  <!-- Text: maskr -->
   <text x="52" y="40" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="700" fill="#1f2937">
-    Mask<tspan fill="url(#grad2)">r</tspan>
+    mask<tspan fill="url(#grad2)">r</tspan>
   </text>
 </svg>

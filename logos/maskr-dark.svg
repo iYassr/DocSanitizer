@@ -13,8 +13,8 @@
   <rect x="14" y="34" width="20" height="4" rx="2" fill="url(#gradDark)"/>
   <rect x="14" y="42" width="12" height="4" rx="2" fill="url(#gradDark)" opacity="0.6"/>
 
-  <!-- Text: Maskr (white for dark mode) -->
+  <!-- Text: maskr (white for dark mode) -->
   <text x="52" y="40" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="700" fill="#f9fafb">
-    Mask<tspan fill="url(#gradDark)">r</tspan>
+    mask<tspan fill="url(#gradDark)">r</tspan>
   </text>
 </svg>

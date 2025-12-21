@@ -193,23 +193,23 @@ export function createApplicationMenu(mainWindow: BrowserWindow) {
         {
           label: 'Documentation',
           click: async () => {
-            await shell.openExternal('https://github.com/iYassr/Maskr#readme')
+            await shell.openExternal('https://github.com/iYassr/maskr#readme')
           }
         },
         {
           label: 'Report Issue',
           click: async () => {
-            await shell.openExternal('https://github.com/iYassr/Maskr/issues')
+            await shell.openExternal('https://github.com/iYassr/maskr/issues')
           }
         },
         { type: 'separator' },
         {
-          label: 'About Maskr',
+          label: 'About maskr',
           click: () => {
             dialog.showMessageBox(mainWindow, {
               type: 'info',
-              title: 'About Maskr',
-              message: 'Maskr',
+              title: 'About maskr',
+              message: 'maskr',
               detail: `Version: ${app.getVersion()}\n\nA local-first document sanitization tool that detects and masks sensitive information before sharing with AI applications.\n\nAll processing is done locally - no data leaves your device.`
             })
           }

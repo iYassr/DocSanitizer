@@ -146,6 +146,9 @@ export function extractEntities(text: string, userCustomNames?: string[]): NEREn
   // 11. Extract Saudi ID numbers (National ID and Iqama)
   detectSaudiIDs(text, addEntity)
 
+  // 12. Extract US Social Security Numbers (SSN)
+  detectSSNs(text, addEntity)
+
   // Deduplicate entities (same position)
   const seen = new Set<string>()
   const uniqueEntities = entities.filter((e) => {
@@ -805,6 +808,53 @@ function detectSaudiIDs(
       start: match.index,
       end: match.index + id.length,
       confidence: 90
+    })
+  }
+}
+
+/**
+ * Detects US Social Security Numbers (SSN).
+ *
+ * SSN format: XXX-XX-XXXX (with or without dashes)
+ * Validates basic SSN rules:
+ * - Area number (first 3 digits) cannot be 000, 666, or 900-999
+ * - Group number (middle 2 digits) cannot be 00
+ * - Serial number (last 4 digits) cannot be 0000
+ *
+ * @param text - Text to search
+ * @param addEntity - Callback to add detected entity
+ * @internal
+ */
+function detectSSNs(
+  text: string,
+  addEntity: (entity: NEREntity) => void
+): void {
+  // SSN pattern: XXX-XX-XXXX or XXXXXXXXX
+  const ssnPattern = /\b(\d{3})[-\s]?(\d{2})[-\s]?(\d{4})\b/g
+
+  let match: RegExpExecArray | null
+  while ((match = ssnPattern.exec(text)) !== null) {
+    const area = match[1]
+    const group = match[2]
+    const serial = match[3]
+
+    // Validate SSN rules
+    // Area cannot be 000, 666, or 900-999
+    const areaNum = parseInt(area, 10)
+    if (areaNum === 0 || areaNum === 666 || areaNum >= 900) continue
+
+    // Group cannot be 00
+    if (group === '00') continue
+
+    // Serial cannot be 0000
+    if (serial === '0000') continue
+
+    addEntity({
+      text: match[0],
+      type: 'ssn',
+      start: match.index,
+      end: match.index + match[0].length,
+      confidence: 95
     })
   }
 }

@@ -124,7 +124,7 @@ export default function App() {
 
       {/* Footer */}
       <footer className="flex-shrink-0 px-4 py-2 flex items-center justify-between text-xs bg-muted border-t border-border text-muted-foreground">
-        <span>Maskr v1.1</span>
+        <span>maskr v1.3</span>
         <span>Secure document sanitization</span>
       </footer>
     </div>

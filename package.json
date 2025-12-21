@@ -4,13 +4,13 @@
   "description": "A privacy-focused desktop app for detecting and masking sensitive information in documents before sharing with AI or other parties",
   "main": "dist-electron/main.js",
   "type": "module",
-  "homepage": "https://github.com/iYassr/Maskr",
+  "homepage": "https://github.com/iYassr/maskr",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/iYassr/Maskr.git"
+    "url": "git+https://github.com/iYassr/maskr.git"
   },
   "bugs": {
-    "url": "https://github.com/iYassr/Maskr/issues"
+    "url": "https://github.com/iYassr/maskr/issues"
   },
   "scripts": {
     "dev": "vite",

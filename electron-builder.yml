@@ -1,5 +1,5 @@
 appId: com.maskr.app
-productName: Maskr
+productName: maskr
 copyright: Copyright © 2025
 
 directories:
@@ -11,42 +11,73 @@ files:
   - dist-electron/**/*
   - package.json
   - node_modules/**/*
-  # Exclude unnecessary files to reduce bundle size
+
+  # ============================================================
+  # EXCLUDE DOCUMENTATION AND METADATA
+  # ============================================================
   - "!node_modules/**/*.map"
   - "!node_modules/**/*.ts"
+  - "!node_modules/**/*.tsx"
   - "!node_modules/**/*.md"
   - "!node_modules/**/*.markdown"
   - "!node_modules/**/README*"
   - "!node_modules/**/CHANGELOG*"
+  - "!node_modules/**/HISTORY*"
   - "!node_modules/**/LICENSE*"
   - "!node_modules/**/license*"
-  - "!node_modules/**/.github"
+  - "!node_modules/**/LICENCE*"
+  - "!node_modules/**/AUTHORS*"
+  - "!node_modules/**/CONTRIBUTORS*"
+  - "!node_modules/**/.github/**"
   - "!node_modules/**/.eslint*"
   - "!node_modules/**/.prettier*"
-  - "!node_modules/**/test/**"
-  - "!node_modules/**/tests/**"
-  - "!node_modules/**/__tests__/**"
-  # Exception: suffix-thumb imports its own test directory at runtime
-  - "node_modules/suffix-thumb/src/test/**"
-  - "!node_modules/**/spec/**"
-  - "!node_modules/**/docs/**"
-  - "!node_modules/**/example/**"
-  - "!node_modules/**/examples/**"
-  - "!node_modules/**/*.d.ts.map"
-  - "!node_modules/**/tsconfig*.json"
-  - "!node_modules/**/.travis.yml"
+  - "!node_modules/**/.npmignore"
+  - "!node_modules/**/.gitignore"
   - "!node_modules/**/.editorconfig"
+  - "!node_modules/**/.travis.yml"
+  - "!node_modules/**/.babelrc*"
+  - "!node_modules/**/tsconfig*.json"
+  - "!node_modules/**/tslint*.json"
+  - "!node_modules/**/jest.config.*"
+  - "!node_modules/**/karma.conf.*"
   - "!node_modules/**/Makefile"
   - "!node_modules/**/Gruntfile.js"
   - "!node_modules/**/gulpfile.js"
   - "!node_modules/**/*.gyp"
   - "!node_modules/**/*.gypi"
-  # Exclude dev-only packages that shouldn't be bundled
+  - "!node_modules/**/*.d.ts.map"
+
+  # ============================================================
+  # EXCLUDE TEST AND EXAMPLE FILES
+  # ============================================================
+  - "!node_modules/**/test/**"
+  - "!node_modules/**/tests/**"
+  - "!node_modules/**/__tests__/**"
+  - "!node_modules/**/__mocks__/**"
+  - "!node_modules/**/spec/**"
+  - "!node_modules/**/specs/**"
+  - "!node_modules/**/docs/**"
+  - "!node_modules/**/doc/**"
+  - "!node_modules/**/example/**"
+  - "!node_modules/**/examples/**"
+  - "!node_modules/**/demo/**"
+  - "!node_modules/**/samples/**"
+  - "!node_modules/**/benchmark/**"
+  - "!node_modules/**/benchmarks/**"
+  - "!node_modules/**/fixtures/**"
+  - "!node_modules/**/coverage/**"
+  # Exception: suffix-thumb imports its own test directory at runtime
+  - "node_modules/suffix-thumb/src/test/**"
+
+  # ============================================================
+  # EXCLUDE DEV-ONLY PACKAGES
+  # ============================================================
   - "!node_modules/electron/**"
   - "!node_modules/electron-builder/**"
   - "!node_modules/@electron/**"
   - "!node_modules/typescript/**"
   - "!node_modules/eslint/**"
+  - "!node_modules/@eslint/**"
   - "!node_modules/@typescript-eslint/**"
   - "!node_modules/playwright/**"
   - "!node_modules/playwright-core/**"
@@ -61,6 +92,45 @@ files:
   - "!node_modules/esbuild/**"
   - "!node_modules/@esbuild/**"
   - "!node_modules/app-builder-bin/**"
+  - "!node_modules/shadcn/**"
+  - "!node_modules/globals/**"
+  - "!node_modules/@types/**"
+  - "!node_modules/png-to-ico/**"
+
+  # ============================================================
+  # OPTIMIZE LARGE PACKAGES - REMOVE DUPLICATES
+  # ============================================================
+  # pdfjs-dist - only keep legacy build (used by main process)
+  - "!node_modules/pdfjs-dist/build/**"
+  - "!node_modules/pdfjs-dist/web/**"
+  - "!node_modules/pdfjs-dist/image_decoders/**"
+  - "!node_modules/pdfjs-dist/types/**"
+  - "!node_modules/pdfjs-dist/*.mjs"
+
+  # pdf-lib - keep only lib folder (es folder is duplicate)
+  - "!node_modules/@pdf-lib/standard-fonts/es/**"
+  - "!node_modules/@pdf-lib/standard-fonts/dist/**"
+
+  # compromise NLP - remove unused language models
+  - "!node_modules/compromise/builds/**"
+  - "!node_modules/compromise-speech/**"
+  - "!node_modules/compromise-dates/**"
+  - "!node_modules/compromise-numbers/**"
+
+  # exceljs - remove browser bundle
+  - "!node_modules/exceljs/dist/exceljs.bare.min.js"
+  - "!node_modules/exceljs/dist/exceljs.min.js"
+
+  # React - use production builds only
+  - "!node_modules/react/cjs/react.development.js"
+  - "!node_modules/react-dom/cjs/react-dom.development.js"
+  - "!node_modules/react-dom/cjs/react-dom-client.development.js"
+  - "!node_modules/scheduler/cjs/scheduler.development.js"
+
+  # Radix UI - remove ESM duplicates (CJS is used)
+  - "!node_modules/@radix-ui/**/dist/*.mjs"
+  - "!node_modules/@floating-ui/**/dist/*umd*"
+  - "!node_modules/@floating-ui/**/dist/*browser*"
 
 asarUnpack:
   - node_modules/tesseract.js/**/*

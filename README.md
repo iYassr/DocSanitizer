@@ -103,23 +103,23 @@ Preview the sanitized document with all sensitive data replaced by placeholders.
 Download the latest release for your platform from the [Releases page](https://github.com/iYassr/maskr/releases).
 
 #### macOS
-1. Download `Maskr-1.3.0-arm64-mac.zip` (Apple Silicon) or `Maskr-1.3.0-mac.zip` (Intel)
+1. Download `maskr-1.3.0-arm64-mac.zip` (Apple Silicon) or `maskr-1.3.0-mac.zip` (Intel)
 2. Extract the zip file
 3. **Important:** Remove the quarantine flag before first run:
    ```bash
-   xattr -cr /path/to/Maskr.app
+   xattr -cr /path/to/maskr.app
    ```
    For example, if extracted to Downloads:
    ```bash
-   xattr -cr ~/Downloads/Maskr.app
+   xattr -cr ~/Downloads/maskr.app
    ```
 4. Drag to Applications folder (optional)
 
 > **Why is this needed?** macOS quarantines apps downloaded from the internet. Since maskr is not yet notarized with Apple, you need to manually remove this flag.
 
 #### Windows
-- `Maskr Setup 1.3.0.exe` - Standard installer
-- `Maskr 1.3.0.exe` - Portable version (no installation required)
+- `maskr Setup 1.3.0.exe` - Standard installer
+- `maskr 1.3.0.exe` - Portable version (no installation required)
 
 #### Linux
 - `.AppImage` - Universal format, make executable with `chmod +x` and run
@@ -238,9 +238,9 @@ Create custom profiles via the Profiles menu.
 ## Troubleshooting
 
 ### macOS "App is damaged" Error
-If you see "Maskr.app is damaged and can't be opened", run:
+If you see "maskr.app is damaged and can't be opened", run:
 ```bash
-xattr -cr /path/to/Maskr.app
+xattr -cr /path/to/maskr.app
 ```
 This removes the quarantine flag that macOS adds to downloaded apps.
 

@@ -48,7 +48,7 @@ test.afterAll(async () => {
   console.log('Test files in:', testDir)
 })
 
-test.describe('Maskr E2E Tests', () => {
+test.describe('maskr E2E Tests', () => {
   let electronApp: ElectronApplication
   let page: Page
 
@@ -91,7 +91,7 @@ test.describe('Maskr E2E Tests', () => {
     const txtFormat = page.locator('text=.txt')
     await expect(txtFormat).toBeVisible()
 
-    // Check Maskr logo (SVG with maskr text)
+    // Check maskr logo (SVG with maskr text)
     const logo = page.locator('svg:has(text:has-text("maskr"))')
     await expect(logo).toBeVisible()
   })
