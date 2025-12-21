@@ -14,6 +14,46 @@ maskr is an Electron desktop app for detecting and masking sensitive information
 - **Push when asked** - Only push/release when explicitly requested
 - **No unnecessary files** - Don't create documentation unless asked
 
+## Things NOT To Do
+- Don't refactor code unless explicitly asked
+- Don't add comments/docstrings to code you didn't write
+- Don't suggest "improvements" beyond what was requested
+- Don't keep restarting dev server hoping it fixes things - rebuild instead
+- Don't say "it should work now" without running tests first
+- Don't create new files when you can edit existing ones
+
+## Frequent Tasks
+
+### "run it" / "start it"
+```bash
+npm run build:vite && npx electron dist-electron/main.js
+```
+
+### "test it"
+```bash
+npm run build:vite && npm test
+```
+
+### "push it"
+```bash
+git add -A && git commit -m "message" && git push origin main
+```
+
+### "release it" (full workflow)
+1. Update version: `npm version X.Y.Z --no-git-tag-version`
+2. Commit version bump
+3. Build all platforms: `npm run build -- --mac --win --linux --x64 --arm64`
+4. Rename Windows files (remove spaces)
+5. Create tag: `git tag -a vX.Y.Z -m "Version X.Y.Z"`
+6. Push tag: `git push origin vX.Y.Z`
+7. Create GitHub release with all assets
+
+## Known Issues
+- **Windows filenames** - electron-builder creates files with spaces, must rename before GitHub upload
+- **Dev mode stale builds** - Electron main process doesn't hot-reload, must rebuild
+- **macOS quarantine** - Users need `xattr -cr` to run unsigned app
+- **Port conflicts** - Dev server auto-increments port if 5173 is busy
+
 ## Critical Build/Test Workflow
 
 ### Before Telling User "It Works"
