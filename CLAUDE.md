@@ -3,6 +3,17 @@
 ## Project Overview
 maskr is an Electron desktop app for detecting and masking sensitive information in documents. Built with React 19, TypeScript, Vite 7, and Electron 39.
 
+- **Owner**: iYassr (GitHub)
+- **Repo**: https://github.com/iYassr/maskr
+- **License**: MIT
+
+## User Preferences
+- **Be concise** - Short responses, get to the point
+- **Act, don't ask** - Do the work, don't ask for permission on routine tasks
+- **Test before claiming done** - User will verify manually, so make sure it actually works
+- **Push when asked** - Only push/release when explicitly requested
+- **No unnecessary files** - Don't create documentation unless asked
+
 ## Critical Build/Test Workflow
 
 ### Before Telling User "It Works"
@@ -72,8 +83,37 @@ These are marked as external in `vite.config.ts` and must be available at runtim
 - tesseract.js (OCR)
 - sharp (image processing)
 
+## Project Structure
+
+```
+├── electron/           # Electron main process
+│   ├── main.ts         # Main entry, IPC handlers
+│   ├── preload.ts      # Preload script, exposes API to renderer
+│   └── services/       # Core services
+│       ├── detector.ts # PII detection logic (NER, regex patterns)
+│       ├── document-parser.ts  # File format parsing
+│       └── security.ts # Input validation
+├── src/                # React renderer
+│   ├── App.tsx         # Main app component
+│   ├── components/     # UI components
+│   │   ├── UploadStep.tsx    # File upload + text input
+│   │   ├── ReviewStep.tsx    # Detection review table
+│   │   └── ExportStep.tsx    # Export sanitized document
+│   └── stores/         # Zustand state management
+├── tests/              # Playwright E2E tests
+├── release/            # Built packages (git-ignored)
+└── dist-electron/      # Built Electron code
+```
+
+## Key Files to Know
+- `electron/services/detector.ts` - All PII detection patterns (email, phone, SSN, etc.)
+- `src/components/UploadStep.tsx` - Handles both file upload AND direct text input
+- `vite.config.ts` - Build config, lists external dependencies
+- `electron-builder.yml` - Package naming, build targets
+
 ## Lessons Learned
 1. **Verify before declaring success** - Run tests, don't just start the app
 2. **Rebuild on errors** - Most "failed to analyze/parse" errors are stale build issues
 3. **Check version consistency** - package.json version must match git tag
 4. **Test the actual build** - Use production build for user-facing verification
+5. **Don't restart dev server repeatedly** - If something's broken, rebuild first
