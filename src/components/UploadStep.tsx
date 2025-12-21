@@ -52,6 +52,7 @@ export function UploadStep({ onFileUploaded }: UploadStepProps) {
   const [error, setError] = useState<string | null>(null)
   const [showLogoSettings, setShowLogoSettings] = useState(false)
   const [showConfigModal, setShowConfigModal] = useState(false)
+  const [pastedText, setPastedText] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const { setFile, setContent, setDetections, setStats } = useDocumentStore()
@@ -283,6 +284,112 @@ export function UploadStep({ onFileUploaded }: UploadStepProps) {
     fileInputRef.current?.click()
   }, [])
 
+  const processText = useCallback(async () => {
+    if (!pastedText.trim()) {
+      setError('Please enter or paste some text to scan')
+      return
+    }
+
+    setError(null)
+    setIsProcessing(true)
+    setProcessingStatus('Detecting sensitive information...')
+
+    try {
+      // Extract entities via NER
+      const nerResult = await window.api?.extractEntities(pastedText)
+
+      if (!nerResult?.success) {
+        throw new Error(nerResult?.error || 'Failed to analyze text')
+      }
+
+      const documentContent = pastedText
+
+      // Safely get entities array
+      const rawEntities = Array.isArray(nerResult.entities) ? nerResult.entities : []
+
+      // Filter valid entities and convert to Detection format
+      const validEntities = rawEntities.filter(entity => {
+        if (!entity) return false
+        const start = Number(entity.start)
+        const end = Number(entity.end)
+        return (
+          !isNaN(start) &&
+          !isNaN(end) &&
+          Number.isFinite(start) &&
+          Number.isFinite(end) &&
+          start >= 0 &&
+          end > start &&
+          start < documentContent.length &&
+          end <= documentContent.length &&
+          typeof entity.text === 'string' &&
+          entity.text.length > 0 &&
+          typeof entity.type === 'string'
+        )
+      })
+
+      // Limit to reasonable number of detections
+      const limitedEntities = validEntities.slice(0, 1000)
+
+      const detections: Detection[] = limitedEntities.map((entity, index) => {
+        const start = Number(entity.start)
+        const end = Number(entity.end)
+        const contextStart = Math.max(0, start - 30)
+        const contextEnd = Math.min(documentContent.length, end + 30)
+
+        return {
+          id: `detection-${index}-${start}`,
+          text: String(entity.text),
+          category: typeToCategory[entity.type] || 'custom',
+          subcategory: entity.type.charAt(0).toUpperCase() + entity.type.slice(1),
+          confidence: 0.85,
+          position: { start, end },
+          suggestedPlaceholder: generatePlaceholder(entity.type, index),
+          context: documentContent.slice(contextStart, contextEnd),
+          approved: true
+        }
+      })
+
+      // Calculate stats
+      const stats = {
+        totalDetections: detections.length,
+        byCategory: {
+          pii: detections.filter(d => d.category === 'pii').length,
+          company: detections.filter(d => d.category === 'company').length,
+          financial: detections.filter(d => d.category === 'financial').length,
+          technical: detections.filter(d => d.category === 'technical').length,
+          custom: detections.filter(d => d.category === 'custom').length
+        },
+        byConfidence: {
+          high: detections.filter(d => d.confidence >= 0.8).length,
+          medium: detections.filter(d => d.confidence >= 0.5 && d.confidence < 0.8).length,
+          low: detections.filter(d => d.confidence < 0.5).length
+        },
+        processingTimeMs: 0
+      }
+
+      // Update store - use virtual file for pasted text
+      setFile({
+        filePath: 'pasted-text.txt',
+        fileName: 'pasted-text.txt',
+        extension: '.txt',
+        buffer: '',
+        size: pastedText.length
+      })
+      setContent(documentContent)
+      setDetections(detections)
+      setStats(stats)
+
+      // Trigger transition
+      onFileUploaded()
+    } catch (err) {
+      console.error('Text processing error:', err)
+      setError(err instanceof Error ? err.message : 'Failed to process text')
+    } finally {
+      setIsProcessing(false)
+      setProcessingStatus('')
+    }
+  }, [pastedText, setFile, setContent, setDetections, setStats, onFileUploaded])
+
   return (
     <div className="flex h-full">
       {/* Hidden file input */}
@@ -294,65 +401,110 @@ export function UploadStep({ onFileUploaded }: UploadStepProps) {
         className="hidden"
       />
 
-      {/* Left side - Drop zone */}
-      <div className="flex-1 flex flex-col items-center justify-center p-8 border-r border-border">
-        <div
-          onDrop={handleDrop}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onClick={!isProcessing ? handleBrowseClick : undefined}
-          className={`
-            relative w-full max-w-sm aspect-square rounded-xl border-2 border-dashed
-            flex flex-col items-center justify-center gap-4 p-8 transition-all
-            ${!isProcessing ? 'cursor-pointer' : 'cursor-wait'}
-            ${isDragging
-              ? 'border-primary bg-primary/5 scale-[1.02]'
-              : 'border-border hover:border-muted-foreground hover:bg-muted/30'
-            }
-            ${isProcessing ? 'pointer-events-none opacity-80' : ''}
-          `}
-        >
-          {isProcessing ? (
-            <>
-              <Spinner className="h-12 w-12" />
-              <p className="text-muted-foreground text-center">{processingStatus}</p>
-            </>
-          ) : (
-            <>
-              <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
-                <Upload className="h-8 w-8 text-muted-foreground" />
-              </div>
-              <div className="text-center">
-                <p className="text-lg font-medium text-foreground">
-                  Drop file here
-                </p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  or click to browse
-                </p>
-              </div>
-            </>
+      {/* Left side - Drop zone and text input */}
+      <div className="flex-1 flex flex-col p-6 border-r border-border overflow-auto">
+        <div className="flex-1 flex flex-col justify-center max-w-lg mx-auto w-full gap-4">
+          {/* Drop zone */}
+          <div
+            onDrop={handleDrop}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onClick={!isProcessing ? handleBrowseClick : undefined}
+            className={`
+              relative w-full rounded-xl border-2 border-dashed
+              flex flex-col items-center justify-center gap-3 p-6 transition-all
+              ${!isProcessing ? 'cursor-pointer' : 'cursor-wait'}
+              ${isDragging
+                ? 'border-primary bg-primary/5 scale-[1.01]'
+                : 'border-border hover:border-muted-foreground hover:bg-muted/30'
+              }
+              ${isProcessing ? 'pointer-events-none opacity-80' : ''}
+            `}
+          >
+            {isProcessing ? (
+              <>
+                <Spinner className="h-10 w-10" />
+                <p className="text-muted-foreground text-center text-sm">{processingStatus}</p>
+              </>
+            ) : (
+              <>
+                <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
+                  <Upload className="h-6 w-6 text-muted-foreground" />
+                </div>
+                <div className="text-center">
+                  <p className="text-base font-medium text-foreground">
+                    Drop file here
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    or click to browse
+                  </p>
+                </div>
+                {/* Supported formats */}
+                <div className="flex flex-wrap justify-center gap-1 mt-1">
+                  {SUPPORTED_EXTENSIONS.slice(0, 8).map((ext) => (
+                    <span
+                      key={ext}
+                      className="px-1.5 py-0.5 rounded text-xs font-mono bg-muted text-muted-foreground"
+                    >
+                      {ext}
+                    </span>
+                  ))}
+                  <span className="px-1.5 py-0.5 text-xs text-muted-foreground">+more</span>
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* OR divider */}
+          <div className="flex items-center gap-4">
+            <div className="flex-1 h-px bg-border" />
+            <span className="text-sm text-muted-foreground font-medium">OR</span>
+            <div className="flex-1 h-px bg-border" />
+          </div>
+
+          {/* Text input area */}
+          <div className="flex flex-col gap-3">
+            <textarea
+              value={pastedText}
+              onChange={(e) => setPastedText(e.target.value)}
+              placeholder="Paste or type your text here..."
+              disabled={isProcessing}
+              className={`
+                w-full h-32 p-4 rounded-xl border border-border bg-background
+                text-sm text-foreground placeholder:text-muted-foreground
+                resize-none focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary
+                ${isProcessing ? 'opacity-50 cursor-not-allowed' : ''}
+              `}
+            />
+            <button
+              onClick={processText}
+              disabled={isProcessing || !pastedText.trim()}
+              className={`
+                w-full py-2.5 px-4 rounded-lg font-medium text-sm
+                transition-all flex items-center justify-center gap-2
+                ${pastedText.trim() && !isProcessing
+                  ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                  : 'bg-muted text-muted-foreground cursor-not-allowed'
+                }
+              `}
+            >
+              {isProcessing ? (
+                <>
+                  <Spinner className="h-4 w-4" />
+                  <span>Processing...</span>
+                </>
+              ) : (
+                <span>Scan Text →</span>
+              )}
+            </button>
+          </div>
+
+          {/* Error message */}
+          {error && (
+            <div className="px-4 py-3 rounded-lg bg-destructive/10 border border-destructive/20">
+              <p className="text-sm text-destructive">{error}</p>
+            </div>
           )}
-        </div>
-
-        {/* Error message */}
-        {error && (
-          <div className="mt-4 px-4 py-3 rounded-lg bg-destructive/10 border border-destructive/20 max-w-sm w-full">
-            <p className="text-sm text-destructive">{error}</p>
-          </div>
-        )}
-
-        {/* Supported formats */}
-        <div className="mt-6">
-          <div className="flex flex-wrap justify-center gap-1.5">
-            {SUPPORTED_EXTENSIONS.map((ext) => (
-              <span
-                key={ext}
-                className="px-2 py-0.5 rounded text-xs font-mono bg-muted text-muted-foreground"
-              >
-                {ext}
-              </span>
-            ))}
-          </div>
         </div>
       </div>
 
