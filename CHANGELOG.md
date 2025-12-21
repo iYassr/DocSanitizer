@@ -5,6 +5,29 @@ All notable changes to maskr will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2024-12-21
+
+### Added
+- **Direct Text Input** - Paste or type text directly in the upload screen
+  - Stacked layout with file upload and text input options
+  - "Sanitize Text" button for processing pasted content
+  - Text persists when navigating back from review screen
+- **Playwright Screenshot Script** - Automated screenshot capture for documentation
+
+### Changed
+- Upgraded to Node.js 24 (now required)
+- Updated all packages to latest versions:
+  - react/react-dom: 19.1.0 → 19.2.3
+  - tailwindcss: 4.1.10 → 4.1.18
+  - eslint: 9.28.0 → 9.39.2
+  - zustand: 5.0.5 → 5.0.9
+  - electron-store: 11.0.0 → 11.0.2
+- Renamed "Maskr" to "maskr" (lowercase) across all documentation
+- Updated README to use banner logo
+
+### Fixed
+- E2E tests updated for compare view (check sanitized panel)
+
 ## [1.2.0] - 2024-12-21
 
 ### Added
@@ -108,3 +131,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [1.0.0]: https://github.com/iYassr/maskr/releases/tag/v1.0.0
 [1.1.0]: https://github.com/iYassr/maskr/releases/tag/v1.1.0
 [1.2.0]: https://github.com/iYassr/maskr/releases/tag/v1.2.0
+[1.3.0]: https://github.com/iYassr/maskr/releases/tag/v1.3.0
