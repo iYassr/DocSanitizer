@@ -25,6 +25,12 @@
 
 ---
 
+## Demo
+
+<p align="center">
+  <img src="screenshots/demo.gif" alt="maskr demo" width="800">
+</p>
+
 ## Why maskr?
 
 Before sharing documents with AI assistants, cloud services, or external parties, you need to ensure sensitive information is properly masked. maskr runs **100% locally** on your machine - no data ever leaves your device.
