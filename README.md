@@ -34,23 +34,23 @@ Before sharing documents with AI assistants, cloud services, or external parties
 ### 1. Upload Your Document
 Drag and drop or browse to select any supported document format. The sidebar shows what types of sensitive information will be detected.
 
-<p align="center">
-  <img src="screenshots/upload.png" alt="maskr Upload Screen" width="800">
-</p>
+| Dark Theme | Light Theme |
+|------------|-------------|
+| ![Upload Dark](screenshots/upload.png) | ![Upload Light](screenshots/upload-light.png) |
 
 ### 2. Review Detections
 See all detected sensitive information organized in a table with categories, confidence scores, replacements, and context. Filter by type and toggle items on/off.
 
-<p align="center">
-  <img src="screenshots/review.png" alt="maskr Review Screen" width="800">
-</p>
+| Dark Theme | Light Theme |
+|------------|-------------|
+| ![Review Dark](screenshots/review.png) | ![Review Light](screenshots/review-light.png) |
 
 ### 3. Export Sanitized Document
 Preview the sanitized document with all sensitive data replaced by placeholders. View a summary of masked items by category, then export.
 
-<p align="center">
-  <img src="screenshots/export.png" alt="maskr Export Screen" width="800">
-</p>
+| Dark Theme | Light Theme |
+|------------|-------------|
+| ![Export Dark](screenshots/export.png) | ![Export Light](screenshots/export-light.png) |
 
 ## Features
 
