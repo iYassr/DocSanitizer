@@ -68,6 +68,8 @@ files:
   - "!node_modules/**/coverage/**"
   # Exception: suffix-thumb imports its own test directory at runtime
   - "node_modules/suffix-thumb/src/test/**"
+  # Exception: exceljs has essential code in lib/doc/ folder
+  - "node_modules/exceljs/lib/doc/**"
 
   # ============================================================
   # EXCLUDE DEV-ONLY PACKAGES
