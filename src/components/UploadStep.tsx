@@ -315,9 +315,22 @@ export function UploadStep({ onFileUploaded }: UploadStepProps) {
     }
   }, [processFile])
 
-  const handleBrowseClick = useCallback(() => {
-    fileInputRef.current?.click()
-  }, [])
+  const handleBrowseClick = useCallback(async () => {
+    try {
+      // Use native Electron file dialog
+      const fileData = await window.api?.openFile()
+      if (fileData && fileData.filePath) {
+        // Convert the file data to a File-like object for processFile
+        const blob = await fetch(`data:application/octet-stream;base64,${fileData.buffer}`).then(r => r.blob())
+        const file = new File([blob], fileData.fileName, { type: 'application/octet-stream' })
+        processFile(file)
+      }
+    } catch (err) {
+      console.error('Failed to open file dialog:', err)
+      // Fallback to HTML file input
+      fileInputRef.current?.click()
+    }
+  }, [processFile])
 
   const processText = useCallback(async () => {
     if (!pastedText.trim()) {
