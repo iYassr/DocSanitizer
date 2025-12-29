@@ -364,17 +364,19 @@ async function parsePdf(buffer: Buffer): Promise<ParsedDocument> {
 
     // Disable worker for Electron/Node.js compatibility
     // Workers don't work properly in packaged Electron apps
+    // Setting workerSrc to empty string and using disableWorker option
     if (typeof pdfjsLib.GlobalWorkerOptions !== 'undefined') {
-      pdfjsLib.GlobalWorkerOptions.workerSrc = ''
-      logDebug('PDF worker disabled for Electron compatibility')
+      // Point to a fake/empty worker to satisfy the check
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'data:,'
+      logDebug('PDF workerSrc set to empty data URI')
     }
 
     // Convert Buffer to Uint8Array for pdfjs
     const uint8Array = new Uint8Array(buffer)
     logDebug('Buffer converted to Uint8Array', { length: uint8Array.length })
 
-    // Load the PDF document with worker disabled
-    logDebug('Loading PDF document with pdfjs')
+    // Load the PDF document with worker explicitly disabled
+    logDebug('Loading PDF document with pdfjs (worker disabled)')
     let loadingTask
     try {
       loadingTask = pdfjsLib.getDocument({
@@ -383,6 +385,8 @@ async function parsePdf(buffer: Buffer): Promise<ParsedDocument> {
         disableFontFace: true,
         isEvalSupported: false,
         useWorkerFetch: false,
+        disableAutoFetch: true,
+        disableStream: true,
         verbosity: 0, // Suppress console warnings
       })
       logDebug('getDocument called, waiting for promise')
