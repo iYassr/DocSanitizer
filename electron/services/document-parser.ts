@@ -195,6 +195,12 @@ async function parseDocx(buffer: Buffer): Promise<ParsedDocument> {
   const images: ParsedDocument['images'] = []
 
   // Extract images directly from DOCX zip structure (word/media folder)
+  // Safety limits to prevent memory exhaustion
+  const MAX_IMAGES = 100
+  const MAX_SINGLE_IMAGE_SIZE = 10 * 1024 * 1024 // 10MB per image
+  const MAX_TOTAL_IMAGE_SIZE = 50 * 1024 * 1024 // 50MB total
+  let totalImageSize = 0
+
   try {
     logDebug('Extracting embedded images from DOCX')
     const zip = await JSZip.loadAsync(buffer)
@@ -206,8 +212,35 @@ async function parseDocx(buffer: Buffer): Promise<ParsedDocument> {
     logDebug('Found media files in DOCX', { count: mediaFiles.length, files: mediaFiles })
 
     for (const filePath of mediaFiles) {
+      // Safety: limit number of images
+      if (images.length >= MAX_IMAGES) {
+        logWarn('Maximum image limit reached in DOCX', { limit: MAX_IMAGES })
+        break
+      }
+
       const file = zip.files[filePath]
+
+      // Check uncompressed size before extracting (if available)
+      const uncompressedSize = file._data?.uncompressedSize
+      if (uncompressedSize && uncompressedSize > MAX_SINGLE_IMAGE_SIZE) {
+        logWarn('Skipping oversized image in DOCX', { filePath, size: uncompressedSize })
+        continue
+      }
+
       const imageBuffer = await file.async('nodebuffer')
+
+      // Validate extracted size
+      if (imageBuffer.length > MAX_SINGLE_IMAGE_SIZE) {
+        logWarn('Extracted image exceeds size limit', { filePath, size: imageBuffer.length })
+        continue
+      }
+
+      // Check total size limit
+      if (totalImageSize + imageBuffer.length > MAX_TOTAL_IMAGE_SIZE) {
+        logWarn('Total image size limit reached', { current: totalImageSize, limit: MAX_TOTAL_IMAGE_SIZE })
+        break
+      }
+
       const fileName = filePath.split('/').pop() || ''
       const ext = fileName.split('.').pop()?.toLowerCase() || ''
 
@@ -230,8 +263,9 @@ async function parseDocx(buffer: Buffer): Promise<ParsedDocument> {
         data: imageBuffer,
         contentType
       })
+      totalImageSize += imageBuffer.length
     }
-    logInfo('DOCX image extraction complete', { imageCount: images.length })
+    logInfo('DOCX image extraction complete', { imageCount: images.length, totalSize: totalImageSize })
   } catch (error) {
     logWarn('Image extraction from DOCX failed', { error })
     // Image extraction failed, continue without images
@@ -359,26 +393,42 @@ async function parsePdf(buffer: Buffer): Promise<ParsedDocument> {
     for (let i = 1; i <= numPages; i++) {
       logDebug('Extracting text from page', { page: i, totalPages: numPages })
       const page = await pdfDoc.getPage(i)
-      const textContent = await page.getTextContent()
 
-      // Safely extract text from items
-      const pageText = textContent.items
-        .map((item: unknown) => {
-          // Type guard for text items
-          if (item && typeof item === 'object' && 'str' in item) {
-            const str = (item as { str: unknown }).str
-            return typeof str === 'string' ? str : String(str || '')
-          }
-          return ''
-        })
-        .join(' ')
+      try {
+        const textContent = await page.getTextContent()
 
-      if (pageText.trim()) {
-        textParts.push(pageText)
-        logDebug('Page text extracted', { page: i, textLength: pageText.length })
-      } else {
-        logDebug('Page has no text content', { page: i })
+        // Safely extract text from items
+        const pageText = textContent.items
+          .map((item: unknown) => {
+            // Type guard for text items
+            if (item && typeof item === 'object' && 'str' in item) {
+              const str = (item as { str: unknown }).str
+              return typeof str === 'string' ? str : String(str || '')
+            }
+            return ''
+          })
+          .join(' ')
+
+        if (pageText.trim()) {
+          textParts.push(pageText)
+          logDebug('Page text extracted', { page: i, textLength: pageText.length })
+        } else {
+          logDebug('Page has no text content', { page: i })
+        }
+      } finally {
+        // Clean up page object to prevent memory leak
+        // Note: cleanup() is available on page objects in pdfjs
+        if (typeof page.cleanup === 'function') {
+          page.cleanup()
+        }
       }
+    }
+
+    // Clean up document to release memory
+    // destroy() is the proper method for PDFDocumentProxy
+    if (typeof pdfDoc.destroy === 'function') {
+      await pdfDoc.destroy()
+      logDebug('PDF document destroyed for memory cleanup')
     }
 
     const content = textParts.join('\n\n')

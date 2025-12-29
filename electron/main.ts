@@ -48,44 +48,119 @@ import {
 // Each module is cached after first import.
 // ============================================================================
 
-let documentParserModule: typeof import('./services/document-parser.js') | null = null
-let detectorModule: typeof import('./services/detector.js') | null = null
-let ocrModule: typeof import('./services/ocr.js') | null = null
-let imageHashModule: typeof import('./services/image-hash.js') | null = null
+// Module cache with error tracking for retry logic
+interface ModuleCache<T> {
+  module: T | null
+  lastError: Error | null
+  lastAttempt: number
+}
+
+const moduleCache = {
+  documentParser: { module: null, lastError: null, lastAttempt: 0 } as ModuleCache<typeof import('./services/document-parser.js')>,
+  detector: { module: null, lastError: null, lastAttempt: 0 } as ModuleCache<typeof import('./services/detector.js')>,
+  ocr: { module: null, lastError: null, lastAttempt: 0 } as ModuleCache<typeof import('./services/ocr.js')>,
+  imageHash: { module: null, lastError: null, lastAttempt: 0 } as ModuleCache<typeof import('./services/image-hash.js')>
+}
+
+// Retry delay: 5 seconds before retrying failed import
+const MODULE_RETRY_DELAY = 5000
 
 async function getDocumentParser() {
-  if (!documentParserModule) {
-    documentParserModule = await import('./services/document-parser.js')
+  const cache = moduleCache.documentParser
+  const now = Date.now()
+
+  // If cached successfully, return it
+  if (cache.module) return cache.module
+
+  // If last attempt failed recently, throw cached error
+  if (cache.lastError && (now - cache.lastAttempt) < MODULE_RETRY_DELAY) {
+    throw cache.lastError
   }
-  return documentParserModule
+
+  try {
+    logInfo('Importing document-parser module')
+    cache.lastAttempt = now
+    cache.module = await import('./services/document-parser.js')
+    cache.lastError = null
+    logInfo('Document-parser module imported successfully')
+    return cache.module
+  } catch (err) {
+    cache.lastError = err instanceof Error ? err : new Error(String(err))
+    logError('Failed to import document-parser module', err)
+    throw cache.lastError
+  }
 }
 
 async function getDetector() {
-  if (!detectorModule) {
-    try {
-      logInfo('Importing detector module from ./services/detector.js')
-      detectorModule = await import('./services/detector.js')
-      logInfo('Detector module imported successfully')
-    } catch (err) {
-      logError('Failed to import detector module', err)
-      throw err
-    }
+  const cache = moduleCache.detector
+  const now = Date.now()
+
+  if (cache.module) return cache.module
+
+  if (cache.lastError && (now - cache.lastAttempt) < MODULE_RETRY_DELAY) {
+    throw cache.lastError
   }
-  return detectorModule
+
+  try {
+    logInfo('Importing detector module')
+    cache.lastAttempt = now
+    cache.module = await import('./services/detector.js')
+    cache.lastError = null
+    logInfo('Detector module imported successfully')
+    return cache.module
+  } catch (err) {
+    cache.lastError = err instanceof Error ? err : new Error(String(err))
+    logError('Failed to import detector module', err)
+    throw cache.lastError
+  }
 }
 
 async function getOCR() {
-  if (!ocrModule) {
-    ocrModule = await import('./services/ocr.js')
+  const cache = moduleCache.ocr
+  const now = Date.now()
+
+  if (cache.module) return cache.module
+
+  if (cache.lastError && (now - cache.lastAttempt) < MODULE_RETRY_DELAY) {
+    throw cache.lastError
   }
-  return ocrModule
+
+  try {
+    logInfo('Importing OCR module')
+    cache.lastAttempt = now
+    cache.module = await import('./services/ocr.js')
+    cache.lastError = null
+    logInfo('OCR module imported successfully')
+    return cache.module
+  } catch (err) {
+    cache.lastError = err instanceof Error ? err : new Error(String(err))
+    logError('Failed to import OCR module', err)
+    throw cache.lastError
+  }
 }
 
 async function getImageHash() {
-  if (!imageHashModule) {
-    imageHashModule = await import('./services/image-hash.js')
+  const cache = moduleCache.imageHash
+  const now = Date.now()
+
+  if (cache.module) return cache.module
+
+  if (cache.lastError && (now - cache.lastAttempt) < MODULE_RETRY_DELAY) {
+    throw cache.lastError
   }
-  return imageHashModule
+
+  try {
+    logInfo('Importing image-hash module')
+    cache.lastAttempt = now
+    cache.module = await import('./services/image-hash.js')
+    cache.lastError = null
+    logInfo('Image-hash module imported successfully')
+    return cache.module
+  } catch (err) {
+    cache.lastError = err instanceof Error ? err : new Error(String(err))
+    logError('Failed to import image-hash module', err)
+    throw cache.lastError
+  }
 }
 
 /** Current directory path (ESM equivalent of __dirname) */

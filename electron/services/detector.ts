@@ -664,6 +664,9 @@ async function detectFullNames(
     'trade', 'mark', 'trademark', 'copyright', 'patent'
   ]
 
+  // Track already found positions to find all occurrences
+  const foundNames = new Set<string>()
+
   people.forEach((person: ReturnType<typeof nlp>) => {
     // Clean up the name - remove trailing punctuation
     const name = person.text().replace(/[,;:]+$/, '').trim()
@@ -682,17 +685,24 @@ async function detectFullNames(
     const lowerParts = parts.map(p => p.toLowerCase().replace(/[^a-z]/g, ''))
     if (lowerParts.some(p => falsePositiveWords.includes(p))) return
 
-    // Find position in original text
-    const start = text.indexOf(name)
-    if (start === -1) return
+    // Skip if already processed this exact name
+    if (foundNames.has(name)) return
+    foundNames.add(name)
 
-    addEntity({
-      text: name,
-      type: 'person',
-      start: start,
-      end: start + name.length,
-      confidence: 85
-    })
+    // Find ALL occurrences of this name using regex for word boundaries
+    const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    const pattern = new RegExp(`\\b${escapedName}\\b`, 'gi')
+    let match: RegExpExecArray | null
+
+    while ((match = pattern.exec(text)) !== null) {
+      addEntity({
+        text: match[0],
+        type: 'person',
+        start: match.index,
+        end: match.index + match[0].length,
+        confidence: 85
+      })
+    }
   })
 }
 

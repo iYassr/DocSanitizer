@@ -103,15 +103,38 @@ export function UploadStep({ onFileUploaded }: UploadStepProps) {
       if (!window.api) {
         throw new Error('Application not properly initialized. Please restart the app.')
       }
-      // Read file as base64
+      // Read file as base64 with proper error handling
       const buffer = await new Promise<string>((resolve, reject) => {
         const reader = new FileReader()
         reader.onload = () => {
-          const result = reader.result as string
-          resolve(result.split(',')[1]) // Remove data URL prefix
+          try {
+            const result = reader.result as string
+            if (!result || typeof result !== 'string') {
+              reject(new Error('Failed to read file: empty result'))
+              return
+            }
+            const base64 = result.split(',')[1]
+            if (!base64) {
+              reject(new Error('Failed to read file: invalid data URL'))
+              return
+            }
+            resolve(base64)
+          } catch (err) {
+            reject(new Error(`Failed to process file: ${err instanceof Error ? err.message : 'unknown error'}`))
+          }
         }
-        reader.onerror = reject
-        reader.readAsDataURL(file)
+        reader.onerror = () => {
+          const errorMsg = reader.error?.message || 'Unknown file read error'
+          reject(new Error(`Failed to read file: ${errorMsg}`))
+        }
+        reader.onabort = () => {
+          reject(new Error('File reading was aborted'))
+        }
+        try {
+          reader.readAsDataURL(file)
+        } catch (err) {
+          reject(new Error(`Failed to start reading file: ${err instanceof Error ? err.message : 'unknown error'}`))
+        }
       })
 
       const fileData = {
