@@ -102,12 +102,13 @@ files:
   # ============================================================
   # OPTIMIZE LARGE PACKAGES - REMOVE DUPLICATES
   # ============================================================
-  # pdfjs-dist - only keep legacy build (used by main process)
-  - "!node_modules/pdfjs-dist/build/**"
+  # pdfjs-dist - keep build folder (main code), remove extras
   - "!node_modules/pdfjs-dist/web/**"
   - "!node_modules/pdfjs-dist/image_decoders/**"
   - "!node_modules/pdfjs-dist/types/**"
-  - "!node_modules/pdfjs-dist/*.mjs"
+  - "!node_modules/pdfjs-dist/legacy/**"
+  - "!node_modules/pdfjs-dist/cmaps/**"
+  - "!node_modules/pdfjs-dist/standard_fonts/**"
 
   # pdf-lib - keep only lib folder (es folder is duplicate)
   - "!node_modules/@pdf-lib/standard-fonts/es/**"

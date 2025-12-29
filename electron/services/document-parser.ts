@@ -264,7 +264,9 @@ async function parseCsv(buffer: Buffer): Promise<ParsedDocument> {
 async function parsePdf(buffer: Buffer): Promise<ParsedDocument> {
   // Use pdfjs-dist for robust PDF text extraction
   try {
+    console.log('[PDF] Importing pdfjs-dist...')
     const pdfjsLib = await import('pdfjs-dist')
+    console.log('[PDF] pdfjs-dist loaded successfully')
 
     // Disable worker for Electron/Node.js compatibility
     // Workers don't work properly in packaged Electron apps
