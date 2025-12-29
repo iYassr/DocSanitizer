@@ -375,15 +375,37 @@ async function parsePdf(buffer: Buffer): Promise<ParsedDocument> {
 
     // Load the PDF document with worker disabled
     logDebug('Loading PDF document with pdfjs')
-    const loadingTask = pdfjsLib.getDocument({
-      data: uint8Array,
-      useSystemFonts: true,
-      disableFontFace: true,
-      isEvalSupported: false,
-      useWorkerFetch: false,
-    })
+    let loadingTask
+    try {
+      loadingTask = pdfjsLib.getDocument({
+        data: uint8Array,
+        useSystemFonts: true,
+        disableFontFace: true,
+        isEvalSupported: false,
+        useWorkerFetch: false,
+        verbosity: 0, // Suppress console warnings
+      })
+      logDebug('getDocument called, waiting for promise')
+    } catch (initError) {
+      logError('getDocument initialization failed', {
+        message: initError instanceof Error ? initError.message : String(initError),
+        stack: initError instanceof Error ? initError.stack : undefined
+      })
+      throw initError
+    }
 
-    const pdfDoc = await loadingTask.promise
+    let pdfDoc
+    try {
+      pdfDoc = await loadingTask.promise
+      logDebug('PDF document promise resolved')
+    } catch (loadError) {
+      logError('PDF document promise rejected', {
+        message: loadError instanceof Error ? loadError.message : String(loadError),
+        name: loadError instanceof Error ? loadError.name : 'Unknown',
+        stack: loadError instanceof Error ? loadError.stack : undefined
+      })
+      throw loadError
+    }
     const numPages = pdfDoc.numPages
     logInfo('PDF document loaded', { numPages })
 
@@ -458,7 +480,14 @@ async function parsePdf(buffer: Buffer): Promise<ParsedDocument> {
     }
   } catch (error) {
     // Fallback: try to extract what we can from the PDF using pdf-lib
-    logError('PDF parsing with pdfjs failed, trying pdf-lib fallback', { error })
+    // Capture full error details for debugging
+    const errorDetails = {
+      message: error instanceof Error ? error.message : String(error),
+      name: error instanceof Error ? error.name : 'Unknown',
+      stack: error instanceof Error ? error.stack : undefined,
+      raw: String(error)
+    }
+    logError('PDF parsing with pdfjs failed, trying pdf-lib fallback', errorDetails)
 
     try {
       logDebug('Attempting pdf-lib fallback for PDF')
