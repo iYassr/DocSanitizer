@@ -128,6 +128,13 @@ export default function App() {
         <div className="flex items-center gap-2">
           <span>maskr v1.3</span>
           <ThemeToggle />
+          <button
+            onClick={() => window.api?.logsOpenFolder()}
+            className="px-1.5 py-0.5 rounded hover:bg-background/50 transition-colors"
+            title="Open debug logs folder"
+          >
+            Logs
+          </button>
         </div>
         <span>Secure document sanitization</span>
       </footer>

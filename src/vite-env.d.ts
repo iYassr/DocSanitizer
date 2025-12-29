@@ -128,6 +128,10 @@ interface Window {
     logoComputeHash: (imageBufferBase64: string) => Promise<LogoHashResult>
     logoScanDocument: (filePath: string, bufferBase64: string, logoHash: string, threshold: number) => Promise<LogoScanResult>
     platform: NodeJS.Platform
+    logsGetPath: () => Promise<string>
+    logsOpenFolder: () => Promise<{ success: boolean }>
+    logsRead: () => Promise<{ success: boolean; content?: string; error?: string }>
+    logsClear: () => Promise<{ success: boolean; error?: string }>
     onMenuEvent: (channel: string, callback: (...args: unknown[]) => void) => void
     removeMenuListener: (channel: string) => void
   }

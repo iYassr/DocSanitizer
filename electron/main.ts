@@ -14,12 +14,13 @@
  * @module electron/main
  */
 
-import { app, BrowserWindow, ipcMain, dialog } from 'electron'
+import { app, BrowserWindow, ipcMain, dialog, shell } from 'electron'
 import { fileURLToPath } from 'url'
 import path from 'path'
 import fs from 'fs/promises'
 // Light imports only - heavy modules are lazy-loaded
 import { createApplicationMenu } from './menu.js'
+import { logInfo, logError, logWarn, logStartup, getLogPath, getLogDir, readLogs, clearLogs } from './services/logger.js'
 import {
   getAllProfiles,
   getProfile,
@@ -145,6 +146,9 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+  // Initialize logging
+  logStartup()
+
   // Set dock icon on macOS
   if (process.platform === 'darwin' && app.dock) {
     const iconPath = path.join(__dirname, '..', 'resources', 'icon.png')
@@ -277,7 +281,7 @@ ipcMain.handle('file:read', async (_event, filePath: string) => {
     // Validate file path for security
     const pathValidation = validateDragDropPath(filePath)
     if (!pathValidation.valid) {
-      console.error('File read blocked:', pathValidation.error)
+      logWarn('File read blocked', { error: pathValidation.error, filePath })
       return null
     }
 
@@ -285,7 +289,7 @@ ipcMain.handle('file:read', async (_event, filePath: string) => {
 
     // Validate file size (50MB limit)
     if (buffer.length > 50 * 1024 * 1024) {
-      console.error('File too large:', buffer.length)
+      logWarn('File too large', { size: buffer.length, filePath })
       return null
     }
 
@@ -300,7 +304,7 @@ ipcMain.handle('file:read', async (_event, filePath: string) => {
       size: buffer.length
     }
   } catch (error) {
-    console.error('Error reading file:', error)
+    logError('Error reading file', error)
     return null
   }
 })
@@ -353,7 +357,7 @@ ipcMain.handle('document:parse', async (_event, fileName: string, bufferBase64: 
       hasImages: parsed.images && parsed.images.length > 0
     }
   } catch (error) {
-    console.error('Document parsing error:', error)
+    logError('Document parsing error', error)
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown parsing error'
@@ -418,7 +422,7 @@ ipcMain.handle('ner:extract', async (_event, text: string, customNames?: string[
       organizations: [] // Organizations are only detected via user configuration now
     }
   } catch (error) {
-    console.error('NER extraction error:', error)
+    logError('NER extraction error', error)
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown NER error'
@@ -486,7 +490,7 @@ ipcMain.handle(
         buffer: resultBuffer.toString('base64')
       }
     } catch (error) {
-      console.error('Create masked document error:', error)
+      logError('Create masked document error', error)
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error'
@@ -551,7 +555,7 @@ ipcMain.handle('ocr:extractText', async (_event, imageBufferBase64: string, lang
       words: result.words
     }
   } catch (error) {
-    console.error('OCR extraction error:', error)
+    logError('OCR extraction error', error)
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown OCR error'
@@ -611,7 +615,7 @@ ipcMain.handle(
         combinedText
       }
     } catch (error) {
-      console.error('Batch OCR extraction error:', error)
+      logError('Batch OCR extraction error', error)
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown OCR error'
@@ -761,7 +765,7 @@ ipcMain.handle('logo:computeHash', async (_event, imageBufferBase64: string) => 
       height: hashResult.height
     }
   } catch (error) {
-    console.error('Logo hash computation error:', error)
+    logError('Logo hash computation error', error)
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error'
@@ -866,7 +870,7 @@ ipcMain.handle(
         similarities
       }
     } catch (error) {
-      console.error('Logo scan error:', error)
+      logError('Logo scan error', error)
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error'
@@ -874,3 +878,48 @@ ipcMain.handle(
     }
   }
 )
+
+// ============================================================================
+// LOGGING IPC HANDLERS
+// ============================================================================
+
+/**
+ * Get the path to the log file
+ */
+ipcMain.handle('logs:getPath', () => {
+  return getLogPath()
+})
+
+/**
+ * Open the log directory in file explorer
+ */
+ipcMain.handle('logs:openFolder', async () => {
+  const dir = getLogDir()
+  await shell.openPath(dir)
+  return { success: true }
+})
+
+/**
+ * Read the current log contents
+ */
+ipcMain.handle('logs:read', async () => {
+  try {
+    const content = await readLogs()
+    return { success: true, content }
+  } catch (error) {
+    return { success: false, error: error instanceof Error ? error.message : 'Failed to read logs' }
+  }
+})
+
+/**
+ * Clear all log files
+ */
+ipcMain.handle('logs:clear', async () => {
+  try {
+    await clearLogs()
+    logInfo('Logs cleared by user')
+    return { success: true }
+  } catch (error) {
+    return { success: false, error: error instanceof Error ? error.message : 'Failed to clear logs' }
+  }
+})

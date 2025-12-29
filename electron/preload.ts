@@ -202,6 +202,13 @@ const api = {
   // Platform info
   getPlatform: (): Promise<string> => ipcRenderer.invoke('app:getPlatform'),
 
+  // Logging
+  logsGetPath: (): Promise<string> => ipcRenderer.invoke('logs:getPath'),
+  logsOpenFolder: (): Promise<{ success: boolean }> => ipcRenderer.invoke('logs:openFolder'),
+  logsRead: (): Promise<{ success: boolean; content?: string; error?: string }> =>
+    ipcRenderer.invoke('logs:read'),
+  logsClear: (): Promise<{ success: boolean; error?: string }> => ipcRenderer.invoke('logs:clear'),
+
   // Menu event listeners
   onMenuEvent: (channel: string, callback: (...args: unknown[]) => void) => {
     const validChannels = [
