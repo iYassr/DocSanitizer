@@ -108,6 +108,13 @@ function writeLog(level: string, message: string, data?: unknown): void {
 }
 
 /**
+ * Log a debug message (verbose, for troubleshooting)
+ */
+export function logDebug(message: string, data?: unknown): void {
+  writeLog('debug', message, data)
+}
+
+/**
  * Log an info message
  */
 export function logInfo(message: string, data?: unknown): void {

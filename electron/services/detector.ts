@@ -19,17 +19,19 @@
  * @module electron/services/detector
  */
 
+import { logDebug, logInfo, logError, logWarn } from './logger.js'
+
 // Lazy-loaded NLP module cache
 let nlpModule: typeof import('compromise') | null = null
 
 async function getNLP() {
   if (!nlpModule) {
-    console.log('[detector] Loading compromise NLP module...')
+    logInfo('Loading compromise NLP module')
     try {
       nlpModule = await import('compromise')
-      console.log('[detector] Compromise loaded successfully')
+      logInfo('Compromise NLP module loaded successfully')
     } catch (err) {
-      console.error('[detector] Failed to load compromise:', err)
+      logError('Failed to load compromise NLP module', err)
       throw err
     }
   }
@@ -99,14 +101,18 @@ export function setCustomNames(names: string[]): void {
  * // Returns: [{ text: 'John Doe', type: 'person', ... }, { text: 'john@example.com', type: 'email', ... }]
  */
 export async function extractEntities(text: string, userCustomNames?: string[]): Promise<NEREntity[]> {
+  logInfo('Starting entity extraction', { textLength: text?.length, hasCustomNames: !!(userCustomNames?.length) })
+
   // Guard against invalid input
   if (!text || typeof text !== 'string') {
+    logWarn('Invalid input to extractEntities', { text: typeof text })
     return []
   }
 
   // Update custom names if provided
   if (userCustomNames) {
     setCustomNames(userCustomNames)
+    logDebug('Custom names set', { count: userCustomNames.length })
   }
 
   const entities: NEREntity[] = []
@@ -128,41 +134,68 @@ export async function extractEntities(text: string, userCustomNames?: string[]):
     }
   }
 
+  // Track counts for each detection type
+  const countBefore = () => entities.length
+
   // 1. Detect custom user-defined names
+  let before = countBefore()
   detectCustomNames(text, addEntity)
+  logDebug('Custom names detection complete', { found: entities.length - before })
 
   // 2. Detect full names using NLP (first + last name, at least 2 parts)
+  before = countBefore()
   await detectFullNames(text, addEntity)
+  logDebug('Full names (NLP) detection complete', { found: entities.length - before })
 
   // 3. Extract financial amounts - ONLY with explicit currency symbols
+  before = countBefore()
   detectFinancialAmounts(text, addEntity)
+  logDebug('Financial amounts detection complete', { found: entities.length - before })
 
   // 4. Extract credit card numbers (with Luhn validation)
+  before = countBefore()
   detectCreditCards(text, addEntity)
+  logDebug('Credit cards detection complete', { found: entities.length - before })
 
   // 5. Extract IBAN numbers (with structure validation)
+  before = countBefore()
   detectIBANs(text, addEntity)
+  logDebug('IBANs detection complete', { found: entities.length - before })
 
   // 6. Extract IP addresses (before phone to avoid false matches)
+  before = countBefore()
   detectIPAddresses(text, addEntity)
+  logDebug('IP addresses detection complete', { found: entities.length - before })
 
   // 7. Extract phone numbers (all formats)
+  before = countBefore()
   detectPhoneNumbers(text, addEntity)
+  logDebug('Phone numbers detection complete', { found: entities.length - before })
 
   // 8. Extract email addresses
+  before = countBefore()
   detectEmails(text, addEntity)
+  logDebug('Email addresses detection complete', { found: entities.length - before })
 
   // 9. Extract URLs
+  before = countBefore()
   detectURLs(text, addEntity)
+  logDebug('URLs detection complete', { found: entities.length - before })
 
   // 10. Extract domain names (after URLs and emails to avoid duplicates)
+  before = countBefore()
   detectDomains(text, addEntity)
+  logDebug('Domain names detection complete', { found: entities.length - before })
 
   // 11. Extract Saudi ID numbers (National ID and Iqama)
+  before = countBefore()
   detectSaudiIDs(text, addEntity)
+  logDebug('Saudi IDs detection complete', { found: entities.length - before })
 
   // 12. Extract US Social Security Numbers (SSN)
+  before = countBefore()
   detectSSNs(text, addEntity)
+  logDebug('SSNs detection complete', { found: entities.length - before })
 
   // Deduplicate entities (same position)
   const seen = new Set<string>()
@@ -171,6 +204,17 @@ export async function extractEntities(text: string, userCustomNames?: string[]):
     if (seen.has(key)) return false
     seen.add(key)
     return true
+  })
+
+  // Log summary by type
+  const typeCounts: Record<string, number> = {}
+  for (const entity of uniqueEntities) {
+    typeCounts[entity.type] = (typeCounts[entity.type] || 0) + 1
+  }
+
+  logInfo('Entity extraction complete', {
+    totalEntities: uniqueEntities.length,
+    byType: typeCounts
   })
 
   return uniqueEntities.sort((a, b) => a.start - b.start)
