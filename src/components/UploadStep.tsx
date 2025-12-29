@@ -99,6 +99,10 @@ export function UploadStep({ onFileUploaded }: UploadStepProps) {
     setProcessingStatus('Reading file...')
 
     try {
+      // Verify API is available
+      if (!window.api) {
+        throw new Error('Application not properly initialized. Please restart the app.')
+      }
       // Read file as base64
       const buffer = await new Promise<string>((resolve, reject) => {
         const reader = new FileReader()
@@ -317,8 +321,13 @@ export function UploadStep({ onFileUploaded }: UploadStepProps) {
 
   const handleBrowseClick = useCallback(async () => {
     try {
+      // Verify API is available
+      if (!window.api?.openFile) {
+        setError('Application not properly initialized. Please restart the app.')
+        return
+      }
       // Use native Electron file dialog
-      const fileData = await window.api?.openFile()
+      const fileData = await window.api.openFile()
       if (fileData && fileData.filePath) {
         // Convert the file data to a File-like object for processFile
         const blob = await fetch(`data:application/octet-stream;base64,${fileData.buffer}`).then(r => r.blob())
@@ -327,8 +336,7 @@ export function UploadStep({ onFileUploaded }: UploadStepProps) {
       }
     } catch (err) {
       console.error('Failed to open file dialog:', err)
-      // Fallback to HTML file input
-      fileInputRef.current?.click()
+      setError(err instanceof Error ? err.message : 'Failed to open file dialog')
     }
   }, [processFile])
 
@@ -343,8 +351,12 @@ export function UploadStep({ onFileUploaded }: UploadStepProps) {
     setProcessingStatus('Detecting sensitive information...')
 
     try {
+      // Verify API is available
+      if (!window.api) {
+        throw new Error('Application not properly initialized. Please restart the app.')
+      }
       // Extract entities via NER
-      const nerResult = await window.api?.extractEntities(pastedText)
+      const nerResult = await window.api.extractEntities(pastedText)
 
       if (!nerResult?.success) {
         throw new Error(nerResult?.error || 'Failed to analyze text')
