@@ -55,11 +55,17 @@ test.describe('maskr E2E Tests', () => {
   test.beforeEach(async () => {
     // Launch fresh Electron app for each test
     electronApp = await electron.launch({
-      args: [path.join(__dirname, '../dist-electron/main.js')],
+      args: [
+        path.join(__dirname, '../dist-electron/main.js'),
+        '--disable-gpu',
+        '--no-sandbox'
+      ],
       env: {
         ...process.env,
-        NODE_ENV: 'test'
-      }
+        NODE_ENV: 'test',
+        ELECTRON_DISABLE_SECURITY_WARNINGS: 'true'
+      },
+      colorScheme: 'dark'
     })
     page = await electronApp.firstWindow()
     await page.waitForLoadState('domcontentloaded')

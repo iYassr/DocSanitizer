@@ -160,9 +160,10 @@ const api = {
   createMaskedDocument: (
     originalBufferBase64: string,
     maskedContent: string,
-    format: string
+    format: string,
+    replacements?: [string, string][]
   ): Promise<MaskedDocumentResult> =>
-    ipcRenderer.invoke('document:createMasked', originalBufferBase64, maskedContent, format),
+    ipcRenderer.invoke('document:createMasked', originalBufferBase64, maskedContent, format, replacements),
 
   // NER extraction
   extractEntities: (text: string, customNames?: string[]): Promise<NERResult> =>

@@ -222,8 +222,14 @@ export function ExportStep({ onBack, onReset }: ExportStepProps) {
       let contentBase64: string
 
       if (binaryFormats.includes(ext) && file?.buffer) {
-        // Create proper binary document
-        const result = await window.api?.createMaskedDocument(file.buffer, maskedContent, ext)
+        // Build replacements array from approved detections for format preservation
+        const safeApproved = Array.isArray(approvedDetections) ? approvedDetections : []
+        const replacementsArray: [string, string][] = safeApproved
+          .filter(d => d && typeof d.text === 'string' && typeof d.suggestedPlaceholder === 'string')
+          .map(d => [d.text, d.suggestedPlaceholder] as [string, string])
+
+        // Create proper binary document with format preservation
+        const result = await window.api?.createMaskedDocument(file.buffer, maskedContent, ext, replacementsArray)
         if (!result?.success || !result.buffer) {
           throw new Error(result?.error || 'Failed to create document')
         }

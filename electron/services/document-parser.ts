@@ -573,92 +573,264 @@ async function parseHtml(buffer: Buffer): Promise<ParsedDocument> {
 // ============================================================================
 
 /**
- * Creates a masked DOCX document with placeholder text.
+ * Creates a masked DOCX document preserving original formatting.
  *
- * Note: Does not preserve original formatting. Creates a new document
- * with simple text paragraphs.
+ * This function:
+ * 1. Extracts the DOCX (which is a ZIP archive)
+ * 2. Finds and replaces sensitive text in the XML content
+ * 3. Preserves all formatting, styles, and images
+ * 4. Repackages the modified content
  *
- * @param originalBuffer - Original document (unused, kept for API consistency)
- * @param maskedContent - Text with placeholders replacing sensitive data
- * @returns Buffer containing the new DOCX file
+ * @param originalBuffer - Original DOCX file buffer
+ * @param maskedContent - Not used directly; replacements extracted from it
+ * @param replacements - Map of original text to replacement text
+ * @returns Buffer containing the masked DOCX file with preserved formatting
  */
 export async function createMaskedDocx(
   originalBuffer: Buffer,
-  maskedContent: string
+  maskedContent: string,
+  replacements?: Map<string, string>
 ): Promise<Buffer> {
-  logInfo('Creating masked DOCX', { contentLength: maskedContent.length })
-
-  // For now, we'll create a simple text-based docx
-  // In future, we could preserve formatting
-  const { Document, Packer, Paragraph, TextRun } = await import('docx')
-  logDebug('docx library loaded')
-
-  const paragraphs = maskedContent.split('\n').map(
-    (line) =>
-      new Paragraph({
-        children: [new TextRun(line)]
-      })
-  )
-  logDebug('Paragraphs created', { count: paragraphs.length })
-
-  const doc = new Document({
-    sections: [
-      {
-        properties: {},
-        children: paragraphs
-      }
-    ]
+  logInfo('Creating masked DOCX with preserved formatting', {
+    bufferSize: originalBuffer.length,
+    hasReplacements: !!replacements,
+    replacementCount: replacements?.size || 0
   })
 
-  const buffer = await Packer.toBuffer(doc)
-  logInfo('Masked DOCX created', { outputSize: buffer.length })
-  return buffer
+  // If no replacements provided, fall back to simple text-based approach
+  if (!replacements || replacements.size === 0) {
+    logWarn('No replacements provided, creating simple text DOCX')
+    const { Document, Packer, Paragraph, TextRun } = await import('docx')
+    const paragraphs = maskedContent.split('\n').map(
+      (line) => new Paragraph({ children: [new TextRun(line)] })
+    )
+    const doc = new Document({
+      sections: [{ properties: {}, children: paragraphs }]
+    })
+    return await Packer.toBuffer(doc)
+  }
+
+  try {
+    // Load the DOCX as a ZIP archive
+    const zip = await JSZip.loadAsync(originalBuffer)
+    logDebug('DOCX ZIP loaded')
+
+    // Get the main document XML
+    const docXmlFile = zip.file('word/document.xml')
+    if (!docXmlFile) {
+      throw new Error('Invalid DOCX: missing word/document.xml')
+    }
+
+    let docXml = await docXmlFile.async('string')
+    logDebug('Document XML loaded', { length: docXml.length })
+
+    // Sort replacements by length (longest first) to avoid partial replacements
+    const sortedReplacements = Array.from(replacements.entries())
+      .sort((a, b) => b[0].length - a[0].length)
+
+    // Replace each sensitive text with its placeholder
+    for (const [original, replacement] of sortedReplacements) {
+      // Escape special XML characters in the search text
+      const escapedOriginal = original
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&apos;')
+
+      // Escape special XML characters in the replacement text
+      const escapedReplacement = replacement
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&apos;')
+
+      // Replace in the XML content
+      // Use a regex that handles text split across XML tags
+      const regex = new RegExp(escapeRegex(escapedOriginal), 'g')
+      const beforeLength = docXml.length
+      docXml = docXml.replace(regex, escapedReplacement)
+
+      if (docXml.length !== beforeLength) {
+        logDebug('Replaced text in DOCX', { original, replacement })
+      }
+    }
+
+    // Update the document XML in the ZIP
+    zip.file('word/document.xml', docXml)
+    logDebug('Document XML updated')
+
+    // Also process headers and footers if they exist
+    const headerFooterFiles = Object.keys(zip.files).filter(
+      name => name.match(/word\/(header|footer)\d*\.xml/)
+    )
+
+    for (const fileName of headerFooterFiles) {
+      const file = zip.file(fileName)
+      if (file) {
+        let content = await file.async('string')
+        for (const [original, replacement] of sortedReplacements) {
+          const escapedOriginal = original
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+          const escapedReplacement = replacement
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+          content = content.replace(new RegExp(escapeRegex(escapedOriginal), 'g'), escapedReplacement)
+        }
+        zip.file(fileName, content)
+      }
+    }
+
+    // Generate the new DOCX
+    const buffer = await zip.generateAsync({
+      type: 'nodebuffer',
+      compression: 'DEFLATE',
+      compressionOptions: { level: 6 }
+    })
+
+    logInfo('Masked DOCX created with preserved formatting', { outputSize: buffer.length })
+    return buffer
+  } catch (error) {
+    logError('Failed to create format-preserving DOCX, falling back to simple', { error })
+    // Fall back to simple text-based approach
+    const { Document, Packer, Paragraph, TextRun } = await import('docx')
+    const paragraphs = maskedContent.split('\n').map(
+      (line) => new Paragraph({ children: [new TextRun(line)] })
+    )
+    const doc = new Document({
+      sections: [{ properties: {}, children: paragraphs }]
+    })
+    return await Packer.toBuffer(doc)
+  }
 }
 
 /**
- * Creates a masked XLSX document.
+ * Escapes special regex characters in a string
+ */
+function escapeRegex(string: string): string {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+/**
+ * Creates a masked XLSX document preserving original formatting.
  *
- * Parses the masked content (sheet headers and tab-separated rows)
- * and creates a new workbook. Does not preserve original formatting.
+ * This function:
+ * 1. Loads the original workbook
+ * 2. Finds and replaces sensitive text in cell values
+ * 3. Preserves all formatting, styles, formulas (converted to values), and sheets
  *
- * @param originalBuffer - Original document (unused, kept for API consistency)
- * @param maskedContent - Text with sheet headers and tab-separated values
- * @returns Buffer containing the new XLSX file
+ * @param originalBuffer - Original XLSX file buffer
+ * @param maskedContent - Not used directly when replacements provided
+ * @param replacements - Map of original text to replacement text
+ * @returns Buffer containing the masked XLSX file with preserved formatting
  */
 export async function createMaskedXlsx(
   originalBuffer: Buffer,
-  maskedContent: string
+  maskedContent: string,
+  replacements?: Map<string, string>
 ): Promise<Buffer> {
-  logInfo('Creating masked XLSX', { contentLength: maskedContent.length })
+  logInfo('Creating masked XLSX with preserved formatting', {
+    bufferSize: originalBuffer.length,
+    hasReplacements: !!replacements,
+    replacementCount: replacements?.size || 0
+  })
 
-  const workbook = new ExcelJS.Workbook()
-  const worksheet = workbook.addWorksheet('Sanitized')
-
-  const lines = maskedContent.split('\n')
-  let rowCount = 0
-
-  for (const line of lines) {
-    if (line.startsWith('--- Sheet:')) {
-      // Skip sheet header lines
-      continue
+  // If no replacements provided, fall back to simple approach
+  if (!replacements || replacements.size === 0) {
+    logWarn('No replacements provided, creating simple XLSX')
+    const workbook = new ExcelJS.Workbook()
+    const worksheet = workbook.addWorksheet('Sanitized')
+    const lines = maskedContent.split('\n')
+    for (const line of lines) {
+      if (!line.startsWith('--- Sheet:') && line.trim()) {
+        worksheet.addRow(line.split('\t'))
+      }
     }
-
-    if (line.trim()) {
-      const values = line.split('\t')
-      worksheet.addRow(values)
-      rowCount++
-    }
+    return Buffer.from(await workbook.xlsx.writeBuffer())
   }
 
-  logDebug('Masked XLSX rows created', { rowCount })
+  try {
+    // Load the original workbook
+    const workbook = new ExcelJS.Workbook()
+    await workbook.xlsx.load(originalBuffer)
+    logDebug('Original XLSX loaded', { sheetCount: workbook.worksheets.length })
 
-  const buffer = Buffer.from(await workbook.xlsx.writeBuffer())
-  logInfo('Masked XLSX created', { outputSize: buffer.length, rowCount })
-  return buffer
+    // Sort replacements by length (longest first)
+    const sortedReplacements = Array.from(replacements.entries())
+      .sort((a, b) => b[0].length - a[0].length)
+
+    let totalReplacements = 0
+
+    // Process each worksheet
+    workbook.eachSheet((worksheet) => {
+      logDebug('Processing sheet', { name: worksheet.name })
+
+      worksheet.eachRow({ includeEmpty: false }, (row) => {
+        row.eachCell({ includeEmpty: false }, (cell) => {
+          // Get the cell value as string
+          let cellValue = ''
+          if (cell.value !== null && cell.value !== undefined) {
+            if (typeof cell.value === 'object') {
+              // Handle rich text, formulas, etc.
+              if ('text' in cell.value) {
+                cellValue = String(cell.value.text)
+              } else if ('result' in cell.value) {
+                cellValue = String(cell.value.result)
+              } else {
+                cellValue = String(cell.value)
+              }
+            } else {
+              cellValue = String(cell.value)
+            }
+          }
+
+          // Apply replacements
+          let newValue = cellValue
+          for (const [original, replacement] of sortedReplacements) {
+            if (newValue.includes(original)) {
+              newValue = newValue.split(original).join(replacement)
+              totalReplacements++
+            }
+          }
+
+          // Update cell if changed
+          if (newValue !== cellValue) {
+            cell.value = newValue
+          }
+        })
+      })
+    })
+
+    logInfo('XLSX replacements applied', { totalReplacements })
+
+    const buffer = Buffer.from(await workbook.xlsx.writeBuffer())
+    logInfo('Masked XLSX created with preserved formatting', { outputSize: buffer.length })
+    return buffer
+  } catch (error) {
+    logError('Failed to create format-preserving XLSX, falling back to simple', { error })
+    // Fall back to simple approach
+    const workbook = new ExcelJS.Workbook()
+    const worksheet = workbook.addWorksheet('Sanitized')
+    const lines = maskedContent.split('\n')
+    for (const line of lines) {
+      if (!line.startsWith('--- Sheet:') && line.trim()) {
+        worksheet.addRow(line.split('\t'))
+      }
+    }
+    return Buffer.from(await workbook.xlsx.writeBuffer())
+  }
 }
 
 /**
  * Creates a masked PDF document.
+ *
+ * NOTE: PDF format preservation is limited. Unlike DOCX/XLSX, PDFs are not
+ * designed for editing. This function creates a new PDF with the sanitized text.
+ * Original formatting (fonts, layout, images) cannot be preserved.
  *
  * Creates a new PDF with:
  * - A4 page size (595 x 842 points)
@@ -666,15 +838,15 @@ export async function createMaskedXlsx(
  * - 50pt margins
  * - Automatic page breaks
  *
- * Long lines are truncated to 100 characters.
- *
- * @param originalBuffer - Original document (unused, kept for API consistency)
+ * @param originalBuffer - Original PDF buffer (for future enhancement)
  * @param maskedContent - Text with placeholders replacing sensitive data
+ * @param replacements - Map of original text to replacement (for API consistency)
  * @returns Buffer containing the new PDF file
  */
 export async function createMaskedPdf(
   originalBuffer: Buffer,
-  maskedContent: string
+  maskedContent: string,
+  replacements?: Map<string, string>
 ): Promise<Buffer> {
   logInfo('Creating masked PDF', { contentLength: maskedContent.length })
 

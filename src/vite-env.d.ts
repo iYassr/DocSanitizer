@@ -112,7 +112,7 @@ interface Window {
     saveFile: (data: string, defaultName: string, format?: string) => Promise<string | null>
     readFile: (filePath: string) => Promise<FileData | null>
     parseDocument: (filePath: string, bufferBase64: string) => Promise<ParsedDocument>
-    createMaskedDocument: (originalBufferBase64: string, maskedContent: string, format: string) => Promise<MaskedDocumentResult>
+    createMaskedDocument: (originalBufferBase64: string, maskedContent: string, format: string, replacements?: [string, string][]) => Promise<MaskedDocumentResult>
     extractEntities: (text: string, customNames?: string[]) => Promise<NERResult>
     ocrExtractText: (imageBufferBase64: string, language?: string) => Promise<OCRResult>
     ocrExtractTextBatch: (imageBuffersBase64: string[], language?: string) => Promise<OCRBatchResult>

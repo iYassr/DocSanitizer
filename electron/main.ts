@@ -522,19 +522,20 @@ ipcMain.handle('ner:extract', async (_event, text: string, customNames?: string[
  * Creates a masked version of a document with sensitive data replaced.
  *
  * Format-specific handling:
- * - DOCX: Creates new document with masked text (formatting not preserved)
- * - XLSX: Creates new workbook with masked content
- * - PDF: Creates new PDF with masked text (A4 format)
+ * - DOCX: Preserves formatting, replaces text in-place
+ * - XLSX: Preserves formatting, replaces cell values in-place
+ * - PDF: Creates new PDF (format preservation not possible)
  * - Text formats: Returns masked text as UTF-8
  *
- * @param originalBufferBase64 - Original document as base64 (for format reference)
+ * @param originalBufferBase64 - Original document as base64
  * @param maskedContent - Text with placeholders replacing sensitive data
  * @param format - Output format (docx, xlsx, pdf, txt, md, json, csv, html)
+ * @param replacementsArray - Optional array of [original, replacement] pairs for format preservation
  * @returns MaskedDocumentResult with base64-encoded output buffer
  */
 ipcMain.handle(
   'document:createMasked',
-  async (_event, originalBufferBase64: string, maskedContent: string, format: string) => {
+  async (_event, originalBufferBase64: string, maskedContent: string, format: string, replacementsArray?: [string, string][]) => {
     try {
       // Validate buffer size
       const bufferValidation = validateBufferSize(originalBufferBase64)
@@ -558,15 +559,26 @@ ipcMain.handle(
       let resultBuffer: Buffer
       const { createMaskedDocx, createMaskedXlsx, createMaskedPdf } = await getDocumentParser()
 
+      // Convert replacements array to Map for format-preserving functions
+      const replacements = replacementsArray && Array.isArray(replacementsArray)
+        ? new Map(replacementsArray)
+        : undefined
+
+      logInfo('Creating masked document', {
+        format,
+        hasReplacements: !!replacements,
+        replacementCount: replacements?.size || 0
+      })
+
       switch (format) {
         case 'docx':
-          resultBuffer = await createMaskedDocx(originalBuffer, maskedContent)
+          resultBuffer = await createMaskedDocx(originalBuffer, maskedContent, replacements)
           break
         case 'xlsx':
-          resultBuffer = await createMaskedXlsx(originalBuffer, maskedContent)
+          resultBuffer = await createMaskedXlsx(originalBuffer, maskedContent, replacements)
           break
         case 'pdf':
-          resultBuffer = await createMaskedPdf(originalBuffer, maskedContent)
+          resultBuffer = await createMaskedPdf(originalBuffer, maskedContent, replacements)
           break
         default:
           // For text formats, just encode the content
