@@ -1,9 +1,9 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useDocumentStore } from './stores/documentStore'
 import { UploadStep } from './components/UploadStep'
 import { ReviewStep } from './components/ReviewStep'
 import { ExportStep } from './components/ExportStep'
-import { Check } from './components/ui/icons'
+import { Check, Shield } from './components/ui/icons'
 import { ThemeToggle } from './components/ui/theme-toggle'
 
 type Step = 'upload' | 'review' | 'export'
@@ -14,9 +14,86 @@ const STEPS: { id: Step; label: string; number: number }[] = [
   { id: 'export', label: 'Export', number: 3 }
 ]
 
+// Loading screen component
+function LoadingScreen({ progress }: { progress: number }) {
+  return (
+    <div className="flex flex-col items-center justify-center h-screen bg-background text-foreground">
+      <div className="text-center">
+        {/* Logo/Icon */}
+        <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-primary/10 flex items-center justify-center">
+          <Shield className="w-10 h-10 text-primary" />
+        </div>
+
+        {/* App name */}
+        <h1 className="text-3xl font-bold text-foreground mb-2">maskr</h1>
+        <p className="text-muted-foreground mb-8">Secure Document Sanitization</p>
+
+        {/* Loading bar */}
+        <div className="w-64 h-1.5 bg-muted rounded-full overflow-hidden">
+          <div
+            className="h-full bg-primary rounded-full transition-all duration-300 ease-out"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+
+        {/* Loading text */}
+        <p className="text-sm text-muted-foreground mt-4">
+          {progress < 30 ? 'Initializing...' :
+           progress < 60 ? 'Loading detection engine...' :
+           progress < 90 ? 'Preparing workspace...' :
+           'Almost ready...'}
+        </p>
+      </div>
+    </div>
+  )
+}
+
 export default function App() {
+  const [isLoading, setIsLoading] = useState(true)
+  const [loadingProgress, setLoadingProgress] = useState(0)
   const [currentStep, setCurrentStep] = useState<Step>('upload')
   const { reset } = useDocumentStore()
+
+  // Simulate loading and preload resources
+  useEffect(() => {
+    let mounted = true
+
+    const preload = async () => {
+      // Stage 1: Initial setup
+      setLoadingProgress(10)
+      await new Promise(r => setTimeout(r, 100))
+
+      // Stage 2: Preload the NLP/detection engine by making a dummy call
+      if (mounted) setLoadingProgress(30)
+      try {
+        // This will trigger lazy loading of the compromise NLP module
+        await window.api?.extractEntities('preload warmup text')
+      } catch {
+        // Ignore errors during preload
+      }
+
+      if (mounted) setLoadingProgress(70)
+      await new Promise(r => setTimeout(r, 100))
+
+      // Stage 3: Final setup
+      if (mounted) setLoadingProgress(90)
+      await new Promise(r => setTimeout(r, 100))
+
+      if (mounted) {
+        setLoadingProgress(100)
+        // Small delay before hiding loading screen
+        setTimeout(() => {
+          if (mounted) setIsLoading(false)
+        }, 200)
+      }
+    }
+
+    preload()
+
+    return () => {
+      mounted = false
+    }
+  }, [])
 
   const handleFileUploaded = useCallback(() => {
     setCurrentStep('review')
@@ -41,6 +118,11 @@ export default function App() {
   }, [reset])
 
   const getCurrentStepIndex = () => STEPS.findIndex(s => s.id === currentStep)
+
+  // Show loading screen during initial load
+  if (isLoading) {
+    return <LoadingScreen progress={loadingProgress} />
+  }
 
   return (
     <div className="flex flex-col h-screen bg-background text-foreground">

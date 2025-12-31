@@ -262,6 +262,29 @@ export function ExportStep({ onBack, onReset }: ExportStepProps) {
     }
   }
 
+  const handleExportAsMarkdown = async () => {
+    setIsExporting(true)
+    setError(null)
+
+    try {
+      const baseName = file?.fileName?.replace(/\.[^/.]+$/, '') || 'document'
+      const defaultName = `${baseName}_sanitized.md`
+
+      // Export as plain text markdown
+      const contentBase64 = btoa(unescape(encodeURIComponent(maskedContent)))
+      const result = await window.api?.saveFile(contentBase64, defaultName, 'md')
+
+      if (result) {
+        setExportSuccess(true)
+      }
+    } catch (err) {
+      console.error('Export as MD error:', err)
+      setError(err instanceof Error ? err.message : 'Failed to export as Markdown')
+    } finally {
+      setIsExporting(false)
+    }
+  }
+
   if (exportSuccess) {
     return (
       <div className="flex flex-col items-center justify-center h-full">
@@ -276,9 +299,15 @@ export function ExportStep({ onBack, onReset }: ExportStepProps) {
             Your sanitized document has been saved successfully.
           </p>
 
-          <Button onClick={onReset}>
-            Sanitize Another Document
-          </Button>
+          <div className="flex items-center gap-3">
+            <Button variant="outline" onClick={() => { setExportSuccess(false); onBack(); }}>
+              <ChevronLeft className="h-4 w-4 mr-1" />
+              Back to Document
+            </Button>
+            <Button onClick={onReset}>
+              Sanitize Another Document
+            </Button>
+          </div>
         </div>
       </div>
     )
@@ -422,6 +451,10 @@ export function ExportStep({ onBack, onReset }: ExportStepProps) {
                 Copy
               </>
             )}
+          </Button>
+          <Button variant="outline" onClick={handleExportAsMarkdown} disabled={isExporting || isGenerating}>
+            <Download className="h-4 w-4 mr-1" />
+            Export as MD
           </Button>
           <Button
             onClick={handleExport}

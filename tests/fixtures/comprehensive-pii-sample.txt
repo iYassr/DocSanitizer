@@ -1,0 +1,936 @@
+COMPREHENSIVE PII TEST DOCUMENT
+================================
+
+This document contains various types of sensitive information for testing detection capabilities.
+
+================================================================================
+SECTION 1: CREDIT CARD NUMBERS (Visa, Mastercard, Mada)
+================================================================================
+
+--- Visa Cards (Starting with 4) ---
+1. Customer John Smith paid with Visa: 4111111111111111
+2. Sarah Johnson's card: 4012888888881881
+3. Payment from Michael Brown: 4222222222222
+4. Order #1001 - Visa: 4532015112830366
+5. Transaction by David Wilson: 4916338506082832
+6. Emily Davis purchased with: 4024007148673576
+7. Robert Miller's payment: 4556737586899855
+8. Jennifer Garcia's card: 4539578763621486
+9. William Martinez used: 4485983356242217
+10. Jessica Anderson paid: 4929778869082405
+11. Card ending 1234: 4716182333661786
+12. VIP member card: 4532421672145029
+13. Premium account: 4916495077693626
+14. Business card: 4539992043aborite750628
+15. Corporate Visa: 4485429517622493
+16. Travel card: 4716989580897798
+17. Rewards card: 4929499372918467
+18. Platinum Visa: 4024007103939509
+19. Gold member: 4532806428920407
+20. Standard card: 4916186265961647
+21. Employee card: 4539156060704740
+22. Vendor payment: 4485806564406153
+23. Supplier card: 4716280359364268
+24. Partner Visa: 4929845682158846
+25. Affiliate card: 4024007182990385
+
+--- Mastercard (Starting with 5) ---
+26. Ahmed Al-Rashid paid with MC: 5425233430109903
+27. Fatima Hassan's card: 5105105105105100
+28. Mohammed Al-Saud: 5500000000000004
+29. Noura Abdullah: 5555555555554444
+30. Khalid Ibrahim: 5454545454545454
+31. Layla Ahmed: 5425232820001308
+32. Omar Mahmoud: 5111111111111118
+33. Hana Al-Farsi: 5204230080000017
+34. Yusuf Nasser: 5543210001234567
+35. Mariam Saleh: 5200828282828210
+36. Ali Hassan: 5105105105105100
+37. Zainab Omar: 5425233430109903
+38. Ibrahim Khalil: 5555555555554444
+39. Aisha Mohammed: 5500000000000004
+40. Tariq Abdullah: 5454545454545454
+41. Reem Al-Qahtani: 5425232820001308
+42. Saud Al-Rashidi: 5111111111111118
+43. Dalal Hamad: 5204230080000017
+44. Faisal Al-Dosari: 5543210001234567
+45. Mona Al-Shehri: 5200828282828210
+46. Corporate MC: 5425233430109903
+47. Business account: 5105105105105100
+48. Premium MC: 5500000000000004
+49. Gold Mastercard: 5555555555554444
+50. Platinum member: 5454545454545454
+
+--- Mada Cards (Saudi Debit - Starting with 4, 5, or specific BINs) ---
+51. Mada card holder Sultan: 4766950000000001
+52. Mada payment Rania: 4766950000000019
+53. Debit card Mansour: 5297410000000001
+54. Mada user Hessa: 5297410000000019
+55. Saudi debit Nawaf: 4766950000000027
+56. Mada card Ghada: 5297410000000027
+57. Local payment Bandar: 4766950000000035
+58. Mada holder Abeer: 5297410000000035
+59. Debit user Turki: 4766950000000043
+60. Mada payer Nouf: 5297410000000043
+61. Saudi card Badr: 4766950000000050
+62. Mada account Lama: 5297410000000050
+63. Local debit Meshal: 4766950000000068
+64. Mada payment Afnan: 5297410000000068
+65. Saudi debit Fahad: 4766950000000076
+66. Mada card Dina: 5297410000000076
+67. Debit holder Nayef: 4766950000000084
+68. Mada user Shahad: 5297410000000084
+69. Local card Saad: 4766950000000092
+70. Mada payer Wafa: 5297410000000092
+71. Saudi Mada Abdulaziz: 4766950000000100
+72. Debit card Reema: 5297410000000100
+73. Mada holder Majed: 4766950000000118
+74. Local payment Nada: 5297410000000118
+75. Saudi debit Sami: 4766950000000126
+
+--- Additional Cards ---
+76. AMEX card: 378282246310005
+77. AMEX corporate: 371449635398431
+78. Discover card: 6011111111111117
+79. Discover: 6011000990139424
+80. JCB card: 3530111333300000
+81. JCB premium: 3566002020360505
+82. Diners Club: 30569309025904
+83. Diners: 38520000023237
+84. UnionPay: 6200000000000005
+85. UnionPay premium: 6212345678901234
+86. Test card 1: 4000056655665556
+87. Test card 2: 5200828282828210
+88. Test card 3: 4000000000000077
+89. Test card 4: 4000000000000093
+90. Test card 5: 4000000000000101
+91. Expired card: 4000000000000119
+92. Invalid CVV test: 4000000000000127
+93. Insufficient funds: 4000000000000135
+94. Lost card: 4000000000000143
+95. Stolen card: 4000000000000150
+96. Processing error: 4000000000000168
+97. Declined: 4000000000000176
+98. Pickup card: 4000000000000184
+99. Restricted: 4000000000000192
+100. Test Visa: 4000000000000200
+101. Test MC: 5100000000000198
+102. Test Discover: 6011000000000004
+103. Test AMEX: 340000000000009
+104. Test JCB: 3088000000000017
+105. Production card: 4111111111111111
+
+================================================================================
+SECTION 2: NAMES (Arabic and English Origins)
+================================================================================
+
+--- Arabic Names ---
+1. Mohammed bin Salman Al-Saud
+2. Abdullah Ahmed Al-Rashid
+3. Fatima bint Hassan Al-Qahtani
+4. Khalid Ibrahim Al-Dosari
+5. Noura Mohammed Al-Shehri
+6. Ahmed Yusuf Al-Farsi
+7. Layla Omar Al-Harbi
+8. Omar Mahmoud Al-Ghamdi
+9. Hana Tariq Al-Zahrani
+10. Yusuf Faisal Al-Otaibi
+11. Mariam Saud Al-Mutairi
+12. Ali Hassan Al-Shamrani
+13. Zainab Abdullah Al-Malki
+14. Ibrahim Nasser Al-Anazi
+15. Aisha Khalid Al-Tamimi
+16. Tariq Mohammed Al-Subaie
+17. Reem Bandar Al-Enezi
+18. Saud Fahad Al-Juhani
+19. Dalal Mansour Al-Harthy
+20. Faisal Sultan Al-Qahtani
+21. Mona Nawaf Al-Dawsari
+22. Sultan Badr Al-Shammari
+23. Rania Turki Al-Ruwaili
+24. Mansour Saad Al-Yami
+25. Hessa Meshal Al-Ajmi
+26. Nawaf Majed Al-Muteiri
+27. Ghada Nayef Al-Rasheed
+28. Bandar Sami Al-Harthi
+29. Abeer Abdulaziz Al-Saif
+30. Turki Hamad Al-Balawi
+31. Nouf Abdullah Al-Mudahi
+32. Badr Mohammed Al-Otaibi
+33. Lama Ahmed Al-Saleh
+34. Meshal Khalid Al-Tamimi
+35. Afnan Omar Al-Qahtani
+36. Fahad Ibrahim Al-Dosari
+37. Dina Yusuf Al-Harbi
+38. Nayef Faisal Al-Shamrani
+39. Shahad Tariq Al-Ghamdi
+40. Saad Bandar Al-Zahrani
+41. Wafa Mansour Al-Farsi
+42. Abdulaziz Sultan Al-Mutairi
+43. Reema Nawaf Al-Anazi
+44. Majed Badr Al-Shehri
+45. Nada Turki Al-Malki
+46. Sami Saad Al-Enezi
+47. Amal Meshal Al-Juhani
+48. Hamad Majed Al-Harthy
+49. Sara Nayef Al-Subaie
+50. Saleh Sami Al-Dawsari
+
+--- English Names ---
+51. John William Smith
+52. Sarah Elizabeth Johnson
+53. Michael David Brown
+54. Emily Rose Davis
+55. Robert James Wilson
+56. Jennifer Anne Garcia
+57. William Thomas Martinez
+58. Jessica Marie Anderson
+59. David Christopher Taylor
+60. Amanda Lynn Thomas
+61. James Patrick Moore
+62. Michelle Nicole Jackson
+63. Christopher Alan White
+64. Stephanie Marie Harris
+65. Matthew Ryan Martin
+66. Ashley Nicole Thompson
+67. Daniel Joseph Garcia
+68. Brittany Ann Robinson
+69. Andrew Michael Clark
+70. Samantha Jo Rodriguez
+71. Joshua David Lewis
+72. Nicole Marie Lee
+73. Ryan Patrick Walker
+74. Megan Elizabeth Hall
+75. Brandon James Allen
+76. Lauren Ashley Young
+77. Tyler Joseph Hernandez
+78. Kayla Marie King
+79. Justin Michael Wright
+80. Rachel Ann Lopez
+81. Kevin Patrick Hill
+82. Amber Nicole Scott
+83. Brian David Green
+84. Christina Marie Adams
+85. Steven James Baker
+86. Heather Ann Gonzalez
+87. Eric Thomas Nelson
+88. Tiffany Marie Carter
+89. Jason Michael Mitchell
+90. Melissa Ann Perez
+91. Aaron David Roberts
+92. Kelly Marie Turner
+93. Sean Patrick Phillips
+94. Laura Elizabeth Campbell
+95. Mark Thomas Parker
+96. Amy Nicole Evans
+97. Scott David Edwards
+98. Rebecca Marie Collins
+99. Paul Joseph Stewart
+100. Katherine Ann Sanchez
+101. Dr. James Morrison
+102. Prof. Elizabeth Warren
+103. Mr. William Henderson
+104. Mrs. Patricia Montgomery
+105. Ms. Catherine Wellington
+
+================================================================================
+SECTION 3: NETWORK ADDRESSES (IPv4, IPv6, Internal, External)
+================================================================================
+
+--- Internal IPv4 Addresses (Private Ranges) ---
+1. Server 1: 192.168.1.1
+2. Server 2: 192.168.1.100
+3. Gateway: 192.168.0.1
+4. DHCP Server: 192.168.1.254
+5. DNS Internal: 192.168.10.10
+6. File Server: 192.168.100.50
+7. Print Server: 192.168.1.200
+8. Database: 192.168.50.25
+9. App Server: 192.168.2.150
+10. Web Internal: 192.168.3.100
+11. Mail Server: 10.0.0.1
+12. Proxy: 10.0.0.50
+13. Firewall: 10.0.1.1
+14. Load Balancer: 10.0.2.100
+15. Cache Server: 10.10.10.10
+16. Backup Server: 10.20.30.40
+17. Dev Server: 10.100.1.1
+18. Test Server: 10.100.2.1
+19. Staging: 10.100.3.1
+20. Production: 10.200.1.1
+21. Class B Internal: 172.16.0.1
+22. VPN Server: 172.16.1.100
+23. Remote Desktop: 172.16.10.50
+24. Terminal Server: 172.17.0.1
+25. Container Host: 172.18.0.1
+26. Docker Network: 172.19.0.1
+27. Kubernetes: 172.20.0.1
+28. Service Mesh: 172.21.0.1
+29. Monitoring: 172.22.0.1
+30. Logging: 172.23.0.1
+31. Localhost: 127.0.0.1
+32. Loopback Alt: 127.0.0.2
+33. Local Test: 127.0.1.1
+34. Development: 127.0.0.100
+35. Debug Server: 127.0.0.200
+
+--- External IPv4 Addresses (Public) ---
+36. Google DNS: 8.8.8.8
+37. Google DNS Alt: 8.8.4.4
+38. Cloudflare: 1.1.1.1
+39. Cloudflare Alt: 1.0.0.1
+40. OpenDNS: 208.67.222.222
+41. OpenDNS Alt: 208.67.220.220
+42. Quad9: 9.9.9.9
+43. External Server 1: 52.84.123.45
+44. External Server 2: 34.102.136.180
+45. CDN Node: 151.101.1.69
+46. API Server: 104.16.132.229
+47. Web Server: 185.199.108.153
+48. Mail External: 74.125.195.26
+49. Cloud Instance: 35.186.224.25
+50. AWS Server: 54.239.28.85
+51. Azure Server: 40.76.4.15
+52. GCP Server: 35.190.247.13
+53. DigitalOcean: 104.236.58.183
+54. Linode: 139.162.130.8
+55. Vultr: 45.32.186.92
+56. Hetzner: 116.203.255.68
+57. OVH: 51.254.180.43
+58. Rackspace: 162.209.99.41
+59. IBM Cloud: 169.57.160.110
+60. Oracle Cloud: 129.213.180.206
+61. Client IP: 203.0.113.50
+62. Partner IP: 198.51.100.75
+63. Vendor IP: 192.0.2.100
+64. Customer IP: 233.252.0.150
+65. Remote Office: 100.64.0.1
+66. Branch Office: 100.64.1.1
+67. Satellite: 100.64.2.1
+68. Edge Node: 100.64.3.1
+69. Point of Presence: 100.64.4.1
+70. Data Center: 100.64.5.1
+
+--- IPv6 Addresses ---
+71. IPv6 Loopback: ::1
+72. IPv6 Google: 2001:4860:4860::8888
+73. IPv6 Google Alt: 2001:4860:4860::8844
+74. IPv6 Cloudflare: 2606:4700:4700::1111
+75. IPv6 Cloudflare Alt: 2606:4700:4700::1001
+76. IPv6 Internal: fd00::1
+77. IPv6 Link Local: fe80::1
+78. IPv6 Server 1: 2001:db8::1
+79. IPv6 Server 2: 2001:db8::2
+80. IPv6 Gateway: 2001:db8:85a3::8a2e:370:7334
+81. IPv6 Database: 2001:db8:1234:5678::1
+82. IPv6 Web: 2001:db8:abcd:ef01::100
+83. IPv6 Mail: 2001:db8:face:b00c::1
+84. IPv6 DNS: 2001:db8:dead:beef::1
+85. IPv6 Proxy: 2001:db8:cafe:babe::1
+86. IPv6 Full: 2001:0db8:85a3:0000:0000:8a2e:0370:7334
+87. IPv6 Compressed: 2001:db8:85a3::8a2e:370:7334
+88. IPv6 Mixed: ::ffff:192.168.1.1
+89. IPv6 Mapped: ::ffff:10.0.0.1
+90. IPv6 6to4: 2002:c000:0204::1
+91. IPv6 Teredo: 2001:0000:4136:e378:8000:63bf:3fff:fdd2
+92. IPv6 Unique Local: fc00::1
+93. IPv6 Site Local: fec0::1
+94. IPv6 Multicast: ff02::1
+95. IPv6 All Nodes: ff02::1
+96. IPv6 All Routers: ff02::2
+97. IPv6 Documentation: 2001:db8::
+98. IPv6 Test Range: 2001:db8:1::1
+99. IPv6 Example: 2001:db8:2::1
+100. IPv6 Reserved: 2001:db8:3::1
+101. Custom IPv6: 2607:f8b0:4004:800::200e
+102. Another IPv6: 2a00:1450:4001:800::200e
+103. More IPv6: 2a03:2880:f10c:83:face:b00c:0:25de
+104. Additional IPv6: 2620:0:862:ed1a::1
+105. Final IPv6: 2001:4998:44:41d::4
+
+================================================================================
+SECTION 4: CURRENCY AMOUNTS (USD, SAR, EUR, GBP)
+================================================================================
+
+--- US Dollars (USD) ---
+1. Invoice total: $1,234.56
+2. Payment received: $99,999.99
+3. Annual salary: $150,000.00
+4. Monthly rent: $2,500.00
+5. Purchase price: $45,678.90
+6. Service fee: $199.99
+7. Subscription: $9.99
+8. Transaction: $12,345.67
+9. Balance: $567,890.12
+10. Credit: $25,000.00
+11. Debit: $1,500.50
+12. Transfer: $10,000.00
+13. Wire amount: $50,000.00
+14. Check value: $7,500.00
+15. Cash payment: $3,250.75
+16. USD 1,000.00
+17. USD 5,500.00
+18. USD 25,750.00
+19. 100,000 USD
+20. 250,000 USD
+21. Amount: $1.5M
+22. Budget: $2.3M
+23. Revenue: $10M
+24. Funding: $50M
+25. Valuation: $100M
+
+--- Saudi Riyals (SAR) ---
+26. Price: SAR 1,500.00
+27. Salary: SAR 15,000.00
+28. Rent: SAR 5,000.00
+29. Invoice: SAR 25,000.00
+30. Payment: SAR 100,000.00
+31. Total: 50,000 SAR
+32. Amount: 75,000 SAR
+33. Fee: 500 SAR
+34. Cost: 2,500 SAR
+35. Value: 10,000 SAR
+36. Budget: SAR 500,000.00
+37. Contract: SAR 1,000,000.00
+38. Project: SAR 5,000,000.00
+39. Investment: SAR 10,000,000.00
+40. Capital: SAR 50,000,000.00
+41. Saudi Riyal 1,234.56
+42. SR 9,999.99
+43. SR 45,678.00
+44. SR 123,456.78
+45. SR 999,999.99
+46. ر.س 1,000
+47. ر.س 5,000
+48. ر.س 10,000
+49. ر.س 50,000
+50. ر.س 100,000
+
+--- Euros (EUR) ---
+51. Euro payment: €1,234.56
+52. EUR transfer: €50,000.00
+53. Invoice EUR: €25,000.00
+54. Amount: €99,999.99
+55. Fee: €500.00
+56. Total EUR: €10,000.00
+57. Balance: €75,000.00
+58. Credit EUR: €15,000.00
+59. Debit: €2,500.00
+60. Wire: €100,000.00
+61. EUR 5,000.00
+62. EUR 25,000.00
+63. EUR 50,000.00
+64. 10,000 EUR
+65. 100,000 EUR
+66. European price: €1.5M
+67. EU budget: €2.3M
+68. Euro revenue: €10M
+69. EU funding: €50M
+70. Valuation EUR: €100M
+
+--- British Pounds (GBP) ---
+71. GBP payment: £1,234.56
+72. Sterling transfer: £50,000.00
+73. Invoice GBP: £25,000.00
+74. Amount: £99,999.99
+75. Fee: £500.00
+76. Total GBP: £10,000.00
+77. Balance: £75,000.00
+78. Credit GBP: £15,000.00
+79. Debit: £2,500.00
+80. Wire: £100,000.00
+81. GBP 5,000.00
+82. GBP 25,000.00
+83. GBP 50,000.00
+84. 10,000 GBP
+85. 100,000 GBP
+86. UK price: £1.5M
+87. British budget: £2.3M
+88. GBP revenue: £10M
+89. UK funding: £50M
+90. Valuation GBP: £100M
+
+--- Other Currencies ---
+91. Japanese Yen: ¥1,234,567
+92. Chinese Yuan: ¥9,876.54
+93. Swiss Franc: CHF 5,000.00
+94. Canadian Dollar: CAD 10,000.00
+95. Australian Dollar: AUD 15,000.00
+96. Indian Rupee: ₹500,000.00
+97. UAE Dirham: AED 25,000.00
+98. Kuwaiti Dinar: KWD 5,000.00
+99. Qatari Riyal: QAR 10,000.00
+100. Bahraini Dinar: BHD 2,500.00
+101. Omani Rial: OMR 3,000.00
+102. Egyptian Pound: EGP 50,000.00
+103. Turkish Lira: TRY 100,000.00
+104. South African Rand: ZAR 75,000.00
+105. Brazilian Real: BRL 25,000.00
+
+================================================================================
+SECTION 5: GOVERNMENT IDs (Saudi ID, Iqama, SSN, Passport)
+================================================================================
+
+--- Saudi National IDs (10 digits starting with 1) ---
+1. Citizen ID: 1012345678
+2. National ID: 1023456789
+3. Saudi ID: 1034567890
+4. ID Number: 1045678901
+5. Citizen: 1056789012
+6. National: 1067890123
+7. Saudi National: 1078901234
+8. ID Card: 1089012345
+9. Hawiya: 1090123456
+10. Identity: 1001234567
+11. Saudi Citizen: 1112345678
+12. KSA ID: 1123456789
+13. National Identity: 1134567890
+14. Citizen Card: 1145678901
+15. Saudi National ID: 1156789012
+16. ID: 1167890123
+17. Identification: 1178901234
+18. National Number: 1189012345
+19. Saudi Number: 1190123456
+20. Citizen Number: 1201234567
+21. KSA Citizen: 1212345678
+22. Saudi Arabian ID: 1223456789
+23. National Card: 1234567890
+24. Saudi Identity: 1245678901
+25. Citizen Identity: 1256789012
+
+--- Iqama IDs (10 digits starting with 2) ---
+26. Iqama: 2012345678
+27. Resident ID: 2023456789
+28. Iqama Number: 2034567890
+29. Resident: 2045678901
+30. Iqama Card: 2056789012
+31. Residency ID: 2067890123
+32. Iqama ID: 2078901234
+33. Resident Number: 2089012345
+34. Iqama Identity: 2090123456
+35. Residency: 2001234567
+36. Resident Card: 2112345678
+37. Iqama Permit: 2123456789
+38. Residency Number: 2134567890
+39. Resident Identity: 2145678901
+40. Iqama Document: 2156789012
+41. Residency Card: 2167890123
+42. Resident Permit: 2178901234
+43. Iqama Residency: 2189012345
+44. Resident Document: 2190123456
+45. Iqama Holder: 2201234567
+46. Residency Holder: 2212345678
+47. Resident Holder: 2223456789
+48. Iqama Registration: 2234567890
+49. Residency Registration: 2245678901
+50. Resident Registration: 2256789012
+
+--- US Social Security Numbers ---
+51. SSN: 123-45-6789
+52. Social Security: 234-56-7890
+53. SS Number: 345-67-8901
+54. SSN#: 456-78-9012
+55. Social: 567-89-0123
+56. SS#: 678-90-1234
+57. Tax ID: 789-01-2345
+58. Social Security Number: 890-12-3456
+59. SSN Number: 901-23-4567
+60. SS: 012-34-5678
+61. Social Sec: 111-22-3333
+62. SSN ID: 222-33-4444
+63. SS ID: 333-44-5555
+64. Tax Number: 444-55-6666
+65. Social Number: 555-66-7777
+66. SS Tax: 666-77-8888
+67. SSN Tax: 777-88-9999
+68. Social ID: 888-99-0000
+69. SS Social: 999-00-1111
+70. SSN Social: 100-20-3040
+71. Employee SSN: 200-30-4050
+72. Worker SS: 300-40-5060
+73. Staff SSN: 400-50-6070
+74. Member SS: 500-60-7080
+75. User SSN: 600-70-8090
+
+--- Passport Numbers ---
+76. US Passport: 123456789
+77. UK Passport: 987654321
+78. Saudi Passport: A12345678
+79. UAE Passport: B23456789
+80. Canadian Passport: C34567890
+81. Australian Passport: D45678901
+82. German Passport: E56789012
+83. French Passport: F67890123
+84. Japanese Passport: G78901234
+85. Chinese Passport: H89012345
+86. Indian Passport: J90123456
+87. Brazilian Passport: K01234567
+88. Mexican Passport: L12345678
+89. Italian Passport: M23456789
+90. Spanish Passport: N34567890
+91. Korean Passport: P45678901
+92. Russian Passport: Q56789012
+93. Turkish Passport: R67890123
+94. Egyptian Passport: S78901234
+95. South African Passport: T89012345
+96. Swiss Passport: U90123456
+97. Dutch Passport: V01234567
+98. Belgian Passport: W12345678
+99. Swedish Passport: X23456789
+100. Norwegian Passport: Y34567890
+101. Danish Passport: Z45678901
+102. Finnish Passport: AA1234567
+103. Irish Passport: BB2345678
+104. Austrian Passport: CC3456789
+105. Polish Passport: DD4567890
+
+================================================================================
+SECTION 6: IBAN NUMBERS
+================================================================================
+
+--- Saudi Arabia IBANs (SA + 2 check digits + 2 chars bank + 18 digits) ---
+1. IBAN SA: SA0380000000608010167519
+2. Saudi IBAN: SA4420000001234567891234
+3. KSA Bank: SA8410000020012345678901
+4. Rajhi IBAN: SA0510000001234567890123
+5. NCB IBAN: SA1040000000001234567890
+6. SABB IBAN: SA4545000000001234567890
+7. Riyad Bank: SA0280000000001234567890
+8. ANB IBAN: SA0430000000001234567890
+9. SIB IBAN: SA5055000000001234567890
+10. Albilad: SA0690000000001234567890
+11. Alinma: SA0505000000001234567890
+12. BSF IBAN: SA5556000000001234567890
+13. Saudi Fransi: SA0420000001234567890123
+14. Saudi Hollandi: SA0510000020001234567890
+15. Gulf Bank SA: SA4320000000123456789012
+16. Bank Account SA: SA1080000000608010167519
+17. Transfer SA: SA2390000000001234567890
+18. Payment SA: SA3440000000001234567890
+19. Wire SA: SA4550000000001234567890
+20. Deposit SA: SA5660000000001234567890
+21. Withdrawal SA: SA6770000000001234567890
+22. Credit SA: SA7880000000001234567890
+23. Debit SA: SA8990000000001234567890
+24. Salary SA: SA9010000000001234567890
+25. Savings SA: SA0120000000001234567890
+
+--- UAE IBANs (AE + 2 check + 3 bank + 16 digits) ---
+26. UAE IBAN: AE070331234567890123456
+27. Emirates IBAN: AE460261234567890123456
+28. Dubai Bank: AE350301234567890123456
+29. Abu Dhabi: AE590201234567890123456
+30. Mashreq: AE610331234567890123456
+31. ENBD: AE920261234567890123456
+32. FAB IBAN: AE070311234567890123456
+33. ADCB: AE250301234567890123456
+34. CBD IBAN: AE460501234567890123456
+35. NBF IBAN: AE790271234567890123456
+
+--- European IBANs ---
+36. German IBAN: DE89370400440532013000
+37. French IBAN: FR1420041010050500013M02606
+38. UK IBAN: GB29NWBK60161331926819
+39. Spanish IBAN: ES9121000418450200051332
+40. Italian IBAN: IT60X0542811101000000123456
+41. Dutch IBAN: NL91ABNA0417164300
+42. Belgian IBAN: BE68539007547034
+43. Swiss IBAN: CH9300762011623852957
+44. Austrian IBAN: AT611904300234573201
+45. Polish IBAN: PL61109010140000071219812874
+46. Swedish IBAN: SE4550000000058398257466
+47. Norwegian IBAN: NO9386011117947
+48. Danish IBAN: DK5000400440116243
+49. Finnish IBAN: FI2112345600000785
+50. Irish IBAN: IE29AIBK93115212345678
+
+--- Other International IBANs ---
+51. Bahrain IBAN: BH67BMAG00001299123456
+52. Kuwait IBAN: KW81CBKU0000000000001234560101
+53. Qatar IBAN: QA58DOHB00001234567890ABCDEFG
+54. Oman IBAN: OM810180000001299123456
+55. Jordan IBAN: JO94CBJO0010000000000131000302
+56. Egypt IBAN: EG380019000500000000263180002
+57. Lebanon IBAN: LB62099900000001001901229114
+58. Turkey IBAN: TR330006100519786457841326
+59. Israel IBAN: IL620108000000099999999
+60. Morocco IBAN: MA64011519000001205000534921
+61. Tunisia IBAN: TN5910006035183598478831
+62. Algeria IBAN: DZ580002100001113000000570
+63. Pakistan IBAN: PK36SCBL0000001123456702
+64. Bangladesh IBAN: BD12CITY1234567890123456789
+65. Singapore IBAN: (no IBAN - for reference)
+66. Hong Kong: (no IBAN - for reference)
+67. Japan: (no IBAN - for reference)
+68. Australia: (no IBAN - for reference)
+69. New Zealand: (no IBAN - for reference)
+70. Canada: (no IBAN - for reference)
+
+--- Additional IBANs ---
+71. Business IBAN: SA0380000000608010167520
+72. Corporate IBAN: SA4420000001234567891235
+73. Personal IBAN: SA8410000020012345678902
+74. Savings IBAN: SA0510000001234567890124
+75. Checking IBAN: SA1040000000001234567891
+76. Investment IBAN: SA4545000000001234567891
+77. Trade IBAN: SA0280000000001234567891
+78. Payroll IBAN: SA0430000000001234567891
+79. Expense IBAN: SA5055000000001234567891
+80. Revenue IBAN: SA0690000000001234567891
+81. Client IBAN: SA0505000000001234567891
+82. Vendor IBAN: SA5556000000001234567891
+83. Partner IBAN: SA0420000001234567890124
+84. Supplier IBAN: SA0510000020001234567891
+85. Customer IBAN: SA4320000000123456789013
+86. Employee IBAN: SA1080000000608010167520
+87. Contractor IBAN: SA2390000000001234567891
+88. Freelancer IBAN: SA3440000000001234567891
+89. Consultant IBAN: SA4550000000001234567891
+90. Advisor IBAN: SA5660000000001234567891
+91. Manager IBAN: SA6770000000001234567891
+92. Director IBAN: SA7880000000001234567891
+93. Executive IBAN: SA8990000000001234567891
+94. Officer IBAN: SA9010000000001234567891
+95. Clerk IBAN: SA0120000000001234567892
+96. Assistant IBAN: SA0380000000608010167521
+97. Secretary IBAN: SA4420000001234567891236
+98. Accountant IBAN: SA8410000020012345678903
+99. Analyst IBAN: SA0510000001234567890125
+100. Developer IBAN: SA1040000000001234567892
+101. Designer IBAN: SA4545000000001234567892
+102. Engineer IBAN: SA0280000000001234567892
+103. Architect IBAN: SA0430000000001234567892
+104. Scientist IBAN: SA5055000000001234567892
+105. Researcher IBAN: SA0690000000001234567892
+
+================================================================================
+SECTION 7: EMAIL ADDRESSES
+================================================================================
+
+1. john.smith@company.com
+2. sarah.johnson@enterprise.org
+3. m.brown@corporation.net
+4. emily.davis@business.co
+5. robert.wilson@firm.io
+6. jennifer.garcia@startup.tech
+7. william.martinez@agency.biz
+8. jessica.anderson@consultancy.com
+9. david.taylor@solutions.org
+10. amanda.thomas@services.net
+11. mohammed.alsaud@aramco.com.sa
+12. fatima.hassan@sabic.com
+13. ahmed.rashid@stc.com.sa
+14. noura.abdullah@almarai.com
+15. khalid.ibrahim@ncb.com.sa
+16. layla.ahmed@alrajhibank.com.sa
+17. omar.mahmoud@petrorabigh.com
+18. hana.alfarsi@savola.com
+19. yusuf.nasser@mobily.com.sa
+20. mariam.saleh@zain.com.sa
+21. admin@internal-server.local
+22. support@helpdesk.internal
+23. noreply@notifications.system
+24. alerts@monitoring.local
+25. backup@storage.internal
+26. ceo@executive.com
+27. cfo@finance.com
+28. cto@technology.com
+29. coo@operations.com
+30. hr@humanresources.com
+31. legal@lawfirm.com
+32. sales@revenue.com
+33. marketing@brand.com
+34. it@techsupport.com
+35. security@infosec.com
+36. privacy@dataprotection.com
+37. compliance@regulatory.com
+38. audit@internal.com
+39. risk@management.com
+40. procurement@purchasing.com
+41. test@example.com
+42. demo@sample.org
+43. info@contact.net
+44. hello@greeting.io
+45. contact@reach.us
+46. feedback@suggestions.com
+47. inquiries@questions.org
+48. billing@payments.net
+49. accounts@finance.io
+50. invoices@accounting.biz
+
+================================================================================
+SECTION 8: PHONE NUMBERS
+================================================================================
+
+--- Saudi Phone Numbers ---
+1. Mobile: +966 50 123 4567
+2. Mobile: +966 55 234 5678
+3. Mobile: +966 56 345 6789
+4. Mobile: +966 54 456 7890
+5. Mobile: +966 59 567 8901
+6. Mobile: +966 58 678 9012
+7. Mobile: +966 57 789 0123
+8. Landline: +966 11 234 5678
+9. Landline: +966 12 345 6789
+10. Landline: +966 13 456 7890
+11. Landline: +966 14 567 8901
+12. Landline: +966 16 678 9012
+13. Landline: +966 17 789 0123
+14. Fax: +966 11 890 1234
+15. Toll-free: 800 123 4567
+
+--- US Phone Numbers ---
+16. Phone: +1 (212) 555-0123
+17. Phone: +1 (310) 555-0124
+18. Phone: +1 (415) 555-0125
+19. Phone: +1 (617) 555-0126
+20. Phone: +1 (305) 555-0127
+21. Phone: +1 (312) 555-0128
+22. Phone: +1 (202) 555-0129
+23. Phone: +1 (404) 555-0130
+24. Phone: +1 (713) 555-0131
+25. Phone: +1 (214) 555-0132
+26. Toll-free: 1-800-555-0133
+27. Toll-free: 1-888-555-0134
+28. Toll-free: 1-877-555-0135
+29. Fax: +1 (212) 555-0136
+30. Mobile: +1 (917) 555-0137
+
+--- UK Phone Numbers ---
+31. Phone: +44 20 7123 4567
+32. Phone: +44 121 234 5678
+33. Phone: +44 161 345 6789
+34. Phone: +44 113 456 7890
+35. Mobile: +44 7700 900123
+36. Mobile: +44 7911 123456
+37. Fax: +44 20 7234 5678
+
+--- International ---
+38. UAE: +971 50 123 4567
+39. UAE: +971 4 234 5678
+40. Kuwait: +965 9876 5432
+41. Qatar: +974 3312 3456
+42. Bahrain: +973 3456 7890
+43. Oman: +968 9123 4567
+44. Egypt: +20 10 1234 5678
+45. Jordan: +962 79 123 4567
+46. Lebanon: +961 3 123 456
+47. Germany: +49 30 12345678
+48. France: +33 1 23 45 67 89
+49. Japan: +81 3 1234 5678
+50. China: +86 10 1234 5678
+
+================================================================================
+SECTION 9: DATES AND TIMES
+================================================================================
+
+1. Date of Birth: 15/03/1985
+2. DOB: 1990-07-22
+3. Birth Date: March 15, 1985
+4. Expiry: 12/2025
+5. Valid Until: 2026-06-30
+6. Issue Date: January 1, 2020
+7. Created: 2023-01-15 14:30:00
+8. Modified: 2023-06-20 09:45:30
+9. Timestamp: 2023-12-31T23:59:59Z
+10. Meeting: 10:30 AM on 15th March 2024
+
+================================================================================
+SECTION 10: ADDRESSES
+================================================================================
+
+1. 123 King Fahd Road, Riyadh 12345, Saudi Arabia
+2. 456 Olaya Street, Al Olaya District, Riyadh 11564
+3. 789 Tahlia Street, Jeddah 21432, KSA
+4. P.O. Box 12345, Riyadh 11411
+5. Building 10, Floor 5, Office 501, King Abdullah Financial District
+6. 100 Main Street, Suite 200, New York, NY 10001, USA
+7. 250 Park Avenue, Floor 15, Manhattan, New York 10177
+8. 1600 Pennsylvania Avenue NW, Washington, DC 20500
+9. 10 Downing Street, London SW1A 2AA, United Kingdom
+10. 1 Infinite Loop, Cupertino, CA 95014, USA
+
+================================================================================
+SECTION 11: URLS AND DOMAINS
+================================================================================
+
+1. https://www.company-internal.com/admin
+2. http://192.168.1.100:8080/dashboard
+3. ftp://files.internal.local/documents
+4. https://api.service.com/v1/users
+5. https://portal.enterprise.org/login
+6. http://dev.staging.internal:3000
+7. https://cdn.assets.company.net/images
+8. https://mail.corporate.com/inbox
+9. https://vpn.secure.internal/connect
+10. https://database.backend.local:5432
+
+================================================================================
+SECTION 12: VEHICLE AND LICENSE PLATES
+================================================================================
+
+--- Saudi License Plates ---
+1. License Plate: ABC 1234
+2. Plate Number: XYZ 5678
+3. Vehicle: DEF 9012
+4. Car Plate: GHI 3456
+5. Truck: JKL 7890
+6. Motorcycle: MNO 1234
+7. Commercial: PQR 5678
+8. Private: STU 9012
+9. Diplomatic: DIP 1234
+10. Government: GOV 5678
+
+--- Driver's License ---
+11. Saudi DL: 1234567890
+12. US DL: D1234567
+13. UK DL: SMITH901015JN9AA
+14. UAE DL: 987654321
+15. International: INT12345678
+
+================================================================================
+SECTION 13: MEDICAL INFORMATION
+================================================================================
+
+1. Medical Record: MRN-123456789
+2. Patient ID: PAT-987654321
+3. Insurance ID: INS-456789012
+4. Policy Number: POL-789012345
+5. Prescription: RX-012345678
+6. Lab Result: LAB-345678901
+7. Diagnosis Code: ICD-10 A00.0
+8. Procedure Code: CPT 99213
+9. Blood Type: O+
+10. Allergies: Penicillin, Sulfa drugs
+
+================================================================================
+SECTION 14: COMPANY CONFIDENTIAL
+================================================================================
+
+1. Company: Acme Corporation
+2. Client: Global Enterprises Inc.
+3. Vendor: Tech Solutions Ltd.
+4. Partner: Strategic Alliance Co.
+5. Subsidiary: Regional Operations LLC
+6. Project Code: PROJ-2024-001
+7. Contract Number: CNT-2024-12345
+8. Invoice Number: INV-2024-00001
+9. Purchase Order: PO-2024-54321
+10. Reference: REF-2024-98765
+
+================================================================================
+END OF COMPREHENSIVE PII TEST DOCUMENT
+================================================================================
+
+Document Statistics:
+- Credit Card Numbers: 105+
+- Names (Arabic/English): 105+
+- IP Addresses (IPv4/IPv6): 105+
+- Currency Amounts: 105+
+- Government IDs: 105+
+- IBAN Numbers: 105+
+- Email Addresses: 50+
+- Phone Numbers: 50+
+- Various other PII types: 50+
+
+Total Sensitive Items: 700+ detectable entities

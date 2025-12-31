@@ -228,6 +228,9 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+  // Set app name for development mode (electron-builder sets it in production)
+  app.name = 'maskr'
+
   // Initialize logging
   logStartup()
 

@@ -1,0 +1,867 @@
+COMPREHENSIVE PII TEST DOCUMENT
+================================
+
+This document contains various types of sensitive information for testing detection capabilities.
+
+================================================================================
+SECTION 1: CREDIT CARD NUMBERS (Visa, Mastercard, Mada)
+================================================================================
+
+--- Visa Cards (Starting with 4) ---
+1. Customer John Smith paid with Visa: [CARD_1]
+2. Sarah Johnson's card: [CARD_2]
+3. Payment from [PERSON_3]: [CARD_4]
+4. Order #1001 - Visa: [CARD_5]
+5. Transaction by [PERSON_6]: [CARD_7]
+6. [PERSON_8] purchased with: [CARD_9]
+7. Robert Miller's payment: [CARD_10]
+8. Jennifer Garcia's card: [CARD_11]
+9. [PERSON_12] used: [CARD_13]
+10. [PERSON_14] paid: [CARD_15]
+11. Card ending 1234: [CARD_16]
+12. VIP member card: 4532421672145029
+13. Premium account: 4916495077693626
+14. Business card: 4539992043aborite750628
+15. Corporate Visa: 4485429517622493
+16. Travel card: 4716989580897798
+17. Rewards card: 4929499372918467
+18. Platinum Visa: [CARD_17]
+19. Gold member: 4532806428920407
+20. Standard card: 4916186265961647
+21. Employee card: 4539156060704740
+22. Vendor payment: 4485806564406153
+23. Supplier card: 4716280359364268
+24. Partner Visa: 4929845682158846
+25. Affiliate card: 4024007182990385
+
+--- Mastercard (Starting with 5) ---
+26. [PERSON_18] paid with MC: [CARD_19]
+27. [PERSON_20]'s card: [CARD_21]
+28. [PERSON_22]: [CARD_23]
+29. [PERSON_24]: [CARD_25]
+30. [PERSON_26]: [CARD_27]
+31. [PERSON_28]: [CARD_29]
+32. [PERSON_30]: [CARD_31]
+33. [PERSON_32]: [CARD_33]
+34. [PERSON_34]: 5543210001234567
+35. [PERSON_35]: [CARD_36]
+36. [PERSON_37]: [CARD_38]
+37. [PERSON_39]: [CARD_40]
+38. [PERSON_41]: [CARD_42]
+39. [PERSON_43]: [CARD_44]
+40. [PERSON_45]: [CARD_46]
+41. [PERSON_47]: [CARD_48]
+42. [PERSON_49]: [CARD_50]
+43. [PERSON_51]: [CARD_52]
+44. [PERSON_53]: 5543210001234567
+45. [PERSON_54]: [CARD_55]
+46. Corporate MC: [CARD_56]
+47. Business account: [CARD_57]
+48. Premium MC: [CARD_58]
+49. Gold Mastercard: [CARD_59]
+50. Platinum member: [CARD_60]
+
+--- Mada Cards (Saudi Debit - Starting with 4, 5, or specific BINs) ---
+51. Mada card holder Sultan: [CARD_61]
+52. Mada payment Rania: [CARD_62]
+53. Debit card Mansour: [CARD_63]
+54. Mada user Hessa: [CARD_64]
+55. Saudi debit Nawaf: [CARD_65]
+56. Mada card Ghada: [CARD_66]
+57. Local payment Bandar: [CARD_67]
+58. Mada holder Abeer: [CARD_68]
+59. Debit user Turki: [CARD_69]
+60. Mada payer Nouf: [CARD_70]
+61. Saudi card Badr: [CARD_71]
+62. Mada account Lama: [CARD_72]
+63. Local debit Meshal: [CARD_73]
+64. Mada payment Afnan: [CARD_74]
+65. Saudi debit Fahad: [CARD_75]
+66. Mada card Dina: [CARD_76]
+67. Debit holder Nayef: [CARD_77]
+68. Mada user Shahad: [CARD_78]
+69. Local card Saad: [CARD_79]
+70. Mada payer Wafa: [CARD_80]
+71. Saudi Mada Abdulaziz: [CARD_81]
+72. Debit card Reema: [CARD_82]
+73. Mada holder Majed: [CARD_83]
+74. Local payment Nada: [CARD_84]
+75. Saudi debit Sami: [CARD_85]
+
+--- Additional Cards ---
+76. AMEX card: [CARD_86]
+77. AMEX corporate: [CARD_87]
+78. Discover card: [CARD_88]
+79. Discover: [CARD_89]
+80. JCB card: [CARD_90]
+81. JCB premium: [CARD_91]
+82. Diners Club: 30569309025904
+83. Diners: 38520000023237
+84. UnionPay: [CARD_92]
+85. UnionPay premium: 6212345678901234
+86. Test card 1: [CARD_93]
+87. Test card 2: [CARD_94]
+88. Test card 3: [CARD_95]
+89. Test card 4: [CARD_96]
+90. Test card 5: [CARD_97]
+91. Expired card: [CARD_98]
+92. Invalid CVV test: [CARD_99]
+93. Insufficient funds: [CARD_100]
+94. Lost card: [CARD_101]
+95. Stolen card: [CARD_102]
+96. Processing error: [CARD_103]
+97. Declined: [CARD_104]
+98. Pickup card: [CARD_105]
+99. Restricted: [CARD_106]
+100. Test Visa: [CARD_107]
+101. Test MC: [CARD_108]
+102. Test Discover: [CARD_109]
+103. Test AMEX: [CARD_110]
+104. Test JCB: 3088000000000017
+105. Production card: [CARD_111]
+
+================================================================================
+SECTION 2: NAMES (Arabic and English Origins)
+================================================================================
+
+--- Arabic Names ---
+1. [PERSON_113]4]. [PERSON_116]PERSON_118]N_119]
+4. [PERSON_121]RSON_123]124]
+6. [PERSON_125]. [PERSON_128]7]8. [PERSON_131]
+9. Hana [PERSON_132]
+10. Yusuf [PERSON_133]
+11. [PERSON_134]SON_135]
+12. [PERSON_137] [PERSON_140]RSON_142]N_143]
+15. [PERSON_144] [PERSON_146]147]
+17. [PERSON_148]. [PERSON_150]ON_151]
+19. Dalal [PERSON_152]
+20. [PERSON_153]N_154]
+21. Mona [PERSON_155]
+22. Sultan [PERSON_156]
+23. [PERSON_157] Mansour [PERSON_159]
+25. Hessa [PERSON_160]
+26. Nawaf [PERSON_161]
+27. Ghada [PERSON_162]
+28. [PERSON_163]9. Abeer [PERSON_165]
+30. [PERSON_166]ON_167]
+31. [PERSON_169]ERSON_171]172]
+33. [PERSON_173]ON_174]
+34. Meshal [PERSON_175]
+35. [PERSON_176]SON_177]
+36. [PERSON_178]_179]
+37. [PERSON_180]8. Nayef [PERSON_182]
+39. Shahad [PERSON_183]
+40. Saad [PERSON_184]
+41. Wafa [PERSON_185]
+42. [PERSON_186]N_187]
+43. Reema [PERSON_188]
+44. Majed [PERSON_189]
+45. Nada [PERSON_190]
+46. Sami [PERSON_191]
+47. Amal [PERSON_192]
+48. Hamad [PERSON_193]
+49. Sara [PERSON_194]
+50. Saleh [PERSON_195]
+
+--- English Names ---
+51. [PERSON_196]
+52. [PERSON_197]
+53. [PERSON_198]
+54. [PERSON_199]
+55. [PERSON_200]
+56. [PERSON_201]
+57. [PERSON_202]
+58. [PERSON_203]
+59. [PERSON_204]
+60. [PERSON_205]
+61. [PERSON_206]
+62. [PERSON_207]
+63. [PERSON_208]
+64. [PERSON_209]
+65. [PERSON_210]
+66. [PERSON_211]
+67. [PERSON_212]
+68. [PERSON_213]
+69. [PERSON_214]
+70. [PERSON_215]
+71. [PERSON_216]
+72. [PERSON_217]
+73. [PERSON_218]
+74. Megan Elizabeth Hall
+75. [PERSON_219]
+76. [PERSON_220]
+77. [PERSON_221]
+78. [PERSON_222]
+79. [PERSON_223]
+80. [PERSON_224]
+81. Kevin Patrick Hill
+82. [PERSON_225]
+83. [PERSON_226]
+84. [PERSON_227]
+85. [PERSON_228]
+86. [PERSON_229]
+87. [PERSON_230]
+88. [PERSON_231]
+89. [PERSON_232]
+90. [PERSON_233]
+91. [PERSON_234]
+92. [PERSON_235]
+93. [PERSON_236]
+94. [PERSON_237]
+95. Mark Thomas Parker
+96. [PERSON_238]
+97. [PERSON_239]
+98. [PERSON_240]
+99. [PERSON_241]
+100. [PERSON_242]
+101. [PERSON_243]
+102. [PERSON_244]
+103. [PERSON_245]
+104. [PERSON_246]
+105. [PERSON_247]
+
+================================================================================
+SECTION 3: NETWORK ADDRESSES (IPv4, IPv6, Internal, External)
+================================================================================
+
+--- Internal IPv4 Addresses (Private Ranges) ---
+1. Server 1: [IP_ADDRESS_248]
+2. Server 2: [IP_ADDRESS_249]
+3. Gateway: [IP_ADDRESS_250]
+4. DHCP Server: [IP_ADDRESS_251]
+5. DNS Internal: [IP_ADDRESS_252]
+6. File Server: [IP_ADDRESS_253]
+7. Print Server: [IP_ADDRESS_254]
+8. Database: [IP_ADDRESS_255]
+9. App Server: [IP_ADDRESS_256]
+10. Web Internal: [IP_ADDRESS_257]
+11. Mail Server: [IP_ADDRESS_258]
+12. Proxy: [IP_ADDRESS_259]
+13. Firewall: [IP_ADDRESS_260]
+14. Load Balancer: [IP_ADDRESS_261]
+15. Cache Server: [IP_ADDRESS_262]
+16. Backup Server: [IP_ADDRESS_263]
+17. Dev Server: [IP_ADDRESS_264]
+18. Test Server: [IP_ADDRESS_265]
+19. Staging: [IP_ADDRESS_266]
+20. Production: [IP_ADDRESS_267]
+21. Class B Internal: [IP_ADDRESS_268]
+22. VPN Server: [IP_ADDRESS_269]
+23. Remote Desktop: [IP_ADDRESS_270]
+24. Terminal Server: [IP_ADDRESS_271]
+25. Container Host: [IP_ADDRESS_272]
+26. Docker Network: [IP_ADDRESS_273]
+27. Kubernetes: [IP_ADDRESS_274]
+28. Service Mesh: [IP_ADDRESS_275]
+29. Monitoring: [IP_ADDRESS_276]
+30. Logging: [IP_ADDRESS_277]
+31. Localhost: [IP_ADDRESS_278]
+32. Loopback Alt: [IP_ADDRESS_279]
+33. Local Test: [IP_ADDRESS_280]
+34. Development: [IP_ADDRESS_281]
+35. Debug Server: [IP_ADDRESS_282]
+
+--- External IPv4 Addresses (Public) ---
+36. Google DNS: 8.8.8.8
+37. Google DNS Alt: 8.8.4.4
+38. Cloudflare: 1.1.1.1
+39. Cloudflare Alt: 1.0.0.1
+40. OpenDNS: [IP_ADDRESS_283]
+41. OpenDNS Alt: [IP_ADDRESS_284]
+42. Quad9: 9.9.9.9
+43. External Server 1: [IP_ADDRESS_285]
+44. External Server 2: [IP_ADDRESS_286]. CDN Node: [IP_ADDRESS_288]
+46. API Server: [IP_ADDRESS_289]
+47. Web Server: [IP_ADDRESS_290]
+48. Mail External: [IP_ADDRESS_291]
+49. Cloud Instance: [IP_ADDRESS_292]
+50. AWS Server: [IP_ADDRESS_293]
+51. Azure Server: [IP_ADDRESS_294]
+52. GCP Server: [IP_ADDRESS_295]
+53. DigitalOcean: [IP_ADDRESS_296]
+54. Linode: [IP_ADDRESS_297]
+55. Vultr: [IP_ADDRESS_298]
+56. Hetzner: [IP_ADDRESS_299]
+57. OVH: [IP_ADDRESS_300]
+58. Rackspace: [IP_ADDRESS_301]
+59. IBM Cloud: [IP_ADDRESS_302]
+60. Oracle Cloud: [IP_ADDRESS_303]
+61. Client IP: [IP_ADDRESS_304]
+62. Partner IP: [IP_ADDRESS_305]
+63. Vendor IP: [IP_ADDRESS_306]
+64. Customer IP: [IP_ADDRESS_307]
+65. Remote Office: [IP_ADDRESS_308]
+66. Branch Office: [IP_ADDRESS_309]
+67. Satellite: [IP_ADDRESS_310]
+68. Edge Node: [IP_ADDRESS_311]
+69. Point of Presence: [IP_ADDRESS_312]
+70. Data Center: [IP_ADDRESS_313]
+
+--- IPv6 Addresses ---
+71. IPv6 Loopback: [IP_ADDRESS_314]
+72. IPv6 Google: [IP_ADDRESS_316]]S_318]DRESS_319]
+73. IPv6 Google Alt: [IP_ADDRESS_321]]S_323]DRESS_324]
+74. IPv6 Cloudflare: [IP_ADDRESS_325]P_ADDRESS_326]111
+75. IPv6 Cloudflare Alt: [IP_ADDRESS_327]P_ADDRESS_328]001
+76. IPv6 Internal: [IP_ADDRESS_329]P_ADDRESS_330]
+77. IPv6 Link Local: [IP_ADDRESS_331]P_ADDRESS_332]
+78. IPv6 Server 1: [IP_ADDRESS_333]P_ADDRESS_334]
+79. IPv6 Server 2: [IP_ADDRESS_336]S_335]DRESS_337]_ADDRESS_338]
+80. IPv6 Gateway: [IP_ADDRESS_342]] [IP_ADDRESS_346]P_ADDRESS_347]
+82. IPv6 Web: [IP_ADDRESS_348]P_ADDRESS_349]00
+83. IPv6 Mail: [IP_ADDRESS_350]P_ADDRESS_351]
+84. IPv6 DNS: [IP_ADDRESS_352]P_ADDRESS_353]
+85. IPv6 Proxy: [IP_ADDRESS_354]P_ADDRESS_355]
+86. IPv6 Full: [IP_ADDRESS_356]
+87. IPv6 Compressed: [IP_ADDRESS_360]]P_ADDRESS_365]S_364]_366]
+89. IPv6 Mapped: [IP_ADDRESS_368]SS_367]ESS_369]
+90. IPv6 6to4: [IP_ADDRESS_370]P_ADDRESS_371]
+91. IPv6 Teredo: [IP_ADDRESS_372]
+92. IPv6 Unique Local: [IP_ADDRESS_373]P_ADDRESS_374]
+93. IPv6 Site Local: [IP_ADDRESS_375]P_ADDRESS_376]
+94. IPv6 Multicast: [IP_ADDRESS_377]P_ADDRESS_378]
+95. IPv6 All Nodes: [IP_ADDRESS_379]P_ADDRESS_380]
+96. IPv6 All Routers: [IP_ADDRESS_382]DRESS_381]_ADDRESS_383]
+97. IPv6 Documentation: 2001:db8::
+98. IPv6 Test Range: [IP_ADDRESS_384]P_ADDRESS_385]
+99. IPv6 Example: [IP_ADDRESS_386]P_ADDRESS_387]
+100. IPv6 Reserved: [IP_ADDRESS_388]P_ADDRESS_389]
+101. Custom IPv6: [IP_ADDRESS_391]4]DRESS_395]
+102. Another IPv6: [IP_ADDRESS_397]0]DRESS_401]
+103. More IPv6: [IP_ADDRESS_402]
+104. Additional IPv6: [IP_ADDRESS_403]P_ADDRESS_404]
+105. Final IPv6: [IP_ADDRESS_406]SS_408]DRESS_409]_ADDRESS_410]
+
+================================================================================
+SECTION 4: CURRENCY AMOUNTS (USD, SAR, EUR, GBP)
+================================================================================
+
+--- US Dollars (USD) ---
+1. Invoice total: [AMOUNT_411]
+2. Payment received: [AMOUNT_412]
+3. Annual salary: [AMOUNT_413]
+4. Monthly rent: [AMOUNT_414]
+5. Purchase price: [AMOUNT_415]
+6. Service fee: [AMOUNT_416]
+7. Subscription: [AMOUNT_417]
+8. Transaction: [AMOUNT_418]
+9. Balance: [AMOUNT_419]
+10. Credit: [AMOUNT_420]
+11. Debit: [AMOUNT_421]
+12. Transfer: [AMOUNT_422]
+13. Wire amount: [AMOUNT_423]
+14. Check value: [AMOUNT_424]
+15. Cash payment: [AMOUNT_425]
+16. [AMOUNT_426]
+17. [AMOUNT_427]
+18. [AMOUNT_428]
+19. [AMOUNT_429]
+20. [AMOUNT_430]
+21. Amount: [AMOUNT_431]
+22. Budget: [AMOUNT_432]
+23. Revenue: [AMOUNT_433]
+24. Funding: [AMOUNT_434]
+25. Valuation: [AMOUNT_435]
+
+--- Saudi Riyals (SAR) ---
+26. Price: [AMOUNT_436]
+27. Salary: [AMOUNT_437]
+28. Rent: [AMOUNT_438]
+29. Invoice: [AMOUNT_439]
+30. Payment: [REDACTED_441]_440]
+31. Total: [AMOUNT_442]
+32. Amount: [AMOUNT_443]
+33. Fee: [AMOUNT_444]
+34. Cost: [AMOUNT_445]
+35. Value: [AMOUNT_446]
+36. Budget: [REDACTED_448]_447]
+37. Contract: [AMOUNT_449]
+38. Project: [AMOUNT_450]
+39. Investment: [AMOUNT_451]
+40. Capital: [AMOUNT_452]
+41. [AMOUNT_453]
+42. [AMOUNT_454]
+43. [AMOUNT_455]
+44. [REDACTED_457]T_456]
+45. [REDACTED_459]T_458]
+46. [AMOUNT_460]
+47. [AMOUNT_461]
+48. [AMOUNT_462]
+49. [AMOUNT_463]
+50. [AMOUNT_464]
+
+--- Euros (EUR) ---
+51. Euro payment: [AMOUNT_465]
+52. EUR transfer: [AMOUNT_466]
+53. Invoice EUR: [AMOUNT_467]
+54. Amount: [AMOUNT_468]
+55. Fee: [AMOUNT_469]
+56. Total EUR: [AMOUNT_470]
+57. Balance: [AMOUNT_471]
+58. Credit EUR: [AMOUNT_472]
+59. Debit: [AMOUNT_473]
+60. Wire: [AMOUNT_474]
+61. [AMOUNT_475]
+62. [AMOUNT_476]
+63. [AMOUNT_477]
+64. 10,000 [AMOUNT_478]. 100,000 [AMOUNT_479]. European price: [AMOUNT_480]
+67. EU budget: [AMOUNT_481]
+68. Euro revenue: [AMOUNT_482]
+69. EU funding: [AMOUNT_483]
+70. Valuation EUR: [AMOUNT_484]
+
+--- British Pounds (GBP) ---
+71. GBP payment: [AMOUNT_485]
+72. Sterling transfer: [AMOUNT_486]
+73. Invoice GBP: [AMOUNT_487]
+74. Amount: [AMOUNT_488]
+75. Fee: [AMOUNT_489]
+76. Total GBP: [AMOUNT_490]
+77. Balance: [AMOUNT_491]
+78. Credit GBP: [AMOUNT_492]
+79. Debit: [AMOUNT_493]
+80. Wire: [AMOUNT_494]
+81. [AMOUNT_495]
+82. [AMOUNT_496]
+83. [AMOUNT_497]
+84. 10,000 [AMOUNT_498]. 100,000 [AMOUNT_499]. UK price: [AMOUNT_500]
+87. British budget: [AMOUNT_501]
+88. GBP revenue: [AMOUNT_502]
+89. UK funding: [AMOUNT_503]
+90. Valuation GBP: [AMOUNT_504]
+
+--- Other Currencies ---
+91. Japanese Yen: [AMOUNT_505]
+92. Chinese Yuan: [AMOUNT_506].54
+93. Swiss Franc: [AMOUNT_507]
+94. Canadian Dollar: [AMOUNT_508]
+95. Australian Dollar: [AMOUNT_509]
+96. Indian Rupee: [AMOUNT_510]
+97. UAE Dirham: [AMOUNT_511]
+98. Kuwaiti Dinar: [AMOUNT_512]
+99. Qatari Riyal: [AMOUNT_513]
+100. Bahraini Dinar: [AMOUNT_514]
+101. Omani Rial: [AMOUNT_515]
+102. Egyptian Pound: [AMOUNT_516]
+103. Turkish Lira: [REDACTED_518]_517]
+104. South African Rand: [AMOUNT_519]
+105. Brazilian Real: [AMOUNT_520]
+
+================================================================================
+SECTION 5: GOVERNMENT IDs (Saudi ID, Iqama, SSN, Passport)
+================================================================================
+
+--- Saudi National IDs (10 digits starting with 1) ---
+1. Citizen ID: [SAUDI_ID_521]
+2. National ID: [SAUDI_ID_522]
+3. Saudi ID: [SAUDI_ID_523]
+4. ID Number: [SAUDI_ID_524]
+5. Citizen: [SAUDI_ID_525]
+6. National: [SAUDI_ID_526]
+7. Saudi National: [SAUDI_ID_527]
+8. ID Card: [SAUDI_ID_528]
+9. Hawiya: [SAUDI_ID_529]
+10. Identity: [SAUDI_ID_530]
+11. Saudi Citizen: [SAUDI_ID_531]
+12. KSA ID: [SAUDI_ID_532]
+13. National Identity: [SAUDI_ID_533]
+14. Citizen Card: [SAUDI_ID_534]
+15. Saudi National ID: [SAUDI_ID_535]
+16. ID: [SAUDI_ID_536]
+17. Identification: [SAUDI_ID_537]
+18. National Number: [SAUDI_ID_538]
+19. Saudi Number: [SAUDI_ID_539]
+20. Citizen Number: [SAUDI_ID_540]
+21. KSA Citizen: [SAUDI_ID_541]
+22. Saudi Arabian ID: [SAUDI_ID_542]
+23. National Card: [SAUDI_ID_543]
+24. Saudi Identity: [SAUDI_ID_544]
+25. Citizen Identity: [SAUDI_ID_545]
+
+--- Iqama IDs (10 digits starting with 2) ---
+26. Iqama: [SAUDI_ID_546]
+27. Resident ID: [SAUDI_ID_547]
+28. Iqama Number: [SAUDI_ID_548]
+29. Resident: [SAUDI_ID_549]
+30. Iqama Card: [SAUDI_ID_550]
+31. Residency ID: [SAUDI_ID_551]
+32. Iqama ID: [SAUDI_ID_552]
+33. Resident Number: [SAUDI_ID_553]
+34. Iqama Identity: [SAUDI_ID_554]
+35. Residency: [SAUDI_ID_555]
+36. Resident Card: [SAUDI_ID_556]
+37. Iqama Permit: [SAUDI_ID_557]
+38. Residency Number: [SAUDI_ID_558]
+39. Resident Identity: [SAUDI_ID_559]
+40. Iqama Document: [SAUDI_ID_560]
+41. Residency Card: [SAUDI_ID_561]
+42. Resident Permit: [SAUDI_ID_562]
+43. Iqama Residency: [SAUDI_ID_563]
+44. Resident Document: [SAUDI_ID_564]
+45. Iqama Holder: [SAUDI_ID_565]
+46. Residency Holder: [SAUDI_ID_566]
+47. Resident Holder: [SAUDI_ID_567]
+48. Iqama Registration: [SAUDI_ID_568]
+49. Residency Registration: [SAUDI_ID_569]
+50. Resident Registration: [SAUDI_ID_570]
+
+--- US Social Security Numbers ---
+51. SSN: [REDACTED_571]
+52. Social Security: [REDACTED_572]
+53. SS Number: [REDACTED_573]
+54. SSN#: [REDACTED_574]
+55. Social: [REDACTED_575]
+56. SS#: [REDACTED_576]
+57. Tax ID: [REDACTED_577]
+58. Social Security Number: [REDACTED_578]
+59. SSN Number: 901-23-4567
+60. SS: [REDACTED_579]
+61. Social Sec: [REDACTED_580]
+62. SSN ID: [REDACTED_581]
+63. SS ID: [REDACTED_582]
+64. Tax Number: [REDACTED_583]
+65. Social Number: [REDACTED_584]
+66. SS Tax: 666-77-8888
+67. SSN Tax: [REDACTED_585]
+68. Social ID: 888-99-0000
+69. SS Social: 999-00-1111
+70. SSN Social: [REDACTED_586]
+71. Employee SSN: [REDACTED_587]
+72. Worker SS: [REDACTED_588]
+73. Staff SSN: [REDACTED_589]
+74. Member SS: [REDACTED_590]
+75. User SSN: [REDACTED_591]
+
+--- Passport [REDACTED_592] ---
+76. US Passport: [REDACTED_593]
+77. UK Passport: [REDACTED_594]
+78. Saudi Passport: [REDACTED_595]
+79. UAE Passport: [REDACTED_596]
+80. Canadian Passport: [REDACTED_597]
+81. Australian Passport: [REDACTED_598]
+82. German Passport: [REDACTED_599]
+83. French Passport: [REDACTED_600]
+84. Japanese Passport: [REDACTED_601]
+85. Chinese Passport: [REDACTED_602]
+86. Indian Passport: [REDACTED_603]
+87. Brazilian Passport: [REDACTED_604]
+88. Mexican Passport: [REDACTED_605]
+89. Italian Passport: [REDACTED_606]
+90. Spanish Passport: [REDACTED_607]
+91. Korean Passport: [REDACTED_608]
+92. Russian Passport: [REDACTED_609]
+93. Turkish Passport: [REDACTED_610]
+94. Egyptian Passport: [REDACTED_611]
+95. South African Passport: [REDACTED_612]
+96. Swiss Passport: [REDACTED_613]
+97. Dutch Passport: [REDACTED_614]
+98. Belgian Passport: [REDACTED_615]
+99. Swedish Passport: [REDACTED_616]
+100. Norwegian Passport: [REDACTED_617]
+101. Danish Passport: [REDACTED_618]
+102. Finnish Passport: [REDACTED_619]
+103. Irish Passport: [REDACTED_620]
+104. Austrian Passport: [REDACTED_621]
+105. Polish Passport: [REDACTED_622]
+
+================================================================================
+SECTION 6: IBAN NUMBERS
+================================================================================
+
+--- Saudi Arabia IBANs (SA + 2 check digits + 2 chars bank + 18 digits) ---
+1. IBAN SA: [IBAN_623]
+2. Saudi IBAN: [IBAN_624]
+3. KSA Bank: [IBAN_625]
+4. Rajhi IBAN: [IBAN_626]
+5. NCB IBAN: [IBAN_627]
+6. SABB IBAN: [IBAN_628]
+7. Riyad Bank: [IBAN_629]
+8. ANB IBAN: [IBAN_630]
+9. SIB IBAN: [IBAN_631]
+10. Albilad: [IBAN_632]
+11. Alinma: [IBAN_633]
+12. BSF IBAN: [IBAN_634]
+13. Saudi Fransi: [IBAN_635]
+14. Saudi Hollandi: [IBAN_636]
+15. Gulf Bank SA: [IBAN_637]
+16. Bank Account SA: [IBAN_638]
+17. Transfer SA: [IBAN_639]
+18. Payment SA: [IBAN_640]
+19. Wire SA: [IBAN_641]
+20. Deposit SA: [IBAN_642]
+21. Withdrawal SA: [IBAN_643]
+22. Credit SA: [IBAN_644]
+23. Debit SA: [IBAN_645]
+24. Salary SA: [IBAN_646]
+25. Savings SA: [IBAN_647]
+
+--- UAE IBANs (AE + 2 check + 3 bank + 16 digits) ---
+26. UAE IBAN: [IBAN_648]
+27. Emirates IBAN: [IBAN_649]
+28. Dubai Bank: [IBAN_650]
+29. Abu Dhabi: [IBAN_651]
+30. Mashreq: [IBAN_652]
+31. ENBD: [IBAN_653]
+32. FAB IBAN: [IBAN_654]
+33. ADCB: [IBAN_655]
+34. CBD IBAN: [IBAN_656]
+35. NBF IBAN: [IBAN_657]
+
+--- European IBANs ---
+36. German IBAN: [IBAN_658]7. French IBAN: [IBAN_661]
+38. UK IBAN: [IBAN_662]
+39. Spanish IBAN: [IBAN_663]
+40. Italian IBAN: [IBAN_664]
+41. Dutch IBAN: [IBAN_665]
+42. Belgian IBAN: [IBAN_666]
+43. Swiss IBAN: [IBAN_667]
+44. Austrian IBAN: [IBAN_668]
+45. Polish IBAN: [IBAN_669]
+46. Swedish IBAN: [IBAN_670]
+47. Norwegian IBAN: [IBAN_671]
+48. Danish IBAN: [IBAN_672]
+49. Finnish IBAN: [IBAN_673]
+50. Irish IBAN: [IBAN_674]
+
+--- Other International IBANs ---
+51. Bahrain IBAN: [IBAN_675]
+52. Kuwait IBAN: [IBAN_676]
+53. Qatar IBAN: [IBAN_677]
+54. Oman IBAN: [IBAN_678]
+55. Jordan IBAN: [IBAN_679]
+56. Egypt IBAN: [IBAN_680]
+57. Lebanon IBAN: [IBAN_681]
+58. Turkey IBAN: [IBAN_682]
+59. Israel IBAN: [IBAN_683]
+60. Morocco IBAN: [IBAN_684]
+61. Tunisia IBAN: [IBAN_685]
+62. Algeria IBAN: [IBAN_686]
+63. Pakistan IBAN: [IBAN_687]
+64. Bangladesh IBAN: BD12CITY1234567890123456789
+65. Singapore IBAN: (no IBAN - for reference)
+66. Hong Kong: (no IBAN - for reference)
+67. Japan: (no IBAN - for reference)
+68. Australia: (no IBAN - for reference)
+69. New Zealand: (no IBAN - for reference)
+70. Canada: (no IBAN - for reference)
+
+--- Additional IBANs ---
+71. Business IBAN: [IBAN_688]
+72. Corporate IBAN: [IBAN_689]
+73. Personal IBAN: [IBAN_690]
+74. Savings IBAN: [IBAN_691]
+75. Checking IBAN: [IBAN_692]
+76. Investment IBAN: [IBAN_693]
+77. Trade IBAN: [IBAN_694]
+78. Payroll IBAN: [IBAN_695]
+79. Expense IBAN: [IBAN_696]
+80. Revenue IBAN: [IBAN_697]
+81. Client IBAN: [IBAN_698]
+82. Vendor IBAN: [IBAN_699]
+83. Partner IBAN: [IBAN_700]
+84. Supplier IBAN: [IBAN_701]
+85. Customer IBAN: [IBAN_702]
+86. Employee IBAN: [IBAN_703]
+87. Contractor IBAN: [IBAN_704]
+88. Freelancer IBAN: [IBAN_705]
+89. Consultant IBAN: [IBAN_706]
+90. Advisor IBAN: [IBAN_707]
+91. Manager IBAN: [IBAN_708]
+92. Director IBAN: [IBAN_709]
+93. Executive IBAN: [IBAN_710]
+94. Officer IBAN: [IBAN_711]
+95. Clerk IBAN: [IBAN_712]
+96. Assistant IBAN: [IBAN_713]
+97. Secretary IBAN: [IBAN_714]
+98. Accountant IBAN: [IBAN_715]
+99. Analyst IBAN: [IBAN_716]
+100. Developer IBAN: [IBAN_717]
+101. Designer IBAN: [IBAN_718]
+102. Engineer IBAN: [IBAN_719]
+103. Architect IBAN: [IBAN_720]
+104. Scientist IBAN: [IBAN_721]
+105. Researcher IBAN: [IBAN_722]
+
+================================================================================
+SECTION 7: EMAIL ADDRESSES
+================================================================================
+
+1. [EMAIL_723]
+2. [EMAIL_724]
+3. [EMAIL_725]
+4. [EMAIL_726]
+5. [EMAIL_727]
+6. [EMAIL_728]
+7. [EMAIL_729]
+8. [EMAIL_730]
+9. [EMAIL_731]
+10. [EMAIL_732]
+11. [EMAIL_733]
+12. [EMAIL_734]
+13. [EMAIL_735]
+14. [EMAIL_736]
+15. [EMAIL_737]
+16. [EMAIL_738]
+17. [EMAIL_739]
+18. [EMAIL_740]
+19. [EMAIL_741]
+20. [EMAIL_742]
+21. [EMAIL_743]
+22. [EMAIL_744]
+23. [EMAIL_745]
+24. [EMAIL_746]
+25. [EMAIL_747]
+26. [EMAIL_748]
+27. [EMAIL_749]
+28. [EMAIL_750]
+29. [EMAIL_751]
+30. [EMAIL_752]
+31. [EMAIL_753]
+32. [EMAIL_754]
+33. [EMAIL_755]
+34. [EMAIL_756]
+35. [EMAIL_757]
+36. [EMAIL_758]
+37. [EMAIL_759]
+38. [EMAIL_760]
+39. [EMAIL_761]
+40. [EMAIL_762]
+41. [EMAIL_763]
+42. [EMAIL_764]
+43. [EMAIL_765]
+44. [EMAIL_766]
+45. [EMAIL_767]
+46. [EMAIL_768]
+47. [EMAIL_769]
+48. [EMAIL_770]
+49. [EMAIL_771]
+50. [EMAIL_772]
+
+================================================================================
+SECTION 8: PHONE NUMBERS
+================================================================================
+
+--- Saudi Phone Numbers ---
+1. Mobile: [PHONE_774]ile: [PHONE_776]ile: [PHONE_778]ile: [PHONE_780]ile: [PHONE_782]ile: [PHONE_784]ile: [PHONE_786]dline: [PHONE_787]. Landline: [PHONE_788]. Landline: [PHONE_789]. Landline: [PHONE_790]. Landline: [PHONE_791]. Landline: [PHONE_792]. Fax: [PHONE_793]. Toll-free: [PHONE_794]
+
+--- US Phone Numbers ---
+16. Phone: [PHONE_795]hone: [PHONE_797]hone: [PHONE_799]hone: [PHONE_801]hone: [PHONE_803]hone: [PHONE_805]hone: [PHONE_807]hone: [PHONE_809]hone: [PHONE_811]hone: [PHONE_813]oll-free: [PHONE_815]Toll-free: [PHONE_818]Toll-free: [PHONE_821]Fax: [PHONE_824]obile: [PHONE_826]-- UK Phone Numbers ---
+31. Phone: [PHONE_829]ne: [PHONE_831]PHONE_835]PHONE_839][PHONE_843]bile: [PHONE_845]x: [PHONE_846]
+
+--- International ---
+38. UAE: [PHONE_848]: [PHONE_849]. Kuwait: [PHONE_850]ar: [PHONE_852]rain: [PHONE_854]n: [PHONE_856]pt: [PHONE_858]. Jordan: [PHONE_859]. Lebanon: [PHONE_860]. Germany: [PHONE_862]ance: [PHONE_864]. Japan: [PHONE_865]. China: [PHONE_866]
+
+================================================================================
+SECTION 9: DATES AND TIMES
+================================================================================
+
+1. Date of Birth: 15/03/1985
+2. DOB: 1990-07-22
+3. Birth Date: March 15, 1985
+4. Expiry: 12/2025
+5. Valid Until: 2026-06-30
+6. Issue Date: [REDACTED_867]
+7. Created: [REDACTED_868] 14:30:00
+8. Modified: [REDACTED_869] 09:45:30
+9. Timestamp: 2023-12-31T23:59:59Z
+10. Meeting: 10:30 AM on 15th March 2024
+
+================================================================================
+SECTION 10: ADDRESSES
+================================================================================
+
+1. 123 King Fahd Road, Riyadh 12345, Saudi Arabia
+2. 456 Olaya Street, Al Olaya District, Riyadh 11564
+3. 789 Tahlia Street, Jeddah 21432, KSA
+4. P.O. Box 12345, Riyadh 11411
+5. Building 10, Floor 5, Office 501, King Abdullah Financial District
+6. 100 Main Street, Suite 200, New York, NY 10001, USA
+7. 250 Park Avenue, Floor 15, Manhattan, New York 10177
+8. 1600 Pennsylvania Avenue NW, Washington, DC 20500
+9. 10 Downing Street, London SW1A 2AA, United Kingdom
+10. 1 Infinite Loop, Cupertino, CA 95014, USA
+
+================================================================================
+SECTION 11: URLS AND DOMAINS
+================================================================================
+
+1. [URL_870]
+2. [URL_871]ard
+3. [URL_873]
+4. [URL_874]
+5. [URL_875]
+6. [URL_876]
+7. [URL_877]s
+8. [URL_879]
+9. [URL_880]
+10. [URL_881]
+
+================================================================================
+SECTION 12: VEHICLE AND LICENSE PLATES
+================================================================================
+
+--- Saudi License Plates ---
+1. License Plate: [REDACTED_882]
+2. Plate Number: [REDACTED_883]
+3. Vehicle: [REDACTED_885]884]
+4. Car Plate: [REDACTED_886]
+5. Truck: [REDACTED_888]887]
+6. Motorcycle: [REDACTED_889]
+7. Commercial: [REDACTED_890]
+8. Private: [REDACTED_891]
+9. Diplomatic: [REDACTED_892]
+10. Government: [REDACTED_893]
+
+--- Driver's License ---
+11. Saudi DL: [SAUDI_ID_894]
+12. US DL: [REDACTED_895]
+13. UK DL: [REDACTED_896]
+14. UAE DL: [REDACTED_897]
+15. International: INT12345678
+
+================================================================================
+SECTION 13: MEDICAL INFORMATION
+================================================================================
+
+1. [REDACTED_898]]_900]
+2. [REDACTED_901]]
+3. [REDACTED_903]]_905]
+4. [REDACTED_906]]_908]
+5. [REDACTED_909]0]_911]
+6. Lab Result: [REDACTED_912]_913]
+7. Diagnosis Code: [REDACTED_914]
+8. Procedure Code: [REDACTED_915]
+9. Blood Type: O+
+10. Allergies: Penicillin, Sulfa drugs
+
+================================================================================
+SECTION 14: COMPANY CONFIDENTIAL
+================================================================================
+
+1. Company: Acme Corporation
+2. Client: Global Enterprises Inc.
+3. Vendor: Tech Solutions Ltd.
+4. Partner: Strategic Alliance Co.
+5. Subsidiary: Regional Operations LLC
+6. Project Code: [REDACTED_916]
+7. Contract Number: [REDACTED_918]-12345
+8. Invoice Number: [REDACTED_920]-00001
+9. Purchase [REDACTED_921]ED_923]]-54321
+10. Reference: [REDACTED_925]-98765
+
+================================================================================
+END OF COMPREHENSIVE PII TEST DOCUMENT
+================================================================================
+
+Document Statistics:
+- Credit Card Numbers: 105+
+- Names (Arabic/English): 105+
+- IP Addresses (IPv4/IPv6): 105+
+- Currency Amounts: 105+
+- Government IDs: 105+
+- IBAN Numbers: 105+
+- Email Addresses: 50+
+- Phone Numbers: 50+
+- Various other PII types: 50+
+
+Total Sensitive Items: 700+ detectable entities

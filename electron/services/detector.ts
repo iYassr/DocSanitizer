@@ -45,7 +45,7 @@ export interface NEREntity {
   /** The detected text content */
   text: string
   /** Entity type classification */
-  type: 'person' | 'financial' | 'credit_card' | 'iban' | 'phone' | 'email' | 'ip' | 'url' | 'domain' | 'saudi_id'
+  type: 'person' | 'financial' | 'credit_card' | 'iban' | 'phone' | 'email' | 'ip' | 'url' | 'domain' | 'saudi_id' | 'ssn' | 'passport' | 'dob' | 'mac_address' | 'api_key' | 'license_plate' | 'medical_record' | 'drivers_license' | 'gps' | 'vin' | 'company_code'
   /** Start position in source text (0-indexed) */
   start: number
   /** End position in source text (exclusive) */
@@ -147,6 +147,11 @@ export async function extractEntities(text: string, userCustomNames?: string[]):
   await detectFullNames(text, addEntity)
   logDebug('Full names (NLP) detection complete', { found: entities.length - before })
 
+  // 2b. Detect Arabic names (pattern-based since NLP doesn't recognize them well)
+  before = countBefore()
+  detectArabicNames(text, addEntity)
+  logDebug('Arabic names detection complete', { found: entities.length - before })
+
   // 3. Extract financial amounts - ONLY with explicit currency symbols
   before = countBefore()
   detectFinancialAmounts(text, addEntity)
@@ -197,6 +202,56 @@ export async function extractEntities(text: string, userCustomNames?: string[]):
   detectSSNs(text, addEntity)
   logDebug('SSNs detection complete', { found: entities.length - before })
 
+  // 13. Extract passport numbers
+  before = countBefore()
+  detectPassports(text, addEntity)
+  logDebug('Passports detection complete', { found: entities.length - before })
+
+  // 14. Extract dates of birth (year 2000+)
+  before = countBefore()
+  detectDOB(text, addEntity)
+  logDebug('DOB detection complete', { found: entities.length - before })
+
+  // 15. Extract MAC addresses
+  before = countBefore()
+  detectMACAddresses(text, addEntity)
+  logDebug('MAC addresses detection complete', { found: entities.length - before })
+
+  // 16. Extract API keys and tokens
+  before = countBefore()
+  detectAPIKeys(text, addEntity)
+  logDebug('API keys detection complete', { found: entities.length - before })
+
+  // 17. Extract license plates
+  before = countBefore()
+  detectLicensePlates(text, addEntity)
+  logDebug('License plates detection complete', { found: entities.length - before })
+
+  // 18. Extract medical record numbers
+  before = countBefore()
+  detectMedicalRecords(text, addEntity)
+  logDebug('Medical records detection complete', { found: entities.length - before })
+
+  // 19. Extract driver's licenses
+  before = countBefore()
+  detectDriversLicenses(text, addEntity)
+  logDebug('Drivers licenses detection complete', { found: entities.length - before })
+
+  // 20. Extract GPS coordinates
+  before = countBefore()
+  detectGPSCoordinates(text, addEntity)
+  logDebug('GPS coordinates detection complete', { found: entities.length - before })
+
+  // 21. Extract VIN numbers
+  before = countBefore()
+  detectVINNumbers(text, addEntity)
+  logDebug('VIN numbers detection complete', { found: entities.length - before })
+
+  // 22. Extract company/project codes
+  before = countBefore()
+  detectCompanyCodes(text, addEntity)
+  logDebug('Company codes detection complete', { found: entities.length - before })
+
   // Deduplicate entities (same position)
   const seen = new Set<string>()
   const uniqueEntities = entities.filter((e) => {
@@ -245,8 +300,12 @@ function detectFinancialAmounts(
     /EUR\s*\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?(?:\s*(?:K|M|B|million|billion|thousand))?\b/gi,
     // Pound: £100, GBP 100
     /(?:£\s*\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?|GBP\s*\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?)(?:\s*(?:K|M|B|million|billion|thousand))?\b/gi,
-    // SAR: SAR 100, 100 SAR, SR 100, 100 SR
+    // SAR: SAR 100, 100 SAR, SR 100, 100 SR, Saudi Riyal 100
     /(?:SAR\s*\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?|\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?\s*SAR|SR\s*\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?|\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?\s*SR)(?:\s*(?:K|M|B|million|billion|thousand))?\b/gi,
+    /Saudi\s+Riyal\s+\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?/gi,
+    // Arabic currency symbol: ر.س 100, 100 ر.س
+    /ر\.س\s*\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?/g,
+    /\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?\s*ر\.س/g,
     // AED: AED 100, 100 AED
     /(?:AED\s*\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?|\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?\s*AED)(?:\s*(?:K|M|B|million|billion|thousand))?\b/gi,
     // USD explicit: USD 100, 100 USD
@@ -257,8 +316,20 @@ function detectFinancialAmounts(
     /(?:₹\s*\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?|INR\s*\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?)(?:\s*(?:K|M|B|million|billion|thousand))?\b/gi,
     // Swiss Franc: CHF 100
     /CHF\s*\d{1,3}(?:[',]\d{3})*(?:\.\d{1,2})?(?:\s*(?:K|M|B|million|billion|thousand))?\b/gi,
+    // Gulf currencies: KWD, QAR, BHD, OMR
+    /(?:KWD\s*\d{1,3}(?:,\d{3})*(?:\.\d{1,3})?|\d{1,3}(?:,\d{3})*(?:\.\d{1,3})?\s*KWD)/gi,
+    /(?:QAR\s*\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?|\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?\s*QAR)/gi,
+    /(?:BHD\s*\d{1,3}(?:,\d{3})*(?:\.\d{1,3})?|\d{1,3}(?:,\d{3})*(?:\.\d{1,3})?\s*BHD)/gi,
+    /(?:OMR\s*\d{1,3}(?:,\d{3})*(?:\.\d{1,3})?|\d{1,3}(?:,\d{3})*(?:\.\d{1,3})?\s*OMR)/gi,
+    // Other currencies: CAD, AUD, EGP, TRY, ZAR, BRL
+    /(?:CAD\s*\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?|\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?\s*CAD)/gi,
+    /(?:AUD\s*\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?|\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?\s*AUD)/gi,
+    /(?:EGP\s*\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?|\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?\s*EGP)/gi,
+    /(?:TRY\s*\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?|\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?\s*TRY)/gi,
+    /(?:ZAR\s*\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?|\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?\s*ZAR)/gi,
+    /(?:BRL\s*\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?|\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?\s*BRL)/gi,
     // Generic with currency word: 100 dollars, 50 euros, 1000 riyals
-    /\d+(?:,\d{3})*(?:\.\d{1,2})?\s*(?:dollars?|euros?|pounds?|riyals?|dirhams?|yen|rupees?)(?:\s*(?:K|M|B|million|billion|thousand))?\b/gi
+    /\d+(?:,\d{3})*(?:\.\d{1,2})?\s*(?:dollars?|euros?|pounds?|riyals?|dirhams?|yen|rupees?|dinars?|francs?)(?:\s*(?:K|M|B|million|billion|thousand))?\b/gi
   ]
 
   for (const pattern of currencyPatterns) {
@@ -355,17 +426,29 @@ function detectCreditCards(
       const cardText = match[0]
       const digitsOnly = cardText.replace(/\D/g, '')
 
-      // Validate with Luhn algorithm
-      if (isValidLuhn(digitsOnly)) {
-        // Check for valid card prefixes (Visa, Mastercard, Amex, Discover, etc.)
+      // Check for Mada card prefixes (specific Saudi debit card BINs)
+      const isMadaCard = /^(4766|5297|4059|4244|4364|4473|4543|4834|4903|4918|4966|5078|5128|5160|5210|5213|5265|5289|5310|5329|5341|5349|5371|5407|5434|5435|5459|5460|5480|5534|5545|5860|5862|5898|6051|6136|6200|6208|6304|6367|6521|6586|6396|6396|6371)/.test(digitsOnly)
+
+      // For Mada cards, trust the BIN prefix (they're very specific)
+      // For other cards, require Luhn validation
+      const passesValidation = isMadaCard || isValidLuhn(digitsOnly)
+
+      if (passesValidation) {
+        // Check for valid card prefixes (Visa, Mastercard, Amex, Discover, JCB, Diners, UnionPay, Mada)
         const isValidPrefix =
+          isMadaCard || // Mada cards (already validated by BIN)
           digitsOnly.startsWith('4') || // Visa
           /^5[1-5]/.test(digitsOnly) || // Mastercard
           /^2[2-7]/.test(digitsOnly) || // Mastercard (2-series)
           /^3[47]/.test(digitsOnly) || // Amex
           digitsOnly.startsWith('6011') || // Discover
           /^65/.test(digitsOnly) || // Discover
-          /^64[4-9]/.test(digitsOnly) // Discover
+          /^64[4-9]/.test(digitsOnly) || // Discover
+          /^35[2-8]/.test(digitsOnly) || // JCB
+          /^30[0-5]/.test(digitsOnly) || // Diners Club
+          /^36/.test(digitsOnly) || // Diners Club International
+          /^38/.test(digitsOnly) || // Diners Club
+          /^62/.test(digitsOnly) // UnionPay
 
         if (isValidPrefix) {
           addEntity({
@@ -445,14 +528,18 @@ function detectIBANs(
       const ibanText = match[0]
       const cleanIBAN = ibanText.replace(/\s/g, '').toUpperCase()
 
-      // Validate IBAN structure
-      if (isValidIBAN(cleanIBAN)) {
+      // For Saudi/Gulf IBANs, trust the format (SA + 22 chars, AE + 21 chars, etc.)
+      // These are very specific formats unlikely to appear randomly
+      const isGulfIBAN = /^(SA[0-9]{22}|AE[0-9]{21}|BH[0-9A-Z]{18}|KW[0-9A-Z]{28}|OM[0-9]{21}|QA[0-9A-Z]{27})$/.test(cleanIBAN)
+
+      // Validate IBAN structure - trust Gulf format or require Mod97
+      if (isGulfIBAN || isValidIBAN(cleanIBAN)) {
         addEntity({
           text: ibanText,
           type: 'iban',
           start: match.index,
           end: match.index + ibanText.length,
-          confidence: 95
+          confidence: isGulfIBAN ? 90 : 95
         })
       }
     }
@@ -707,6 +794,132 @@ async function detectFullNames(
 }
 
 /**
+ * Detects Arabic names using pattern matching.
+ *
+ * Recognizes:
+ * - Names with Al- prefix (e.g., Mohammed Al-Rashid, Fatima Al-Qahtani)
+ * - Names with bin/bint (e.g., Abdullah bin Mohammed)
+ * - Common Arabic first names followed by family names
+ *
+ * @param text - Text to search
+ * @param addEntity - Callback to add detected entity
+ * @internal
+ */
+function detectArabicNames(
+  text: string,
+  addEntity: (entity: NEREntity) => void
+): void {
+  // Common Arabic first names (male and female)
+  const arabicFirstNames = [
+    // Male names
+    'mohammed', 'mohammad', 'muhammad', 'ahmed', 'ahmad', 'ali', 'omar', 'umar',
+    'khalid', 'khaled', 'abdullah', 'abdulrahman', 'abdulaziz', 'abdul', 'ibrahim',
+    'yusuf', 'yousuf', 'youssef', 'tariq', 'tarek', 'faisal', 'fahad', 'fahd',
+    'sultan', 'saud', 'saleh', 'salih', 'nasser', 'nasir', 'bandar', 'turki',
+    'nawaf', 'meshal', 'majed', 'majid', 'nayef', 'naif', 'saad', 'badr',
+    'hamad', 'hamed', 'waleed', 'walid', 'rashid', 'rasheed', 'sami', 'sameer',
+    'yasser', 'yasir', 'adel', 'adil', 'karim', 'kareem', 'hassan', 'hussein',
+    'hosain', 'mustafa', 'mostafa', 'jamal', 'gamal', 'osama', 'usama',
+    'mansour', 'mansur', 'ziad', 'ziyad', 'mazen', 'rami', 'hani', 'amr',
+    'amer', 'amir', 'basem', 'bassem', 'wael', 'hazem', 'hatem', 'hatim',
+    'firas', 'feras', 'fouad', 'fuad', 'imad', 'emad', 'bilal', 'belal',
+    'tamer', 'tamir', 'sherif', 'sharif', 'ashraf', 'akram', 'anwar', 'anas',
+    'aws', 'ayman', 'aymen', 'bader', 'badri', 'essam', 'isam', 'issam',
+    'ghassan', 'hisham', 'hesham', 'jihad', 'jihad', 'lotfi', 'lutfi',
+    'marwan', 'maher', 'mahir', 'mohannad', 'muhannad', 'munir', 'monir',
+    'nadim', 'nabil', 'nabeel', 'nader', 'nadir', 'rafiq', 'rafik', 'raed',
+    'raid', 'ramzi', 'rashed', 'riad', 'riyad', 'saeed', 'said', 'shadi',
+    'talal', 'tawfiq', 'tawfik', 'wissam', 'wisam', 'yahya', 'yehya', 'zaki',
+    'zakaria', 'zakariya', 'zuhair', 'zoheir', 'qasim', 'qassim', 'kassem',
+    // Female names
+    'fatima', 'fatimah', 'aisha', 'aysha', 'noura', 'nora', 'maryam', 'mariam',
+    'layla', 'leila', 'hana', 'hanna', 'sara', 'sarah', 'reem', 'rim',
+    'dalal', 'mona', 'muna', 'abeer', 'rania', 'raniya', 'hessa', 'hissa',
+    'ghada', 'afnan', 'shahad', 'wafa', 'lama', 'nada', 'dina', 'deena',
+    'nouf', 'amal', 'asma', 'asma', 'zainab', 'zaynab', 'khadija', 'khadijah',
+    'sumaya', 'sumayyah', 'lubna', 'najla', 'naglaa', 'huda', 'maysa', 'maisa'
+  ]
+
+  // Common Arabic family name patterns (Al- prefixed)
+  const arabicFamilyPrefixes = [
+    'al-', 'al ', 'el-', 'el ', 'bin ', 'ibn ', 'bint ', 'abu ', 'umm '
+  ]
+
+  // Common Arabic family names
+  const arabicFamilyNames = [
+    'saud', 'rashid', 'rasheed', 'qahtani', 'dosari', 'doseri', 'shehri',
+    'ghamdi', 'harbi', 'otaibi', 'utaibi', 'mutairi', 'mutairy', 'anazi',
+    'enezi', 'shamrani', 'zahrani', 'malki', 'juhani', 'johani', 'tamimi',
+    'subaie', 'subai', 'dawsari', 'shammari', 'ruwaili', 'yami', 'ajmi',
+    'harthi', 'harthy', 'saif', 'balawi', 'mudahi', 'saleh', 'farsi',
+    'ahmed', 'hassan', 'hussein', 'ali', 'omar', 'ibrahim', 'mohammed',
+    'khalil', 'mahmoud', 'nasser', 'abdullah', 'hamad', 'fahad', 'sultan',
+    'saeed', 'said', 'khalaf', 'obaid', 'ubaid', 'thani', 'nahyan',
+    'maktoum', 'zayed', 'rashid', 'nuaimi', 'sharqi', 'mualla', 'qasimi'
+  ]
+
+  // Build patterns for Arabic names
+  const patterns: RegExp[] = []
+
+  // Pattern 1: FirstName Al-FamilyName, FirstName Al FamilyName, or FirstName Alfamily (attached)
+  const firstNamesPattern = arabicFirstNames.join('|')
+  patterns.push(
+    new RegExp(`\\b(${firstNamesPattern})\\s+(al[- ]?\\w+)\\b`, 'gi')
+  )
+  // Also match "Aldosari" style (Al attached to family name)
+  patterns.push(
+    new RegExp(`\\b(${firstNamesPattern})\\s+(al\\w{3,})\\b`, 'gi')
+  )
+
+  // Pattern 2: FirstName bin/bint FamilyName
+  patterns.push(
+    new RegExp(`\\b(${firstNamesPattern})\\s+(bin|bint|ibn|abu)\\s+(\\w+)\\b`, 'gi')
+  )
+
+  // Pattern 3: FirstName FamilyName (where family is a known Arabic name)
+  const familyNamesPattern = arabicFamilyNames.join('|')
+  patterns.push(
+    new RegExp(`\\b(${firstNamesPattern})\\s+(${familyNamesPattern})\\b`, 'gi')
+  )
+
+  // Pattern 4: Title + Arabic name patterns (Dr., Mr., Mrs., etc.)
+  patterns.push(
+    new RegExp(`\\b(?:dr\\.?|mr\\.?|mrs\\.?|ms\\.?|prof\\.?)\\s+(${firstNamesPattern})\\s+(\\w+)\\b`, 'gi')
+  )
+
+  // Track found names to avoid duplicates
+  const foundPositions = new Set<string>()
+
+  for (const pattern of patterns) {
+    pattern.lastIndex = 0
+    let match: RegExpExecArray | null
+    while ((match = pattern.exec(text)) !== null) {
+      const fullName = match[0].trim()
+      const posKey = `${match.index}-${match.index + fullName.length}`
+
+      // Skip if already found at this position
+      if (foundPositions.has(posKey)) continue
+      foundPositions.add(posKey)
+
+      // Must have at least 2 parts
+      const parts = fullName.split(/\s+/)
+      if (parts.length < 2) continue
+
+      // Skip very short matches
+      if (fullName.length < 5) continue
+
+      addEntity({
+        text: fullName,
+        type: 'person',
+        start: match.index,
+        end: match.index + fullName.length,
+        confidence: 85
+      })
+    }
+  }
+}
+
+/**
  * Detects IP addresses (IPv4 and IPv6).
  *
  * IPv4: Standard dotted decimal (e.g., 192.168.1.1)
@@ -725,29 +938,52 @@ function detectIPAddresses(
   const ipPatterns = [
     // IPv4: 192.168.1.1, 10.0.0.1, etc.
     /\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b/g,
+    // IPv6 loopback: ::1
+    /(?:^|[^:])::1(?:$|[^:\d])/g,
     // IPv6 full: 2001:0db8:85a3:0000:0000:8a2e:0370:7334
     /\b(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}\b/g,
-    // IPv6 compressed: 2001:db8::1, ::1, fe80::
-    /\b(?:[0-9a-fA-F]{1,4}:){1,7}:|(?:[0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|(?:[0-9a-fA-F]{1,4}:){1,5}(?::[0-9a-fA-F]{1,4}){1,2}|(?:[0-9a-fA-F]{1,4}:){1,4}(?::[0-9a-fA-F]{1,4}){1,3}|(?:[0-9a-fA-F]{1,4}:){1,3}(?::[0-9a-fA-F]{1,4}){1,4}|(?:[0-9a-fA-F]{1,4}:){1,2}(?::[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:(?::[0-9a-fA-F]{1,4}){1,6}|:(?::[0-9a-fA-F]{1,4}){1,7}|::(?:[fF]{4}:)?(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b/g
+    // IPv6 with double colon: 2001:db8::1, fe80::1, etc.
+    /\b(?:[0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}\b/g,
+    /\b(?:[0-9a-fA-F]{1,4}:){1,5}(?::[0-9a-fA-F]{1,4}){1,2}\b/g,
+    /\b(?:[0-9a-fA-F]{1,4}:){1,4}(?::[0-9a-fA-F]{1,4}){1,3}\b/g,
+    /\b(?:[0-9a-fA-F]{1,4}:){1,3}(?::[0-9a-fA-F]{1,4}){1,4}\b/g,
+    /\b(?:[0-9a-fA-F]{1,4}:){1,2}(?::[0-9a-fA-F]{1,4}){1,5}\b/g,
+    /\b[0-9a-fA-F]{1,4}:(?::[0-9a-fA-F]{1,4}){1,6}\b/g,
+    // IPv6 ending with :: (like fe80::)
+    /\b(?:[0-9a-fA-F]{1,4}:){1,7}:\b/g,
+    // IPv6 starting with :: (like ::ffff:192.168.1.1)
+    /::(?:[fF]{4}:)?(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b/g,
+    // IPv6 starting with :: and having hex
+    /::[0-9a-fA-F]{1,4}(?::[0-9a-fA-F]{1,4}){0,5}\b/g
   ]
 
   for (const pattern of ipPatterns) {
     pattern.lastIndex = 0
     let match: RegExpExecArray | null
     while ((match = pattern.exec(text)) !== null) {
+      let ipText = match[0]
+      let startOffset = 0
+
+      // Handle the ::1 loopback pattern which may include surrounding chars
+      if (ipText.includes('::1') && !ipText.includes('.')) {
+        const idx = ipText.indexOf('::1')
+        ipText = '::1'
+        startOffset = idx
+      }
+
       // Validate IPv4 to avoid version numbers like 1.0.0.0
-      if (match[0].includes('.') && !match[0].includes(':')) {
-        const parts = match[0].split('.')
+      if (ipText.includes('.') && !ipText.includes(':')) {
+        const parts = ipText.split('.')
         // Skip if it looks like a version number (all parts are small)
         const isVersionLike = parts.every(p => parseInt(p, 10) < 10)
         if (isVersionLike) continue
       }
 
       addEntity({
-        text: match[0],
+        text: ipText,
         type: 'ip',
-        start: match.index,
-        end: match.index + match[0].length,
+        start: match.index + startOffset,
+        end: match.index + startOffset + ipText.length,
         confidence: 95
       })
     }
@@ -926,6 +1162,424 @@ function detectSSNs(
       end: match.index + match[0].length,
       confidence: 95
     })
+  }
+}
+
+/**
+ * Detects passport numbers with context validation.
+ *
+ * Passport formats vary by country:
+ * - US: 9 digits
+ * - UK: 9 alphanumeric
+ * - Saudi/UAE/Gulf: 1 letter + 7-8 digits
+ * - European: Various alphanumeric formats
+ *
+ * Requires context words like "passport", "travel document" nearby to reduce false positives.
+ *
+ * @param text - Text to search
+ * @param addEntity - Callback to add detected entity
+ * @internal
+ */
+function detectPassports(
+  text: string,
+  addEntity: (entity: NEREntity) => void
+): void {
+  // Look for passport-related context
+  const passportPatterns = [
+    // Letter(s) followed by digits: A12345678, AB1234567
+    /\b(?:passport|travel\s+document|passport\s+(?:number|no|#)|passport:)\s*[:\s#]*([A-Z]{1,2}\d{6,8})\b/gi,
+    // Just digits with passport context: 123456789
+    /\b(?:passport|travel\s+document|passport\s+(?:number|no|#)|passport:)\s*[:\s#]*(\d{8,9})\b/gi,
+    // Passport followed by alphanumeric
+    /\bpassport[:\s#]+([A-Z0-9]{6,12})\b/gi,
+    // Standalone patterns with letter prefix (common format)
+    /\b([A-Z][A-Z]?\d{7,8})\b(?=.*passport)/gi,
+    /\bpassport.*?\b([A-Z][A-Z]?\d{7,8})\b/gi
+  ]
+
+  for (const pattern of passportPatterns) {
+    pattern.lastIndex = 0
+    let match: RegExpExecArray | null
+    while ((match = pattern.exec(text)) !== null) {
+      // Get the captured group (passport number) or full match
+      const passportNum = match[1] || match[0]
+
+      // Find the actual position of the passport number in the match
+      const numStart = match[0].indexOf(passportNum)
+      const start = match.index + numStart
+      const end = start + passportNum.length
+
+      // Validate - must be 6-12 characters
+      if (passportNum.length < 6 || passportNum.length > 12) continue
+
+      addEntity({
+        text: passportNum,
+        type: 'passport',
+        start: start,
+        end: end,
+        confidence: 85
+      })
+    }
+  }
+}
+
+/**
+ * Detects dates of birth - with DOB context detects any year, without context only 2000+.
+ * @internal
+ */
+function detectDOB(
+  text: string,
+  addEntity: (entity: NEREntity) => void
+): void {
+  // Years 2000-2025 for dates without context
+  const recentYearPattern = '200[0-9]|201[0-9]|202[0-5]'
+  // Any realistic birth year (1920-2025) for dates with DOB context
+  const anyYearPattern = '19[2-9][0-9]|20[0-2][0-9]'
+
+  const dobPatterns = [
+    // With DOB context - match any year
+    // "Date of Birth: 15/03/1985" or "DOB: 1990-07-22"
+    /\b(?:date\s+of\s+birth|dob|birth\s*date|born|birthday)[:\s]+(\d{1,2}[-/\.]\d{1,2}[-/\.]\d{4})\b/gi,
+    /\b(?:date\s+of\s+birth|dob|birth\s*date|born|birthday)[:\s]+(\d{4}[-/\.]\d{1,2}[-/\.]\d{1,2})\b/gi,
+    /\b(?:date\s+of\s+birth|dob|birth\s*date|born|birthday)[:\s]+([A-Za-z]+\s+\d{1,2},?\s+\d{4})\b/gi,
+    /\b(?:date\s+of\s+birth|dob|birth\s*date|born|birthday)[:\s]+(\d{1,2}\s+[A-Za-z]+\s+\d{4})\b/gi,
+
+    // DD/MM/YYYY or DD-MM-YYYY with recent years only (2000+)
+    new RegExp(`\\b(0?[1-9]|[12][0-9]|3[01])[-/\\.](0?[1-9]|1[0-2])[-/\\.](${recentYearPattern})\\b`, 'g'),
+    // YYYY-MM-DD (ISO format) with recent years
+    new RegExp(`\\b(${recentYearPattern})[-/](0?[1-9]|1[0-2])[-/](0?[1-9]|[12][0-9]|3[01])\\b`, 'g'),
+    // Month DD, YYYY with recent years
+    new RegExp(`\\b(January|February|March|April|May|June|July|August|September|October|November|December)\\s+(0?[1-9]|[12][0-9]|3[01]),?\\s+(${recentYearPattern})\\b`, 'gi'),
+  ]
+
+  const seenPositions = new Set<string>()
+
+  for (const pattern of dobPatterns) {
+    pattern.lastIndex = 0
+    let match: RegExpExecArray | null
+    while ((match = pattern.exec(text)) !== null) {
+      // Get the actual date part (captured group or full match)
+      const dateText = match[1] || match[0]
+      const start = match[1] ? match.index + match[0].indexOf(match[1]) : match.index
+      const key = `${start}-${start + dateText.length}`
+
+      if (seenPositions.has(key)) continue
+      seenPositions.add(key)
+
+      addEntity({
+        text: match[0], // Include context like "DOB: "
+        type: 'dob',
+        start: match.index,
+        end: match.index + match[0].length,
+        confidence: 85
+      })
+    }
+  }
+}
+
+/**
+ * Detects MAC addresses.
+ * @internal
+ */
+function detectMACAddresses(
+  text: string,
+  addEntity: (entity: NEREntity) => void
+): void {
+  const macPatterns = [
+    // XX:XX:XX:XX:XX:XX or XX-XX-XX-XX-XX-XX
+    /\b([0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2}\b/g,
+    // XXXX.XXXX.XXXX (Cisco format)
+    /\b[0-9A-Fa-f]{4}\.[0-9A-Fa-f]{4}\.[0-9A-Fa-f]{4}\b/g,
+  ]
+
+  for (const pattern of macPatterns) {
+    pattern.lastIndex = 0
+    let match: RegExpExecArray | null
+    while ((match = pattern.exec(text)) !== null) {
+      addEntity({
+        text: match[0],
+        type: 'mac_address',
+        start: match.index,
+        end: match.index + match[0].length,
+        confidence: 95
+      })
+    }
+  }
+}
+
+/**
+ * Detects API keys and tokens.
+ * @internal
+ */
+function detectAPIKeys(
+  text: string,
+  addEntity: (entity: NEREntity) => void
+): void {
+  const apiPatterns = [
+    // Stripe keys
+    /\b(sk_live_[a-zA-Z0-9]{24,})\b/g,
+    /\b(pk_live_[a-zA-Z0-9]{24,})\b/g,
+    /\b(sk_test_[a-zA-Z0-9]{24,})\b/g,
+    /\b(pk_test_[a-zA-Z0-9]{24,})\b/g,
+    // AWS keys
+    /\b(AKIA[0-9A-Z]{16})\b/g,
+    /\b(ASIA[0-9A-Z]{16})\b/g,
+    // Google API keys
+    /\b(AIza[0-9A-Za-z_-]{35})\b/g,
+    // GitHub tokens
+    /\b(ghp_[a-zA-Z0-9]{36})\b/g,
+    /\b(gho_[a-zA-Z0-9]{36})\b/g,
+    /\b(ghu_[a-zA-Z0-9]{36})\b/g,
+    // Generic API keys
+    /\b(api[_-]?key)[=:\s]+["']?([a-zA-Z0-9_-]{20,})["']?\b/gi,
+    /\b(api[_-]?secret)[=:\s]+["']?([a-zA-Z0-9_-]{20,})["']?\b/gi,
+    /\b(auth[_-]?token)[=:\s]+["']?([a-zA-Z0-9_-]{20,})["']?\b/gi,
+    /\b(access[_-]?token)[=:\s]+["']?([a-zA-Z0-9_-]{20,})["']?\b/gi,
+    // Bearer tokens
+    /\bBearer\s+([a-zA-Z0-9_-]{20,})\b/g,
+    // JWT tokens (simplified)
+    /\beyJ[a-zA-Z0-9_-]{10,}\.[a-zA-Z0-9_-]{10,}\.[a-zA-Z0-9_-]{10,}\b/g,
+  ]
+
+  for (const pattern of apiPatterns) {
+    pattern.lastIndex = 0
+    let match: RegExpExecArray | null
+    while ((match = pattern.exec(text)) !== null) {
+      addEntity({
+        text: match[0],
+        type: 'api_key',
+        start: match.index,
+        end: match.index + match[0].length,
+        confidence: 95
+      })
+    }
+  }
+}
+
+/**
+ * Detects license plates (Saudi and international formats).
+ * @internal
+ */
+function detectLicensePlates(
+  text: string,
+  addEntity: (entity: NEREntity) => void
+): void {
+  const platePatterns = [
+    // Saudi plates: 3 letters + 4 digits or vice versa
+    /\b[A-Z]{3}\s*\d{4}\b/g,
+    /\b\d{4}\s*[A-Z]{3}\b/g,
+    // Saudi plates with Arabic-style: ABC 1234
+    /\b[A-Z]{2,3}\s+\d{3,4}\b/g,
+    // US plates: ABC-1234, ABC 1234
+    /\b[A-Z]{1,3}[-\s]?\d{3,4}\b/g,
+    // European plates: XX-999-XX
+    /\b[A-Z]{2}[-\s]?\d{3}[-\s]?[A-Z]{2}\b/g,
+    // License/Plate context
+    /\b(?:plate|license|vehicle|car|truck)[:\s#]+([A-Z0-9]{2,3}[-\s]?[A-Z0-9]{3,4}[-\s]?[A-Z0-9]{0,3})\b/gi,
+  ]
+
+  const seenPositions = new Set<string>()
+
+  for (const pattern of platePatterns) {
+    pattern.lastIndex = 0
+    let match: RegExpExecArray | null
+    while ((match = pattern.exec(text)) !== null) {
+      const plateText = match[1] || match[0]
+      const start = match[1] ? match.index + match[0].indexOf(match[1]) : match.index
+      const key = `${start}-${start + plateText.length}`
+
+      if (seenPositions.has(key)) continue
+      seenPositions.add(key)
+
+      // Must have both letters and numbers
+      if (!/[A-Z]/i.test(plateText) || !/\d/.test(plateText)) continue
+
+      addEntity({
+        text: plateText,
+        type: 'license_plate',
+        start: start,
+        end: start + plateText.length,
+        confidence: 85
+      })
+    }
+  }
+}
+
+/**
+ * Detects medical record numbers and patient IDs.
+ * @internal
+ */
+function detectMedicalRecords(
+  text: string,
+  addEntity: (entity: NEREntity) => void
+): void {
+  const medicalPatterns = [
+    // MRN, PAT, INS, POL prefixes
+    /\b(MRN|PAT|INS|POL|RX|LAB)[-:#\s]?\d{6,12}\b/gi,
+    // Medical record with context
+    /\b(?:medical\s+record|patient\s+id|insurance\s+id|policy\s+number|prescription)[:\s#]+([A-Z0-9-]{6,15})\b/gi,
+    // ICD codes
+    /\bICD[-\s]?10[-\s]?[A-Z]\d{2}(?:\.\d{1,2})?\b/gi,
+    // CPT codes
+    /\bCPT[-\s]?\d{5}\b/gi,
+    // NPI (National Provider Identifier)
+    /\bNPI[-:\s]?\d{10}\b/gi,
+  ]
+
+  for (const pattern of medicalPatterns) {
+    pattern.lastIndex = 0
+    let match: RegExpExecArray | null
+    while ((match = pattern.exec(text)) !== null) {
+      addEntity({
+        text: match[0],
+        type: 'medical_record',
+        start: match.index,
+        end: match.index + match[0].length,
+        confidence: 90
+      })
+    }
+  }
+}
+
+/**
+ * Detects driver's license numbers.
+ * @internal
+ */
+function detectDriversLicenses(
+  text: string,
+  addEntity: (entity: NEREntity) => void
+): void {
+  const dlPatterns = [
+    // With DL/driver context
+    /\b(?:driver'?s?\s*license|DL|driving\s+license)[:\s#]+([A-Z0-9]{7,15})\b/gi,
+    // UK format: XXXXX999999XX9XX
+    /\b[A-Z]{5}\d{6}[A-Z0-9]{5}\b/g,
+    // US format: D + 7-8 digits or letter + digits
+    /\b[A-Z]\d{7,8}\b/g,
+    // Saudi DL: 10 digits
+    /\b(?:saudi\s+dl|رخصة)[:\s#]?\d{10}\b/gi,
+  ]
+
+  for (const pattern of dlPatterns) {
+    pattern.lastIndex = 0
+    let match: RegExpExecArray | null
+    while ((match = pattern.exec(text)) !== null) {
+      const dlText = match[1] || match[0]
+      const start = match[1] ? match.index + match[0].indexOf(match[1]) : match.index
+
+      addEntity({
+        text: dlText,
+        type: 'drivers_license',
+        start: start,
+        end: start + dlText.length,
+        confidence: 85
+      })
+    }
+  }
+}
+
+/**
+ * Detects GPS coordinates.
+ * @internal
+ */
+function detectGPSCoordinates(
+  text: string,
+  addEntity: (entity: NEREntity) => void
+): void {
+  const gpsPatterns = [
+    // Decimal degrees: 24.7136, 46.6753 or (24.7136, 46.6753)
+    /\(?\s*-?\d{1,3}\.\d{4,8}\s*,\s*-?\d{1,3}\.\d{4,8}\s*\)?/g,
+    // DMS format: 24°42'49"N 46°40'31"E
+    /\d{1,3}°\d{1,2}'[\d.]+"\s*[NSEW]\s+\d{1,3}°\d{1,2}'[\d.]+"\s*[NSEW]/g,
+    // With GPS/coordinates context
+    /\b(?:gps|coordinates?|location|lat(?:itude)?|lon(?:gitude)?)[:\s]+(-?\d{1,3}\.\d{4,8})/gi,
+  ]
+
+  for (const pattern of gpsPatterns) {
+    pattern.lastIndex = 0
+    let match: RegExpExecArray | null
+    while ((match = pattern.exec(text)) !== null) {
+      addEntity({
+        text: match[0],
+        type: 'gps',
+        start: match.index,
+        end: match.index + match[0].length,
+        confidence: 90
+      })
+    }
+  }
+}
+
+/**
+ * Detects Vehicle Identification Numbers (VIN).
+ * @internal
+ */
+function detectVINNumbers(
+  text: string,
+  addEntity: (entity: NEREntity) => void
+): void {
+  // VIN is exactly 17 alphanumeric characters (no I, O, Q)
+  const vinPattern = /\b[A-HJ-NPR-Z0-9]{17}\b/g
+
+  let match: RegExpExecArray | null
+  while ((match = vinPattern.exec(text)) !== null) {
+    const vin = match[0]
+
+    // VIN must have mix of letters and numbers
+    if (!/[A-Z]/.test(vin) || !/\d/.test(vin)) continue
+
+    // Check if it looks like a VIN (has structure)
+    // Position 9 is check digit, position 10 is year
+    addEntity({
+      text: vin,
+      type: 'vin',
+      start: match.index,
+      end: match.index + vin.length,
+      confidence: 85
+    })
+  }
+}
+
+/**
+ * Detects company and project codes.
+ * @internal
+ */
+function detectCompanyCodes(
+  text: string,
+  addEntity: (entity: NEREntity) => void
+): void {
+  const codePatterns = [
+    // Project codes: PROJ-2024-001
+    /\b(PROJ|PROJECT)[-_]?\d{4}[-_]\d{3,5}\b/gi,
+    // Contract numbers: CNT-2024-12345
+    /\b(CNT|CONTRACT)[-_]?\d{4}[-_]\d{3,6}\b/gi,
+    // Invoice numbers: INV-2024-00001
+    /\b(INV|INVOICE)[-_]?\d{4}[-_]\d{4,6}\b/gi,
+    // Purchase orders: PO-2024-54321
+    /\b(PO|PURCHASE[-_]?ORDER)[-_]?\d{4}[-_]\d{4,6}\b/gi,
+    // Reference numbers: REF-2024-98765
+    /\b(REF|REFERENCE)[-_]?\d{4}[-_]\d{4,6}\b/gi,
+    // Order numbers: ORD-123456
+    /\b(ORD|ORDER)[-_]?\d{5,8}\b/gi,
+    // Ticket/Case numbers: TKT-123456, CASE-123456
+    /\b(TKT|TICKET|CASE|INC|INCIDENT)[-_]?\d{5,10}\b/gi,
+    // Generic ID patterns with context
+    /\b(?:order|ticket|case|incident|request)[:\s#]+([A-Z]{2,4}[-_]?\d{4,10})\b/gi,
+  ]
+
+  for (const pattern of codePatterns) {
+    pattern.lastIndex = 0
+    let match: RegExpExecArray | null
+    while ((match = pattern.exec(text)) !== null) {
+      const codeText = match[1] && match[1].length < match[0].length ? match[0] : match[0]
+      addEntity({
+        text: codeText,
+        type: 'company_code',
+        start: match.index,
+        end: match.index + codeText.length,
+        confidence: 90
+      })
+    }
   }
 }
 
