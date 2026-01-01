@@ -6,6 +6,18 @@ maskr is an Electron desktop app for detecting and masking sensitive information
 - **Owner**: iYassr (GitHub)
 - **Repo**: https://github.com/iYassr/maskr
 - **License**: MIT
+- **Current Version**: 1.3.15
+- **Landing Page**: https://maskr.pages.dev (Cloudflare Pages)
+- **GitHub Pages**: https://iyassr.github.io/maskr/
+
+## Detection Capabilities (30+ Entity Types)
+- **Names**: English (NLP) + 150+ Arabic names (Mohammed, Ahmed, Fatima, etc.)
+- **Contact**: Emails, phone numbers (US, UK, Saudi +966, UAE, international)
+- **Government IDs**: SSN, Saudi National ID, Iqama
+- **Financial**: Credit cards (Visa, Mastercard, Amex, Mada), IBANs (SA, AE, international)
+- **Technical**: IPv4/IPv6, URLs, domains, MAC addresses, API keys/tokens
+- **Other**: DOB, license plates, GPS coordinates, VIN numbers, company codes
+- **Custom**: User-defined names and keywords
 
 ## User Preferences
 - **Be concise** - Short responses, get to the point
@@ -50,11 +62,18 @@ git add -A && git commit -m "message" && git push origin main
 6. Push tag: `git push origin vX.Y.Z`
 7. Create GitHub release with all assets
 
+### "deploy landing page"
+```bash
+npx wrangler pages deploy docs --project-name=maskr
+```
+
 ## Known Issues
 - **Windows filenames** - electron-builder creates files with spaces, must rename before GitHub upload
 - **Dev mode stale builds** - Electron main process doesn't hot-reload, must rebuild
 - **macOS quarantine** - Users need `xattr -cr` to run unsigned app
 - **Port conflicts** - Dev server auto-increments port if 5173 is busy
+- **Mada cards** - Use official BIN prefixes, skip Luhn validation for Mada
+- **Gulf IBANs** - SA/AE/BH/KW/OM/QA IBANs trust format without Mod97 validation
 
 ## Critical Build/Test Workflow
 
@@ -109,6 +128,7 @@ gh release create vX.Y.Z --title "maskr vX.Y.Z - Title" --notes "..." file1 file
 - `tests/comprehensive.spec.ts` - Extended tests (13 tests)
 - `tests/all-formats.spec.ts` - Format-specific tests (12 tests)
 - `tests/binary-formats.spec.ts` - DOCX/XLSX/PDF tests (6 tests)
+- `tests/fixtures/comprehensive-pii-sample.txt` - 700+ PII items for detection testing
 
 ### Running Tests
 ```bash
@@ -129,33 +149,58 @@ These are marked as external in `vite.config.ts` and must be available at runtim
 
 ```
 ├── electron/           # Electron main process
-│   ├── main.ts         # Main entry, IPC handlers
+│   ├── main.ts         # Main entry, IPC handlers, app.name setting
 │   ├── preload.ts      # Preload script, exposes API to renderer
 │   └── services/       # Core services
-│       ├── detector.ts # PII detection logic (NER, regex patterns)
+│       ├── detector.ts # PII detection (30+ types, Arabic names, Mada cards)
 │       ├── document-parser.ts  # File format parsing
 │       └── security.ts # Input validation
 ├── src/                # React renderer
-│   ├── App.tsx         # Main app component
+│   ├── App.tsx         # Main app component + loading screen
 │   ├── components/     # UI components
 │   │   ├── UploadStep.tsx    # File upload + text input
 │   │   ├── ReviewStep.tsx    # Detection review table
-│   │   └── ExportStep.tsx    # Export sanitized document
+│   │   └── ExportStep.tsx    # Export sanitized document + back button
 │   └── stores/         # Zustand state management
+├── docs/               # Landing page (deployed to Cloudflare Pages)
+│   ├── index.html      # SEO-optimized landing page
+│   └── assets/         # Screenshots, demo GIF, favicon
 ├── tests/              # Playwright E2E tests
+│   └── fixtures/       # Test data including comprehensive PII sample
+├── scripts/            # Utility scripts
+│   └── generate-architecture-gif.mjs  # Creates animated architecture diagram
+├── architecture.gif    # Animated component flow diagram
+├── architecture-animated.html  # Interactive HTML version
+├── architecture-flow.drawio    # DrawIO source file
 ├── release/            # Built packages (git-ignored)
 └── dist-electron/      # Built Electron code
 ```
 
 ## Key Files to Know
-- `electron/services/detector.ts` - All PII detection patterns (email, phone, SSN, etc.)
+- `electron/services/detector.ts` - All PII detection patterns (30+ types)
 - `src/components/UploadStep.tsx` - Handles both file upload AND direct text input
+- `src/App.tsx` - Loading screen, step navigation
+- `docs/index.html` - Landing page with SEO meta tags
 - `vite.config.ts` - Build config, lists external dependencies
 - `electron-builder.yml` - Package naming, build targets
 
 ## CI/CD (GitHub Actions)
 - `.github/workflows/ci.yml` - Runs tests on Windows, macOS, and Linux on every push/PR
 - `.github/workflows/release.yml` - Builds and publishes releases for all platforms when a tag is pushed
+
+## Hosting
+- **Landing Page**: Cloudflare Pages (https://maskr.pages.dev)
+- **Releases**: GitHub Releases
+- **Source**: GitHub (https://github.com/iYassr/maskr)
+
+### Deploy Landing Page
+```bash
+# Login (one-time)
+npx wrangler login
+
+# Deploy
+npx wrangler pages deploy docs --project-name=maskr
+```
 
 ## Windows Testing
 Common Windows-specific issues to watch for:
@@ -172,3 +217,5 @@ Common Windows-specific issues to watch for:
 3. **Check version consistency** - package.json version must match git tag
 4. **Test the actual build** - Use production build for user-facing verification
 5. **Don't restart dev server repeatedly** - If something's broken, rebuild first
+6. **Mada cards need BIN bypass** - Official Mada BINs skip Luhn validation
+7. **Gulf IBANs trust format** - SA/AE/etc IBANs don't require Mod97 checksum
