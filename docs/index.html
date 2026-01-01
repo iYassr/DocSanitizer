@@ -707,26 +707,84 @@
   <section class="download" id="download">
     <div class="container">
       <h2 class="section-title">Download maskr</h2>
-      <p class="section-subtitle">Free and open source. Available for all platforms.</p>
-      <div class="download-buttons">
-        <a href="https://github.com/iYassr/maskr/releases/latest" class="download-btn">
+      <p class="section-subtitle">Free and open source. Available for all platforms. <span id="release-version" style="color: var(--accent);"></span></p>
+      <div class="download-buttons" id="download-buttons">
+        <a href="https://github.com/iYassr/maskr/releases/latest" class="download-btn" id="download-mac">
           <span class="platform">🍎</span>
           <span class="name">macOS</span>
-          <span class="version">Intel & Apple Silicon</span>
+          <span class="version" id="mac-version">Intel & Apple Silicon</span>
         </a>
-        <a href="https://github.com/iYassr/maskr/releases/latest" class="download-btn">
+        <a href="https://github.com/iYassr/maskr/releases/latest" class="download-btn" id="download-win">
           <span class="platform">🪟</span>
           <span class="name">Windows</span>
-          <span class="version">Installer & Portable</span>
+          <span class="version" id="win-version">Installer & Portable</span>
         </a>
-        <a href="https://github.com/iYassr/maskr/releases/latest" class="download-btn">
+        <a href="https://github.com/iYassr/maskr/releases/latest" class="download-btn" id="download-linux">
           <span class="platform">🐧</span>
           <span class="name">Linux</span>
-          <span class="version">AppImage & .deb</span>
+          <span class="version" id="linux-version">AppImage & .deb</span>
         </a>
       </div>
+      <p style="margin-top: 24px; font-size: 14px; color: var(--text-muted);">
+        <a href="https://github.com/iYassr/maskr/releases" target="_blank" style="color: var(--accent);">View all releases</a>
+      </p>
     </div>
   </section>
+
+  <!-- Dynamic Release Fetching -->
+  <script>
+    (async function() {
+      try {
+        const response = await fetch('https://api.github.com/repos/iYassr/maskr/releases/latest');
+        const release = await response.json();
+
+        if (!release || !release.assets) return;
+
+        const version = release.tag_name || release.name;
+        document.getElementById('release-version').textContent = version;
+
+        // Find assets for each platform
+        const assets = release.assets;
+
+        // macOS - prefer arm64 (Apple Silicon)
+        const macArm = assets.find(a => a.name.includes('arm64-mac.zip'));
+        const macIntel = assets.find(a => a.name.includes('-mac.zip') && !a.name.includes('arm64'));
+        if (macArm) {
+          document.getElementById('download-mac').href = macArm.browser_download_url;
+          document.getElementById('mac-version').textContent = 'Apple Silicon';
+        } else if (macIntel) {
+          document.getElementById('download-mac').href = macIntel.browser_download_url;
+          document.getElementById('mac-version').textContent = 'Intel';
+        }
+
+        // Windows - prefer setup.exe
+        const winSetup = assets.find(a => a.name.includes('setup.exe'));
+        const winPortable = assets.find(a => a.name.includes('portable.exe'));
+        if (winSetup) {
+          document.getElementById('download-win').href = winSetup.browser_download_url;
+          document.getElementById('win-version').textContent = 'Installer';
+        } else if (winPortable) {
+          document.getElementById('download-win').href = winPortable.browser_download_url;
+          document.getElementById('win-version').textContent = 'Portable';
+        }
+
+        // Linux - prefer AppImage
+        const linuxAppImage = assets.find(a => a.name.endsWith('.AppImage') && !a.name.includes('arm64'));
+        const linuxDeb = assets.find(a => a.name.endsWith('.deb') && a.name.includes('amd64'));
+        if (linuxAppImage) {
+          document.getElementById('download-linux').href = linuxAppImage.browser_download_url;
+          document.getElementById('linux-version').textContent = 'AppImage';
+        } else if (linuxDeb) {
+          document.getElementById('download-linux').href = linuxDeb.browser_download_url;
+          document.getElementById('linux-version').textContent = '.deb';
+        }
+
+      } catch (error) {
+        console.log('Could not fetch latest release:', error);
+        // Falls back to /releases/latest links
+      }
+    })();
+  </script>
 
   <!-- Footer -->
   <footer>
