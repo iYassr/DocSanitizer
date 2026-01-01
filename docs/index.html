@@ -3,13 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>maskr - Document Sanitizer</title>
-  <meta name="description" content="A privacy-focused desktop app for detecting and masking sensitive information in documents. 100% local processing, no data leaves your device.">
-  <meta name="keywords" content="document sanitizer, PII detection, privacy, data masking, sensitive information, GDPR, redaction">
-  <meta property="og:title" content="maskr - Document Sanitizer">
-  <meta property="og:description" content="Detect and mask sensitive information in documents. 100% local, no cloud.">
+  <title>maskr - PII Detection & Document Sanitization Tool | Free & Open Source</title>
+  <meta name="description" content="Free open-source desktop app for detecting and masking PII in documents. Detect names, emails, phones, SSNs, credit cards, IBANs, Saudi IDs, Mada cards, Arabic names & more. 100% offline, GDPR/HIPAA compliant.">
+  <meta name="keywords" content="PII detection, data masking, document redaction, privacy tool, GDPR compliance, HIPAA, sensitive data, document sanitizer, credit card masker, SSN redaction, Saudi ID detector, Iqama, Mada card, Arabic names, IBAN masking, OCR, NLP, Electron app, open source, offline, data protection, personal information, anonymization">
+  <meta name="author" content="iYassr">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://iyassr.github.io/maskr/">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="maskr - Detect & Mask PII in Documents | 100% Offline">
+  <meta property="og:description" content="Free open-source tool for PII detection and document sanitization. Names, emails, SSNs, credit cards, Saudi IDs, Arabic names & more. GDPR/HIPAA compliant, works offline.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://iyassr.github.io/maskr/">
+  <meta property="og:image" content="https://iyassr.github.io/maskr/assets/og-image.png">
+  <meta property="og:site_name" content="maskr">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="maskr - PII Detection & Document Sanitization">
+  <meta name="twitter:description" content="Detect & mask sensitive data in documents. 100% offline, GDPR compliant. Free & open source.">
+  <meta name="twitter:image" content="https://iyassr.github.io/maskr/assets/og-image.png">
+
   <link rel="icon" type="image/svg+xml" href="assets/maskr-logo-favicon.svg">
   <style>
     :root {
@@ -512,9 +526,9 @@
           <h1>maskr<span>_</span></h1>
           <p class="hero-tagline"># document sanitizer</p>
           <p class="hero-description">
-            Detect and mask sensitive information in documents before sharing.
-            Names, emails, phone numbers, SSNs, credit cards, and more — all processed
-            <strong>100% locally</strong> on your device.
+            Detect and mask PII in documents before sharing with AI, cloud services, or third parties.
+            Names, emails, phones, SSNs, credit cards, IBANs, Saudi IDs, Mada cards, Arabic names & 30+ entity types —
+            <strong>100% offline</strong>, GDPR/HIPAA compliant.
           </p>
           <div class="hero-buttons">
             <a href="#download" class="btn btn-primary">
@@ -561,8 +575,8 @@
         </div>
         <div class="feature-card">
           <div class="feature-icon">🎯</div>
-          <h3>Smart Detection</h3>
-          <p>Automatically detects names, emails, phone numbers, SSNs, credit cards, IBANs, and more.</p>
+          <h3>30+ Entity Types</h3>
+          <p>Names (English & Arabic), emails, phones, SSNs, credit cards, Mada, IBANs, Saudi IDs, Iqama, DOB, MAC addresses, API keys, and more.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">📄</div>
@@ -722,7 +736,40 @@
         <a href="https://github.com/iYassr/maskr" target="_blank">GitHub</a> ·
         <a href="https://github.com/iYassr/maskr/blob/main/LICENSE" target="_blank">MIT License</a>
       </p>
+      <p style="margin-top: 16px; font-size: 12px;">
+        <span style="opacity: 0.6;">
+          #pii-detection #data-masking #document-redaction #privacy-tool #gdpr-compliance #hipaa
+          #data-protection #sensitive-data #ocr #nlp #electron-app #open-source #offline-first
+          #saudi-id #iqama #mada-card #arabic-names #iban-masking #credit-card-masker #ssn-redaction
+        </span>
+      </p>
     </div>
   </footer>
+
+  <!-- Structured Data for SEO -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "maskr",
+    "description": "Free open-source desktop app for detecting and masking PII in documents. 100% offline, GDPR/HIPAA compliant.",
+    "url": "https://iyassr.github.io/maskr/",
+    "downloadUrl": "https://github.com/iYassr/maskr/releases/latest",
+    "operatingSystem": "Windows, macOS, Linux",
+    "applicationCategory": "SecurityApplication",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "author": {
+      "@type": "Person",
+      "name": "iYassr",
+      "url": "https://github.com/iYassr"
+    },
+    "license": "https://opensource.org/licenses/MIT",
+    "keywords": "PII detection, data masking, document redaction, privacy, GDPR, HIPAA, Saudi ID, Mada card, Arabic names, IBAN, SSN, credit card, OCR, NLP"
+  }
+  </script>
 </body>
 </html>
