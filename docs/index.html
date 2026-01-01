@@ -507,6 +507,176 @@
         flex-direction: column;
         align-items: center;
       }
+
+      .transform-animation {
+        padding: 60px 0;
+      }
+
+      .transform-track {
+        height: 280px;
+      }
+
+      .maskr-gate {
+        width: 80px;
+        font-size: 14px;
+      }
+
+      .data-item {
+        font-size: 11px;
+        padding: 6px 10px;
+      }
+    }
+
+    /* Transform Animation */
+    .transform-animation {
+      padding: 80px 0;
+      overflow: hidden;
+    }
+
+    .transform-track {
+      position: relative;
+      height: 320px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .maskr-gate {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 100px;
+      height: 200px;
+      background: linear-gradient(180deg, var(--accent) 0%, var(--accent-hover) 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Courier New', monospace;
+      font-weight: bold;
+      font-size: 18px;
+      color: var(--bg-dark);
+      z-index: 10;
+      box-shadow:
+        0 0 40px rgba(254, 128, 25, 0.4),
+        0 0 80px rgba(254, 128, 25, 0.2);
+    }
+
+    .maskr-gate::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, transparent, #fff, transparent);
+      animation: scan 2s ease-in-out infinite;
+      border-radius: 12px 12px 0 0;
+    }
+
+    @keyframes scan {
+      0%, 100% { top: 0; opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { top: calc(100% - 4px); opacity: 0; }
+    }
+
+    .data-item {
+      position: absolute;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      font-weight: 500;
+      white-space: nowrap;
+      opacity: 0;
+    }
+
+    .data-item.sensitive {
+      background: rgba(251, 73, 52, 0.15);
+      border: 1px solid var(--red);
+      color: var(--red);
+      animation: flowIn 4s ease-in-out infinite;
+    }
+
+    .data-item.masked {
+      background: rgba(254, 128, 25, 0.15);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      animation: flowOut 4s ease-in-out infinite;
+    }
+
+    /* Row positions */
+    .data-item.row-1 { top: 20px; }
+    .data-item.row-2 { top: 80px; }
+    .data-item.row-3 { top: 140px; }
+    .data-item.row-4 { top: 200px; }
+    .data-item.row-5 { top: 260px; }
+
+    /* Stagger delays */
+    .data-item.delay-1 { animation-delay: 0s; }
+    .data-item.delay-2 { animation-delay: 0.8s; }
+    .data-item.delay-3 { animation-delay: 1.6s; }
+    .data-item.delay-4 { animation-delay: 2.4s; }
+    .data-item.delay-5 { animation-delay: 3.2s; }
+
+    @keyframes flowIn {
+      0% {
+        left: -200px;
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      45% {
+        left: calc(50% - 160px);
+        opacity: 1;
+      }
+      50%, 100% {
+        left: calc(50% - 160px);
+        opacity: 0;
+      }
+    }
+
+    @keyframes flowOut {
+      0%, 50% {
+        right: calc(50% - 160px);
+        opacity: 0;
+      }
+      55% {
+        right: calc(50% - 160px);
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        right: -200px;
+        opacity: 0;
+      }
+    }
+
+    .transform-labels {
+      display: flex;
+      justify-content: space-between;
+      max-width: 900px;
+      margin: 24px auto 0;
+      padding: 0 40px;
+    }
+
+    .transform-label {
+      font-size: 14px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .transform-label.input {
+      color: var(--red);
+    }
+
+    .transform-label.output {
+      color: var(--accent);
     }
   </style>
 </head>
@@ -548,6 +718,34 @@
         <div class="hero-image">
           <img src="assets/review.png" alt="maskr detection review screen">
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Transform Animation -->
+  <section class="transform-animation">
+    <div class="container">
+      <div class="transform-track">
+        <!-- Sensitive data flowing in from left -->
+        <div class="data-item sensitive row-1 delay-1">John Smith</div>
+        <div class="data-item sensitive row-2 delay-2">john@email.com</div>
+        <div class="data-item sensitive row-3 delay-3">555-123-4567</div>
+        <div class="data-item sensitive row-4 delay-4">4532-8901-2345-6789</div>
+        <div class="data-item sensitive row-5 delay-5">123-45-6789</div>
+
+        <!-- Central maskr gate -->
+        <div class="maskr-gate">maskr_</div>
+
+        <!-- Masked data flowing out to right -->
+        <div class="data-item masked row-1 delay-1">[PERSON_NAME]</div>
+        <div class="data-item masked row-2 delay-2">[EMAIL]</div>
+        <div class="data-item masked row-3 delay-3">[PHONE]</div>
+        <div class="data-item masked row-4 delay-4">[CREDIT_CARD]</div>
+        <div class="data-item masked row-5 delay-5">[SSN]</div>
+      </div>
+      <div class="transform-labels">
+        <span class="transform-label input">Sensitive Data</span>
+        <span class="transform-label output">Masked Output</span>
       </div>
     </div>
   </section>
