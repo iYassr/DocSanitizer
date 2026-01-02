@@ -1,0 +1,1423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>maskr - PII Detection Tool (Web Version)</title>
+  <link rel="icon" type="image/svg+xml" href="../logos/favicon.svg">
+
+  <!-- PDF.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.min.mjs" type="module"></script>
+
+  <!-- Mammoth.js for DOCX -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+
+  <!-- ExcelJS for XLSX -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
+
+  <!-- Compromise NLP -->
+  <script src="https://unpkg.com/compromise@14.10.0/builds/compromise.min.js"></script>
+
+  <!-- Tesseract.js for OCR -->
+  <script src="https://unpkg.com/tesseract.js@5.0.4/dist/tesseract.min.js"></script>
+
+  <style>
+    :root {
+      --bg-dark: #1a1a1a;
+      --bg-medium: #242424;
+      --bg-light: #2d2d2d;
+      --text: #e5e5e5;
+      --text-muted: #999;
+      --accent: #fe8019;
+      --accent-hover: #e67316;
+      --border: #333;
+      --success: #4ade80;
+      --warning: #fbbf24;
+      --error: #f87171;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* Header */
+    header {
+      background: var(--bg-medium);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text);
+    }
+
+    .logo img {
+      height: 32px;
+    }
+
+    .logo span {
+      font-size: 1.5rem;
+      font-weight: 600;
+      font-family: 'Courier New', monospace;
+    }
+
+    .badge {
+      background: var(--accent);
+      color: #000;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    /* Main */
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    /* Steps */
+    .steps {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .step {
+      flex: 1;
+      padding: 12px 16px;
+      background: var(--bg-medium);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .step:hover {
+      border-color: var(--accent);
+    }
+
+    .step.active {
+      background: var(--accent);
+      color: #000;
+      border-color: var(--accent);
+    }
+
+    .step.completed {
+      border-color: var(--success);
+    }
+
+    .step-number {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .step-label {
+      font-size: 0.875rem;
+      opacity: 0.8;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--bg-medium);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .card h2 {
+      font-size: 1.25rem;
+      margin-bottom: 16px;
+    }
+
+    /* Upload Area */
+    .upload-area {
+      border: 2px dashed var(--border);
+      border-radius: 8px;
+      padding: 48px;
+      text-align: center;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .upload-area:hover,
+    .upload-area.dragover {
+      border-color: var(--accent);
+      background: rgba(254, 128, 25, 0.1);
+    }
+
+    .upload-area svg {
+      width: 48px;
+      height: 48px;
+      margin-bottom: 16px;
+      color: var(--accent);
+    }
+
+    .upload-area p {
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .upload-area input {
+      display: none;
+    }
+
+    /* Text Input */
+    .text-input-toggle {
+      text-align: center;
+      margin-top: 16px;
+    }
+
+    .text-input-toggle button {
+      background: none;
+      border: none;
+      color: var(--accent);
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .text-input-area {
+      display: none;
+      margin-top: 16px;
+    }
+
+    .text-input-area.visible {
+      display: block;
+    }
+
+    .text-input-area textarea {
+      width: 100%;
+      min-height: 200px;
+      padding: 16px;
+      background: var(--bg-light);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'Courier New', monospace;
+      font-size: 0.875rem;
+      resize: vertical;
+    }
+
+    .text-input-area textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #000;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn-primary:disabled {
+      background: var(--border);
+      color: var(--text-muted);
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background: var(--bg-light);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--accent);
+    }
+
+    /* Detection Table */
+    .detection-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .detection-table th,
+    .detection-table td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .detection-table th {
+      background: var(--bg-light);
+      font-weight: 500;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    .detection-table tr:hover {
+      background: var(--bg-light);
+    }
+
+    .detection-type {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .type-person { background: #dc262622; color: #f87171; }
+    .type-email { background: #dc262622; color: #f87171; }
+    .type-phone { background: #dc262622; color: #f87171; }
+    .type-ssn { background: #dc262622; color: #f87171; }
+    .type-saudi_id { background: #dc262622; color: #f87171; }
+    .type-credit_card { background: #16a34a22; color: #4ade80; }
+    .type-iban { background: #16a34a22; color: #4ade80; }
+    .type-financial { background: #16a34a22; color: #4ade80; }
+    .type-ip { background: #7c3aed22; color: #a78bfa; }
+    .type-url { background: #7c3aed22; color: #a78bfa; }
+    .type-domain { background: #7c3aed22; color: #a78bfa; }
+
+    .confidence {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .confidence-bar {
+      width: 60px;
+      height: 6px;
+      background: var(--bg-light);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .confidence-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 3px;
+    }
+
+    /* Toggle */
+    .toggle {
+      position: relative;
+      width: 40px;
+      height: 22px;
+    }
+
+    .toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--bg-light);
+      border-radius: 22px;
+      transition: 0.2s;
+    }
+
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 3px;
+      bottom: 3px;
+      background: white;
+      border-radius: 50%;
+      transition: 0.2s;
+    }
+
+    .toggle input:checked + .toggle-slider {
+      background: var(--accent);
+    }
+
+    .toggle input:checked + .toggle-slider:before {
+      transform: translateX(18px);
+    }
+
+    /* Export Preview */
+    .preview-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 768px) {
+      .preview-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .preview-panel {
+      background: var(--bg-light);
+      border-radius: 8px;
+      padding: 16px;
+      max-height: 400px;
+      overflow: auto;
+    }
+
+    .preview-panel h3 {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .preview-panel pre {
+      font-family: 'Courier New', monospace;
+      font-size: 0.875rem;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .masked-text {
+      background: var(--accent);
+      color: #000;
+      padding: 2px 4px;
+      border-radius: 2px;
+    }
+
+    /* Stats */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat {
+      background: var(--bg-light);
+      padding: 16px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .stat-label {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    /* Loading */
+    .loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px;
+    }
+
+    .spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading p {
+      margin-top: 16px;
+      color: var(--text-muted);
+    }
+
+    /* Hidden */
+    .hidden {
+      display: none !important;
+    }
+
+    /* Actions */
+    .actions {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      margin-top: 24px;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 24px;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    /* Privacy Badge */
+    .privacy-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #16a34a22;
+      color: var(--success);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.875rem;
+      margin-bottom: 24px;
+    }
+
+    .privacy-badge svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* Custom Names Input */
+    .custom-names {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .custom-names label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+
+    .custom-names input {
+      width: 100%;
+      padding: 12px;
+      background: var(--bg-light);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 0.875rem;
+    }
+
+    .custom-names input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .custom-names small {
+      display: block;
+      margin-top: 4px;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="../" class="logo">
+      <img src="../logos/final/maskr-logo-icon.svg" alt="maskr">
+      <span>maskr</span>
+    </a>
+    <span class="badge">Web Version</span>
+  </header>
+
+  <main>
+    <div class="privacy-badge">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      </svg>
+      100% Client-Side - Your data never leaves your browser
+    </div>
+
+    <!-- Steps -->
+    <div class="steps">
+      <div class="step active" data-step="1">
+        <div class="step-number">1</div>
+        <div class="step-label">Upload</div>
+      </div>
+      <div class="step" data-step="2">
+        <div class="step-number">2</div>
+        <div class="step-label">Review</div>
+      </div>
+      <div class="step" data-step="3">
+        <div class="step-number">3</div>
+        <div class="step-label">Export</div>
+      </div>
+    </div>
+
+    <!-- Step 1: Upload -->
+    <div id="step1" class="card">
+      <h2>Upload Document or Paste Text</h2>
+
+      <div class="upload-area" id="uploadArea">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="17,8 12,3 7,8"/>
+          <line x1="12" y1="3" x2="12" y2="15"/>
+        </svg>
+        <p>Drag and drop a file here, or click to browse</p>
+        <p style="font-size: 0.75rem;">Supports: TXT, MD, JSON, CSV, HTML, DOCX, XLSX, PDF, PNG, JPG, WebP</p>
+        <input type="file" id="fileInput" accept=".txt,.md,.json,.csv,.html,.docx,.xlsx,.pdf,.png,.jpg,.jpeg,.webp,.gif,.bmp,.tiff">
+      </div>
+
+      <div class="text-input-toggle">
+        <button id="toggleTextInput">Or paste text directly</button>
+      </div>
+
+      <div class="text-input-area" id="textInputArea">
+        <textarea id="textInput" placeholder="Paste your text here..."></textarea>
+        <div class="actions">
+          <button class="btn btn-primary" id="analyzeTextBtn" disabled>Analyze Text</button>
+        </div>
+      </div>
+
+      <div class="custom-names">
+        <label>Custom Names to Detect (optional)</label>
+        <input type="text" id="customNamesInput" placeholder="John Doe, Jane Smith, Company Name">
+        <small>Comma-separated list of names to always detect with 100% confidence</small>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div id="loading" class="card hidden">
+      <div class="loading">
+        <div class="spinner"></div>
+        <p id="loadingText">Analyzing document...</p>
+      </div>
+    </div>
+
+    <!-- Step 2: Review -->
+    <div id="step2" class="card hidden">
+      <h2>Review Detected Sensitive Information</h2>
+
+      <div class="stats" id="stats"></div>
+
+      <div style="overflow-x: auto;">
+        <table class="detection-table">
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Original</th>
+              <th>Replacement</th>
+              <th>Confidence</th>
+              <th>Include</th>
+            </tr>
+          </thead>
+          <tbody id="detectionTable"></tbody>
+        </table>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-secondary" id="backToUpload">Back</button>
+        <button class="btn btn-primary" id="continueToExport">Continue to Export</button>
+      </div>
+    </div>
+
+    <!-- Step 3: Export -->
+    <div id="step3" class="card hidden">
+      <h2>Export Sanitized Document</h2>
+
+      <div class="preview-container">
+        <div class="preview-panel">
+          <h3>Original</h3>
+          <pre id="originalPreview"></pre>
+        </div>
+        <div class="preview-panel">
+          <h3>Sanitized</h3>
+          <pre id="sanitizedPreview"></pre>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-secondary" id="backToReview">Back</button>
+        <button class="btn btn-primary" id="downloadBtn">Download Sanitized File</button>
+        <button class="btn btn-secondary" id="copyBtn">Copy to Clipboard</button>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>
+      <a href="../">maskr</a> - 100% offline PII detection tool.
+      <a href="https://github.com/iYassr/maskr" target="_blank">View on GitHub</a>
+    </p>
+    <p style="margin-top: 8px;">
+      For full features including logo detection and format preservation,
+      <a href="../#download">download the desktop app</a>.
+    </p>
+  </footer>
+
+  <script type="module">
+    // ============================================================================
+    // STATE
+    // ============================================================================
+    let currentFile = null;
+    let originalContent = '';
+    let detections = [];
+    let customNames = [];
+
+    // ============================================================================
+    // DETECTOR (Browser-compatible version)
+    // ============================================================================
+
+    const EntityTypes = {
+      person: 'person',
+      email: 'email',
+      phone: 'phone',
+      ssn: 'ssn',
+      saudi_id: 'saudi_id',
+      credit_card: 'credit_card',
+      iban: 'iban',
+      financial: 'financial',
+      ip: 'ip',
+      url: 'url',
+      domain: 'domain',
+      dob: 'dob',
+      mac_address: 'mac_address',
+      api_key: 'api_key',
+      gps: 'gps',
+      vin: 'vin'
+    };
+
+    // Luhn algorithm for credit card validation
+    function isValidLuhn(cardNumber) {
+      const digits = cardNumber.replace(/\D/g, '');
+      if (digits.length < 13 || digits.length > 19) return false;
+
+      let sum = 0;
+      let isEven = false;
+
+      for (let i = digits.length - 1; i >= 0; i--) {
+        let digit = parseInt(digits[i], 10);
+        if (isEven) {
+          digit *= 2;
+          if (digit > 9) digit -= 9;
+        }
+        sum += digit;
+        isEven = !isEven;
+      }
+
+      return sum % 10 === 0;
+    }
+
+    // IBAN validation (Mod97)
+    function isValidIBAN(iban) {
+      const cleanIBAN = iban.replace(/\s/g, '').toUpperCase();
+      if (cleanIBAN.length < 15 || cleanIBAN.length > 34) return false;
+      if (!/^[A-Z]{2}\d{2}[A-Z0-9]+$/.test(cleanIBAN)) return false;
+
+      const rearranged = cleanIBAN.slice(4) + cleanIBAN.slice(0, 4);
+      const numericString = rearranged.replace(/[A-Z]/g, char => (char.charCodeAt(0) - 55).toString());
+
+      let remainder = 0;
+      for (let i = 0; i < numericString.length; i++) {
+        remainder = (remainder * 10 + parseInt(numericString[i], 10)) % 97;
+      }
+
+      return remainder === 1;
+    }
+
+    async function extractEntities(text, userCustomNames = []) {
+      const entities = [];
+      const seenPositions = new Set();
+
+      const addEntity = (entity) => {
+        if (!entity || !entity.text || entity.text.length === 0) return;
+        if (entity.start < 0 || entity.end <= entity.start) return;
+
+        const key = `${entity.start}-${entity.end}`;
+        if (!seenPositions.has(key)) {
+          seenPositions.add(key);
+          entities.push(entity);
+        }
+      };
+
+      // 1. Custom names (100% confidence)
+      for (const name of userCustomNames) {
+        if (!name.trim()) continue;
+        const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const pattern = new RegExp(`\\b${escapedName}\\b`, 'gi');
+        let match;
+        while ((match = pattern.exec(text)) !== null) {
+          addEntity({
+            text: match[0],
+            type: 'person',
+            start: match.index,
+            end: match.index + match[0].length,
+            confidence: 100
+          });
+        }
+      }
+
+      // 2. NLP-based name detection (using Compromise)
+      if (typeof nlp !== 'undefined') {
+        const doc = nlp(text);
+        const people = doc.people();
+        const foundNames = new Set();
+
+        people.forEach(person => {
+          let name = person.text().replace(/[,;:]+$/, '').trim();
+          const parts = name.split(/\s+/);
+          if (parts.length < 2 || name.length < 4) return;
+          if (foundNames.has(name)) return;
+          foundNames.add(name);
+
+          const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          const pattern = new RegExp(`\\b${escapedName}\\b`, 'gi');
+          let match;
+          while ((match = pattern.exec(text)) !== null) {
+            addEntity({
+              text: match[0],
+              type: 'person',
+              start: match.index,
+              end: match.index + match[0].length,
+              confidence: 85
+            });
+          }
+        });
+      }
+
+      // 3. Arabic names
+      const arabicFirstNames = [
+        'mohammed', 'mohammad', 'muhammad', 'ahmed', 'ahmad', 'ali', 'omar',
+        'khalid', 'khaled', 'abdullah', 'abdulrahman', 'abdulaziz', 'ibrahim',
+        'yusuf', 'yousuf', 'faisal', 'fahad', 'sultan', 'saud', 'saleh',
+        'nasser', 'bandar', 'turki', 'nawaf', 'meshal', 'majed', 'nayef',
+        'fatima', 'fatimah', 'aisha', 'noura', 'nora', 'maryam', 'layla',
+        'sara', 'sarah', 'reem', 'hessa', 'ghada', 'afnan', 'shahad'
+      ];
+
+      const arabicPattern = new RegExp(
+        `\\b(${arabicFirstNames.join('|')})\\s+(al[- ]?\\w+|\\w+)\\b`, 'gi'
+      );
+      let match;
+      while ((match = arabicPattern.exec(text)) !== null) {
+        if (match[0].split(/\s+/).length >= 2) {
+          addEntity({
+            text: match[0],
+            type: 'person',
+            start: match.index,
+            end: match.index + match[0].length,
+            confidence: 85
+          });
+        }
+      }
+
+      // 4. Email addresses
+      const emailPattern = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g;
+      while ((match = emailPattern.exec(text)) !== null) {
+        addEntity({
+          text: match[0],
+          type: 'email',
+          start: match.index,
+          end: match.index + match[0].length,
+          confidence: 95
+        });
+      }
+
+      // 5. Phone numbers
+      const phonePatterns = [
+        /\+\d{1,3}[\s.-]?\(?\d{1,4}\)?[\s.-]?\d{1,4}[\s.-]?\d{1,4}[\s.-]?\d{0,4}\b/g,
+        /(?:\+966|00966|0)5\d{8}\b/g,
+        /\(\d{3}\)[\s.-]?\d{3}[\s.-]?\d{4}\b/g,
+        /\b\d{3}[\s.-]\d{3}[\s.-]\d{4}\b/g
+      ];
+
+      for (const pattern of phonePatterns) {
+        pattern.lastIndex = 0;
+        while ((match = pattern.exec(text)) !== null) {
+          const digits = match[0].replace(/\D/g, '');
+          if (digits.length >= 7 && digits.length <= 15) {
+            addEntity({
+              text: match[0],
+              type: 'phone',
+              start: match.index,
+              end: match.index + match[0].length,
+              confidence: 85
+            });
+          }
+        }
+      }
+
+      // 6. SSN
+      const ssnPattern = /\b(\d{3})[-\s]?(\d{2})[-\s]?(\d{4})\b/g;
+      while ((match = ssnPattern.exec(text)) !== null) {
+        const area = parseInt(match[1], 10);
+        if (area !== 0 && area !== 666 && area < 900 && match[2] !== '00' && match[3] !== '0000') {
+          addEntity({
+            text: match[0],
+            type: 'ssn',
+            start: match.index,
+            end: match.index + match[0].length,
+            confidence: 95
+          });
+        }
+      }
+
+      // 7. Saudi IDs
+      const saudiIdPattern = /\b[12]\d{9}\b/g;
+      while ((match = saudiIdPattern.exec(text)) !== null) {
+        const charBefore = text[match.index - 1] || '';
+        const charAfter = text[match.index + match[0].length] || '';
+        if (charBefore !== '+' && !/\d/.test(charAfter)) {
+          addEntity({
+            text: match[0],
+            type: 'saudi_id',
+            start: match.index,
+            end: match.index + match[0].length,
+            confidence: 90
+          });
+        }
+      }
+
+      // 8. Credit cards
+      const cardPatterns = [
+        /\b\d{4}[\s]\d{4}[\s]\d{4}[\s]\d{4}\b/g,
+        /\b\d{4}[-]\d{4}[-]\d{4}[-]\d{4}\b/g,
+        /\b\d{16}\b/g,
+        /\b\d{4}[\s]\d{6}[\s]\d{5}\b/g,
+        /\b\d{15}\b/g
+      ];
+
+      for (const pattern of cardPatterns) {
+        pattern.lastIndex = 0;
+        while ((match = pattern.exec(text)) !== null) {
+          const digits = match[0].replace(/\D/g, '');
+          if (isValidLuhn(digits)) {
+            const isValidPrefix = digits.startsWith('4') || /^5[1-5]/.test(digits) ||
+              /^3[47]/.test(digits) || digits.startsWith('6011');
+            if (isValidPrefix) {
+              addEntity({
+                text: match[0],
+                type: 'credit_card',
+                start: match.index,
+                end: match.index + match[0].length,
+                confidence: 95
+              });
+            }
+          }
+        }
+      }
+
+      // 9. IBANs
+      const ibanPatterns = [
+        /\b[A-Z]{2}\d{2}(?:\s?[A-Z0-9]{4}){3,7}\s?[A-Z0-9]{1,4}\b/gi,
+        /\b[A-Z]{2}\d{2}[A-Z0-9]{11,30}\b/gi
+      ];
+
+      for (const pattern of ibanPatterns) {
+        pattern.lastIndex = 0;
+        while ((match = pattern.exec(text)) !== null) {
+          const cleanIBAN = match[0].replace(/\s/g, '').toUpperCase();
+          const isGulfIBAN = /^(SA[0-9]{22}|AE[0-9]{21})$/.test(cleanIBAN);
+          if (isGulfIBAN || isValidIBAN(cleanIBAN)) {
+            addEntity({
+              text: match[0],
+              type: 'iban',
+              start: match.index,
+              end: match.index + match[0].length,
+              confidence: isGulfIBAN ? 90 : 95
+            });
+          }
+        }
+      }
+
+      // 10. Financial amounts
+      const currencyPatterns = [
+        /\$\s*\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?(?:\s*(?:K|M|B|million|billion))?\b/gi,
+        /€\s*\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?\b/gi,
+        /£\s*\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?\b/gi,
+        /(?:SAR|AED|USD|EUR|GBP)\s*\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?\b/gi
+      ];
+
+      for (const pattern of currencyPatterns) {
+        pattern.lastIndex = 0;
+        while ((match = pattern.exec(text)) !== null) {
+          addEntity({
+            text: match[0],
+            type: 'financial',
+            start: match.index,
+            end: match.index + match[0].length,
+            confidence: 95
+          });
+        }
+      }
+
+      // 11. IP addresses
+      const ipv4Pattern = /\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b/g;
+      while ((match = ipv4Pattern.exec(text)) !== null) {
+        const parts = match[0].split('.');
+        const isVersionLike = parts.every(p => parseInt(p, 10) < 10);
+        if (!isVersionLike) {
+          addEntity({
+            text: match[0],
+            type: 'ip',
+            start: match.index,
+            end: match.index + match[0].length,
+            confidence: 95
+          });
+        }
+      }
+
+      // 12. URLs
+      const urlPattern = /\b(?:https?|ftp):\/\/[^\s<>\[\]"'`,;)]+/gi;
+      while ((match = urlPattern.exec(text)) !== null) {
+        let url = match[0].replace(/[.,;:!?)]+$/, '');
+        addEntity({
+          text: url,
+          type: 'url',
+          start: match.index,
+          end: match.index + url.length,
+          confidence: 95
+        });
+      }
+
+      // 13. Domains
+      const domainPattern = /\b(?!www\.)[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.(?:com|org|net|io|co|tech|dev|app|ai|cloud|edu|gov|sa|ae|uk|de|fr)\b/gi;
+      while ((match = domainPattern.exec(text)) !== null) {
+        const start = match.index;
+        if (start > 0 && text[start - 1] === '@') continue;
+        const textBefore = text.slice(Math.max(0, start - 10), start);
+        if (textBefore.includes('://')) continue;
+
+        addEntity({
+          text: match[0],
+          type: 'domain',
+          start: start,
+          end: start + match[0].length,
+          confidence: 90
+        });
+      }
+
+      return entities.sort((a, b) => a.start - b.start);
+    }
+
+    // ============================================================================
+    // DOCUMENT PARSER (Browser-compatible version)
+    // ============================================================================
+
+    async function parseDocument(file) {
+      const ext = file.name.split('.').pop().toLowerCase();
+      const buffer = await file.arrayBuffer();
+
+      switch (ext) {
+        case 'txt':
+        case 'md':
+        case 'csv':
+          return new TextDecoder().decode(buffer);
+
+        case 'json':
+          try {
+            const json = JSON.parse(new TextDecoder().decode(buffer));
+            return JSON.stringify(json, null, 2);
+          } catch {
+            return new TextDecoder().decode(buffer);
+          }
+
+        case 'html':
+          const html = new TextDecoder().decode(buffer);
+          return html
+            .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+            .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+            .replace(/<[^>]+>/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+
+        case 'docx':
+          if (typeof mammoth !== 'undefined') {
+            const result = await mammoth.extractRawText({ arrayBuffer: buffer });
+            return result.value;
+          }
+          throw new Error('DOCX parsing not available');
+
+        case 'xlsx':
+          if (typeof ExcelJS !== 'undefined') {
+            const workbook = new ExcelJS.Workbook();
+            await workbook.xlsx.load(buffer);
+            const parts = [];
+            workbook.eachSheet(worksheet => {
+              parts.push(`--- Sheet: ${worksheet.name} ---`);
+              worksheet.eachRow({ includeEmpty: false }, row => {
+                const values = row.values.slice(1).map(cell => {
+                  if (cell === null || cell === undefined) return '';
+                  if (cell instanceof Date) return cell.toISOString();
+                  return String(cell);
+                });
+                parts.push(values.join('\t'));
+              });
+            });
+            return parts.join('\n');
+          }
+          throw new Error('XLSX parsing not available');
+
+        case 'pdf':
+          updateLoading('Loading PDF...');
+          const pdfjsLib = await import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.min.mjs');
+          pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.mjs';
+
+          const pdfDoc = await pdfjsLib.getDocument({ data: buffer }).promise;
+          const textParts = [];
+
+          for (let i = 1; i <= pdfDoc.numPages; i++) {
+            updateLoading(`Extracting page ${i}/${pdfDoc.numPages}...`);
+            const page = await pdfDoc.getPage(i);
+            const textContent = await page.getTextContent();
+            const pageText = textContent.items
+              .map(item => item.str || '')
+              .join(' ');
+            if (pageText.trim()) textParts.push(pageText);
+          }
+
+          return textParts.join('\n\n');
+
+        case 'png':
+        case 'jpg':
+        case 'jpeg':
+        case 'gif':
+        case 'bmp':
+        case 'webp':
+        case 'tiff':
+          if (typeof Tesseract !== 'undefined') {
+            updateLoading('Running OCR...');
+            const result = await Tesseract.recognize(file, 'eng', {
+              logger: m => {
+                if (m.status === 'recognizing text') {
+                  updateLoading(`OCR: ${Math.round(m.progress * 100)}%`);
+                }
+              }
+            });
+            return result.data.text;
+          }
+          throw new Error('OCR not available');
+
+        default:
+          throw new Error(`Unsupported format: ${ext}`);
+      }
+    }
+
+    // ============================================================================
+    // UI HELPERS
+    // ============================================================================
+
+    function updateLoading(message) {
+      document.getElementById('loadingText').textContent = message;
+    }
+
+    function showStep(step) {
+      document.querySelectorAll('.step').forEach((el, i) => {
+        el.classList.remove('active');
+        if (i + 1 < step) el.classList.add('completed');
+        if (i + 1 === step) el.classList.add('active');
+      });
+
+      document.getElementById('step1').classList.toggle('hidden', step !== 1);
+      document.getElementById('step2').classList.toggle('hidden', step !== 2);
+      document.getElementById('step3').classList.toggle('hidden', step !== 3);
+      document.getElementById('loading').classList.add('hidden');
+    }
+
+    function generatePlaceholder(entity, index, counters) {
+      const typeMap = {
+        person: 'PERSON',
+        email: 'EMAIL',
+        phone: 'PHONE',
+        ssn: 'SSN',
+        saudi_id: 'SAUDI_ID',
+        credit_card: 'CREDIT_CARD',
+        iban: 'IBAN',
+        financial: 'AMOUNT',
+        ip: 'IP_ADDRESS',
+        url: 'URL',
+        domain: 'DOMAIN',
+        dob: 'DOB',
+        mac_address: 'MAC',
+        api_key: 'API_KEY',
+        gps: 'GPS',
+        vin: 'VIN'
+      };
+
+      const label = typeMap[entity.type] || entity.type.toUpperCase();
+      if (!counters[entity.type]) counters[entity.type] = 0;
+      counters[entity.type]++;
+
+      return `<${label}_${counters[entity.type]}>`;
+    }
+
+    function renderDetections() {
+      const tbody = document.getElementById('detectionTable');
+      const counters = {};
+
+      tbody.innerHTML = detections.map((d, i) => {
+        if (!d.placeholder) {
+          d.placeholder = generatePlaceholder(d, i, counters);
+        }
+        d.enabled = d.enabled !== false;
+
+        return `
+          <tr>
+            <td><span class="detection-type type-${d.type}">${d.type}</span></td>
+            <td><code>${escapeHtml(d.text)}</code></td>
+            <td><code>${d.placeholder}</code></td>
+            <td>
+              <div class="confidence">
+                <div class="confidence-bar">
+                  <div class="confidence-fill" style="width: ${d.confidence}%"></div>
+                </div>
+                <span>${d.confidence}%</span>
+              </div>
+            </td>
+            <td>
+              <label class="toggle">
+                <input type="checkbox" ${d.enabled ? 'checked' : ''} data-index="${i}">
+                <span class="toggle-slider"></span>
+              </label>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      // Add toggle listeners
+      tbody.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+        checkbox.addEventListener('change', (e) => {
+          const index = parseInt(e.target.dataset.index, 10);
+          detections[index].enabled = e.target.checked;
+        });
+      });
+
+      // Render stats
+      const stats = {};
+      detections.forEach(d => {
+        stats[d.type] = (stats[d.type] || 0) + 1;
+      });
+
+      document.getElementById('stats').innerHTML = Object.entries(stats)
+        .map(([type, count]) => `
+          <div class="stat">
+            <div class="stat-value">${count}</div>
+            <div class="stat-label">${type}</div>
+          </div>
+        `).join('');
+    }
+
+    function escapeHtml(str) {
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function getMaskedContent() {
+      let masked = originalContent;
+
+      // Sort by position descending to replace from end
+      const enabled = detections
+        .filter(d => d.enabled)
+        .sort((a, b) => b.start - a.start);
+
+      for (const d of enabled) {
+        masked = masked.slice(0, d.start) + d.placeholder + masked.slice(d.end);
+      }
+
+      return masked;
+    }
+
+    function renderExportPreview() {
+      const masked = getMaskedContent();
+
+      // Truncate for preview
+      const maxLen = 5000;
+      document.getElementById('originalPreview').textContent =
+        originalContent.length > maxLen
+          ? originalContent.slice(0, maxLen) + '\n\n... [truncated]'
+          : originalContent;
+
+      document.getElementById('sanitizedPreview').textContent =
+        masked.length > maxLen
+          ? masked.slice(0, maxLen) + '\n\n... [truncated]'
+          : masked;
+    }
+
+    // ============================================================================
+    // EVENT HANDLERS
+    // ============================================================================
+
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('fileInput');
+    const textInput = document.getElementById('textInput');
+    const textInputArea = document.getElementById('textInputArea');
+    const toggleTextInput = document.getElementById('toggleTextInput');
+    const analyzeTextBtn = document.getElementById('analyzeTextBtn');
+
+    // Drag and drop
+    uploadArea.addEventListener('click', () => fileInput.click());
+
+    uploadArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadArea.classList.add('dragover');
+    });
+
+    uploadArea.addEventListener('dragleave', () => {
+      uploadArea.classList.remove('dragover');
+    });
+
+    uploadArea.addEventListener('drop', async (e) => {
+      e.preventDefault();
+      uploadArea.classList.remove('dragover');
+
+      const file = e.dataTransfer.files[0];
+      if (file) await processFile(file);
+    });
+
+    fileInput.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (file) await processFile(file);
+    });
+
+    // Text input
+    toggleTextInput.addEventListener('click', () => {
+      textInputArea.classList.toggle('visible');
+    });
+
+    textInput.addEventListener('input', () => {
+      analyzeTextBtn.disabled = !textInput.value.trim();
+    });
+
+    analyzeTextBtn.addEventListener('click', async () => {
+      await processText(textInput.value);
+    });
+
+    // Navigation
+    document.getElementById('backToUpload').addEventListener('click', () => showStep(1));
+    document.getElementById('backToReview').addEventListener('click', () => showStep(2));
+
+    document.getElementById('continueToExport').addEventListener('click', () => {
+      renderExportPreview();
+      showStep(3);
+    });
+
+    // Export
+    document.getElementById('downloadBtn').addEventListener('click', () => {
+      const masked = getMaskedContent();
+      const blob = new Blob([masked], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = currentFile
+        ? currentFile.name.replace(/\.[^.]+$/, '-sanitized.txt')
+        : 'sanitized.txt';
+      a.click();
+
+      URL.revokeObjectURL(url);
+    });
+
+    document.getElementById('copyBtn').addEventListener('click', async () => {
+      const masked = getMaskedContent();
+      await navigator.clipboard.writeText(masked);
+
+      const btn = document.getElementById('copyBtn');
+      const original = btn.textContent;
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = original, 2000);
+    });
+
+    // ============================================================================
+    // MAIN PROCESSING
+    // ============================================================================
+
+    async function processFile(file) {
+      currentFile = file;
+      document.getElementById('step1').classList.add('hidden');
+      document.getElementById('loading').classList.remove('hidden');
+      updateLoading('Parsing document...');
+
+      try {
+        originalContent = await parseDocument(file);
+        await analyze();
+      } catch (error) {
+        console.error('Error processing file:', error);
+        alert('Error processing file: ' + error.message);
+        showStep(1);
+      }
+    }
+
+    async function processText(text) {
+      currentFile = null;
+      originalContent = text;
+      document.getElementById('step1').classList.add('hidden');
+      document.getElementById('loading').classList.remove('hidden');
+
+      try {
+        await analyze();
+      } catch (error) {
+        console.error('Error processing text:', error);
+        alert('Error: ' + error.message);
+        showStep(1);
+      }
+    }
+
+    async function analyze() {
+      updateLoading('Detecting sensitive information...');
+
+      // Get custom names
+      const customNamesInput = document.getElementById('customNamesInput').value;
+      customNames = customNamesInput
+        .split(',')
+        .map(n => n.trim())
+        .filter(Boolean);
+
+      detections = await extractEntities(originalContent, customNames);
+
+      if (detections.length === 0) {
+        alert('No sensitive information detected.');
+        showStep(1);
+        return;
+      }
+
+      // Generate placeholders
+      const counters = {};
+      detections.forEach((d, i) => {
+        d.placeholder = generatePlaceholder(d, i, counters);
+        d.enabled = true;
+      });
+
+      renderDetections();
+      showStep(2);
+    }
+  </script>
+</body>
+</html>
