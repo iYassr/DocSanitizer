@@ -2,7 +2,7 @@
   <img src="logos/final/maskr-logo-banner.svg" alt="maskr - PII Detection and Document Sanitization Tool" width="500">
 </p>
 
-<h3 align="center">Detect & Mask Sensitive Data in Documents - 100% Offline Privacy Tool</h3>
+<h3 align="center">Never Leak Sensitive Data Again.</h3>
 
 <p align="center">
   <strong>Open-source desktop app for PII detection, data masking, and document redaction. Protect personal information before sharing with AI, cloud services, or third parties.</strong>
