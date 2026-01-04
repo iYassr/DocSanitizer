@@ -1,10 +1,10 @@
 import { test, expect } from '@playwright/test'
 import { join, dirname } from 'path'
-import { fileURLToPath } from 'url'
+import { fileURLToPath, pathToFileURL } from 'url'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
-const WEB_APP_URL = 'file://' + join(__dirname, '../docs/app/index.html')
+const WEB_APP_URL = pathToFileURL(join(__dirname, '../docs/app/index.html')).href
 
 test.describe('Web App - Browser Version', () => {
   test.beforeEach(async ({ page }) => {

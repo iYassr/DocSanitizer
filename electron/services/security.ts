@@ -47,9 +47,10 @@ const MAX_TEXT_LENGTH = 10 * 1024 * 1024
 
 /**
  * System directories that should never be accessed.
- * Includes both Unix and Windows paths.
+ * Unix paths are hardcoded. Windows paths are detected dynamically
+ * using environment variables to support all drive letters.
  */
-const FORBIDDEN_PATHS = [
+const UNIX_FORBIDDEN_PATHS = [
   '/etc',
   '/System',
   '/usr',
@@ -57,10 +58,43 @@ const FORBIDDEN_PATHS = [
   '/sbin',
   '/var',
   '/private/etc',
-  '/private/var',
-  'C:\\Windows',
-  'C:\\Program Files',
-  'C:\\ProgramData'
+  '/private/var'
+]
+
+/**
+ * Get Windows system paths dynamically from environment variables.
+ * This handles cases where Windows is installed on drives other than C:.
+ */
+function getWindowsForbiddenPaths(): string[] {
+  if (process.platform !== 'win32') return []
+
+  const paths: string[] = []
+
+  // System root (e.g., C:\Windows)
+  if (process.env.SYSTEMROOT) {
+    paths.push(process.env.SYSTEMROOT)
+  }
+  if (process.env.WINDIR) {
+    paths.push(process.env.WINDIR)
+  }
+
+  // Program Files directories
+  if (process.env.PROGRAMFILES) {
+    paths.push(process.env.PROGRAMFILES)
+  }
+  if (process.env['PROGRAMFILES(X86)']) {
+    paths.push(process.env['PROGRAMFILES(X86)'])
+  }
+  if (process.env.PROGRAMDATA) {
+    paths.push(process.env.PROGRAMDATA)
+  }
+
+  return paths
+}
+
+const FORBIDDEN_PATHS = [
+  ...UNIX_FORBIDDEN_PATHS,
+  ...getWindowsForbiddenPaths()
 ]
 
 // ============================================================================

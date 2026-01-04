@@ -200,7 +200,7 @@ function createWindow() {
       nodeIntegration: false,
       sandbox: true
     },
-    titleBarStyle: 'hiddenInset',
+    ...(process.platform === 'darwin' ? { titleBarStyle: 'hiddenInset' as const } : {}),
     show: false
   })
 

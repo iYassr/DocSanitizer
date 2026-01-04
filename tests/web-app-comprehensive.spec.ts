@@ -1,11 +1,11 @@
 import { test, expect } from '@playwright/test'
 import { readFileSync } from 'fs'
 import { join, dirname } from 'path'
-import { fileURLToPath } from 'url'
+import { fileURLToPath, pathToFileURL } from 'url'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
-const WEB_APP_URL = 'file://' + join(__dirname, '../docs/app/index.html')
+const WEB_APP_URL = pathToFileURL(join(__dirname, '../docs/app/index.html')).href
 const COMPREHENSIVE_DATA = readFileSync(join(__dirname, 'fixtures/comprehensive-pii-sample.txt'), 'utf-8')
 
 test.describe('Web App - Comprehensive PII Detection', () => {
